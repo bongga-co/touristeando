@@ -1,37 +1,105 @@
 package co.bongga.toury.fragments;
 
-
+import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
 
 import java.util.ArrayList;
 
+import ai.api.AIServiceException;
+import ai.api.android.AIDataService;
+import ai.api.AIListener;
+import ai.api.android.AIConfiguration;
+import ai.api.android.AIService;
+import ai.api.model.AIError;
+import ai.api.model.AIRequest;
+import ai.api.model.AIResponse;
+import ai.api.model.Result;
 import co.bongga.toury.R;
 import co.bongga.toury.adapters.EventAdapter;
 import co.bongga.toury.models.Event;
-import co.bongga.toury.utils.DividerItem;
+import co.bongga.toury.utils.Constants;
+import co.bongga.toury.utils.UtilityManager;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements AIListener, View.OnClickListener {
     private RecyclerView chatList;
     private EventAdapter eventAdapter;
     private ArrayList<Event> chatItems = new ArrayList();
 
+    private EditText rqText;
+    private ImageButton btnSpeech;
+    private ImageButton btnText;
+
+    private AIService aiService;
+    private AIRequest aiRequest;
+    private AIDataService aiDataService;
+
+    private ProgressDialog loader;
+
+    private static final int REQUEST_RECORD_PERMISSION = 1;
+
     public HomeFragment() {}
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setupAPIAI();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        loader = UtilityManager.showLoader(getActivity(), getString(R.string.loader_message));
+
+        rqText = (EditText) view.findViewById(R.id.rqText);
+        rqText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                if(charSequence.length() > 0){
+                    btnSpeech.setVisibility(View.GONE);
+                    btnText.setVisibility(View.VISIBLE);
+                }
+                else {
+                    btnSpeech.setVisibility(View.VISIBLE);
+                    btnText.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+
+        btnSpeech = (ImageButton) view.findViewById(R.id.btnSpeech);
+        btnSpeech.setOnClickListener(this);
+
+        btnText = (ImageButton) view.findViewById(R.id.btnText);
+        btnText.setOnClickListener(this);
 
         chatList = (RecyclerView) view.findViewById(R.id.chatList);
 
@@ -40,7 +108,6 @@ public class HomeFragment extends Fragment {
         chatList.setHasFixedSize(true);
         chatList.setLayoutManager(new LinearLayoutManager(getActivity()));
         chatList.setItemAnimator(new DefaultItemAnimator());
-        chatList.addItemDecoration(new DividerItem(getActivity(), LinearLayoutManager.VERTICAL));
         chatList.setAdapter(eventAdapter);
 
         didGetChatList();
@@ -48,13 +115,151 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+    private void setupAPIAI(){
+        final AIConfiguration config = new AIConfiguration(Constants.API_AI_KEY,
+                AIConfiguration.SupportedLanguages.Spanish,
+                AIConfiguration.RecognitionEngine.System);
+
+        aiDataService = new AIDataService(getActivity(), config);
+        aiRequest = new AIRequest();
+
+        aiService = AIService.getService(getActivity(), config);
+        aiService.setListener(this);
+    }
+
+    private void requestRecordPermission(){
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{
+                    Manifest.permission.RECORD_AUDIO
+            }, REQUEST_RECORD_PERMISSION);
+        }
+        else {
+            aiService.startListening();
+        }
+    }
+
+    private void sendQuery(){
+        String query = rqText.getText().toString();
+        aiRequest.setQuery(query);
+        rqText.setText(null);
+
+        new AsyncTask<AIRequest, Void, AIResponse>() {
+            @Override
+            protected AIResponse doInBackground(AIRequest... requests) {
+                final AIRequest request = requests[0];
+                try {
+                    final AIResponse response = aiDataService.request(request);
+                    return response;
+                }
+                catch (AIServiceException e) {}
+
+                return null;
+            }
+            @Override
+            protected void onPostExecute(AIResponse response) {
+                if (response != null) {
+                    didShowResponse(response);
+                }
+            }
+        }.execute(aiRequest);
+    }
+
+    private void didShowResponse(AIResponse response){
+        Result result = response.getResult();
+        didSendMessage(result.getResolvedQuery(), result.getFulfillment().getSpeech());
+    }
+
+    private void didSendMessage(String query, String response){
+        Event event_query = new Event(query, true);
+        chatItems.add(event_query);
+        didStoreMessage(event_query);
+
+        if(response != null){
+            //TODO: Revisar isSelf
+            Event event_response = new Event(response, true);
+            chatItems.add(event_response);
+            didStoreMessage(event_response);
+        }
+
+        eventAdapter.notifyDataSetChanged();
+        chatList.scrollToPosition(chatItems.size()-1);
+    }
+
+    private void didStoreMessage(Event event){
+
+    }
+
     private void didGetChatList(){
-        Event event = new Event("Hola");
+        /*Event event = new Event("Hola");
         chatItems.add(event);
 
         Event event2 = new Event("Hola Tourister");
         chatItems.add(event2);
 
-        eventAdapter.notifyDataSetChanged();
+        eventAdapter.notifyDataSetChanged();*/
+    }
+
+    @Override
+    public void onResult(AIResponse result) {
+        didShowResponse(result);
+    }
+
+    @Override
+    public void onError(AIError error) {
+        rqText.setHint(R.string.txt_placeholder_chat_input);
+        btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+    }
+
+    @Override
+    public void onAudioLevel(float level) {
+
+    }
+
+    @Override
+    public void onListeningStarted() {
+        rqText.setHint(R.string.txt_placeholder_chat_listening);
+        btnSpeech.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+    }
+
+    @Override
+    public void onListeningCanceled() {
+        rqText.setHint(R.string.txt_placeholder_chat_input);
+        btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+    }
+
+    @Override
+    public void onListeningFinished() {
+        rqText.setHint(R.string.txt_placeholder_chat_input);
+        btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btnSpeech:
+                rqText.setText(null);
+                rqText.clearFocus();
+                UtilityManager.hideKeyboard(getActivity());
+                requestRecordPermission();
+                break;
+
+            case R.id.btnText:
+                sendQuery();
+                break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            switch (requestCode) {
+                case REQUEST_RECORD_PERMISSION:
+                    aiService.startListening();
+                    break;
+            }
+        }
+        else {
+            UtilityManager.showMessage(rqText, getString(R.string.permission_denied));
+        }
     }
 }

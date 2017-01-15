@@ -6,13 +6,15 @@ package co.bongga.toury.models;
 
 public class Event {
     private String name;
+    private boolean isSelf;
 
     public Event(){
 
     }
 
-    public Event(String name){
+    public Event(String name, boolean isSelf){
         this.name = name;
+        this.isSelf = isSelf;
     }
 
     public String getName() {
@@ -21,5 +23,13 @@ public class Event {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isSelf() {
+        return isSelf;
+    }
+
+    public void setSelf(boolean self) {
+        isSelf = self;
     }
 }
