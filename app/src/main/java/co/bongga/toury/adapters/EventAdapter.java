@@ -2,9 +2,11 @@ package co.bongga.toury.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -36,7 +38,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
     @Override
     public void onBindViewHolder(EventHolder holder, int position) {
         Event event = chatList.get(position);
+
         holder.name.setText(event.getName());
+
+        if (event.isSelf()) {
+            holder.itemWrapper.setGravity(Gravity.RIGHT);
+        }
     }
 
     @Override
@@ -45,11 +52,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
     }
 
     public class EventHolder extends RecyclerView.ViewHolder {
+        LinearLayout itemWrapper;
         public TextView name;
 
         EventHolder(View view){
             super(view);
 
+            itemWrapper = (LinearLayout) view.findViewById(R.id.itemWrapper);
             name = (TextView) view.findViewById(R.id.name);
         }
     }

@@ -106,7 +106,8 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         eventAdapter = new EventAdapter(getActivity(), chatItems);
 
         chatList.setHasFixedSize(true);
-        chatList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        chatList.setLayoutManager(layoutManager);
         chatList.setItemAnimator(new DefaultItemAnimator());
         chatList.setAdapter(eventAdapter);
 
@@ -175,8 +176,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         didStoreMessage(event_query);
 
         if(response != null){
-            //TODO: Revisar isSelf
-            Event event_response = new Event(response, true);
+            Event event_response = new Event(response, false);
             chatItems.add(event_response);
             didStoreMessage(event_response);
         }
