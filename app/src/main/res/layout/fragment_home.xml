@@ -1,7 +1,9 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/tile_bg"
     tools:context="co.bongga.toury.fragments.HomeFragment">
     <RelativeLayout
         android:layout_width="match_parent"
@@ -21,6 +23,15 @@
             android:layout_margin="10dp"
             android:elevation="10dp"
             android:background="@drawable/rounded_corners">
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@mipmap/ic_launcher"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical" />
             <EditText
                 android:id="@+id/rqText"
                 android:layout_width="0dp"
@@ -29,8 +40,8 @@
                 android:hint="@string/txt_placeholder_chat_input"
                 android:layout_weight="0.9"
                 android:padding="7dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:background="@android:color/transparent"
                 android:layout_gravity="center_vertical"/>
             <ImageButton
@@ -44,7 +55,6 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:src="@android:drawable/ic_menu_send"
-                android:backgroundTint="@color/colorAccent"
                 android:background="@null"
                 android:visibility="gone" />
         </LinearLayout>

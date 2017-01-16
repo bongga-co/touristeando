@@ -6,6 +6,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -42,7 +43,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
         holder.name.setText(event.getName());
 
         if (event.isSelf()) {
-            holder.itemWrapper.setGravity(Gravity.RIGHT);
+            holder.name.setBackgroundResource(R.drawable.bg_msg_you);
+            holder.icon.setVisibility(View.GONE);
+            holder.itemWrapper.setGravity(Gravity.END);
+        }
+        else {
+            holder.name.setBackgroundResource(R.drawable.bg_msg_from);
+            holder.icon.setVisibility(View.VISIBLE);
+            holder.itemWrapper.setGravity(Gravity.START);
         }
     }
 
@@ -52,13 +60,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
     }
 
     public class EventHolder extends RecyclerView.ViewHolder {
-        LinearLayout itemWrapper;
+        public LinearLayout itemWrapper;
+        public ImageView icon;
         public TextView name;
 
         EventHolder(View view){
             super(view);
 
             itemWrapper = (LinearLayout) view.findViewById(R.id.itemWrapper);
+            icon = (ImageView) view.findViewById(R.id.chat_user_icon);
             name = (TextView) view.findViewById(R.id.name);
         }
     }

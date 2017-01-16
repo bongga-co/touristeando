@@ -1,4 +1,4 @@
-package co.bongga.toury;
+package co.bongga.toury.activities;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +15,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import co.bongga.toury.R;
 import co.bongga.toury.fragments.HomeFragment;
 
 public class Main extends AppCompatActivity {
@@ -83,7 +85,7 @@ public class Main extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        return false;
     }
 
     @Override

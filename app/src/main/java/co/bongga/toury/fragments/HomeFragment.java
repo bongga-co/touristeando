@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -99,6 +100,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         btnSpeech.setOnClickListener(this);
 
         btnText = (ImageButton) view.findViewById(R.id.btnText);
+        btnText.setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_ATOP);
         btnText.setOnClickListener(this);
 
         chatList = (RecyclerView) view.findViewById(R.id.chatList);

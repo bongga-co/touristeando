@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context="co.bongga.toury.activities.Splash">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/app_name"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:src="@drawable/bongga_logo_light"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>
