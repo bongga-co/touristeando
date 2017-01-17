@@ -15,9 +15,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import co.bongga.toury.R;
 import co.bongga.toury.fragments.HomeFragment;
+import co.bongga.toury.utils.CircleTransform;
+import co.bongga.toury.utils.Constants;
 
 public class Main extends AppCompatActivity {
     private DrawerLayout drawer;
@@ -30,6 +36,9 @@ public class Main extends AppCompatActivity {
     private static String CURRENT_TAG = TAG_HOME;
 
     private String[] activityTitles;
+
+    private View navHeader;
+    private ImageView imgNavHeaderBg, imgProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +65,13 @@ public class Main extends AppCompatActivity {
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navHeader = navigationView.getHeaderView(0);
+        imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
+        imgProfile = (ImageView) navHeader.findViewById(R.id.img_header_profile);
 
         handler = new Handler();
 
-        //loadNavHeader();
+        loadNavHeader();
 
         // initializing navigation menu
         setUpNavigationView();
@@ -96,7 +108,7 @@ public class Main extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_clear_all) {
             return true;
         }
 
@@ -127,6 +139,25 @@ public class Main extends AppCompatActivity {
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }*/
+
+    private void loadNavHeader(){
+        String urlNavHeaderBg = Constants.DEFAULT_HEADER_IMAGE;
+        String urlProfileImg = Constants.DEFAULT_PROFILE_IMAGE;
+
+        // loading header background image
+        Glide.with(this).load(urlNavHeaderBg)
+                .crossFade()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(imgNavHeaderBg);
+
+        // Loading profile image
+        Glide.with(this).load(urlProfileImg)
+                .crossFade()
+                .thumbnail(0.5f)
+                .bitmapTransform(new CircleTransform(this))
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(imgProfile);
+    }
 
     private void setUpNavigationView() {
         //Setting Navigation View Item Selected Listener to handle the item click of the navigation menu

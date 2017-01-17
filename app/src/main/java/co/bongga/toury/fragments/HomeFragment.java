@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -22,7 +21,12 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.google.gson.JsonElement;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import ai.api.AIServiceException;
 import ai.api.android.AIDataService;
@@ -34,7 +38,8 @@ import ai.api.model.AIRequest;
 import ai.api.model.AIResponse;
 import ai.api.model.Result;
 import co.bongga.toury.R;
-import co.bongga.toury.adapters.EventAdapter;
+import co.bongga.toury.adapters.ChatMessageAdapter;
+import co.bongga.toury.models.ChatMessage;
 import co.bongga.toury.models.Event;
 import co.bongga.toury.utils.Constants;
 import co.bongga.toury.utils.UtilityManager;
@@ -44,8 +49,8 @@ import co.bongga.toury.utils.UtilityManager;
  */
 public class HomeFragment extends Fragment implements AIListener, View.OnClickListener {
     private RecyclerView chatList;
-    private EventAdapter eventAdapter;
-    private ArrayList<Event> chatItems = new ArrayList();
+    private ChatMessageAdapter chatMessageAdapter;
+    private ArrayList<ChatMessage> chatItems = new ArrayList();
 
     private EditText rqText;
     private ImageButton btnSpeech;
@@ -105,13 +110,13 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
         chatList = (RecyclerView) view.findViewById(R.id.chatList);
 
-        eventAdapter = new EventAdapter(getActivity(), chatItems);
+        chatMessageAdapter = new ChatMessageAdapter(getActivity(), chatItems);
 
         chatList.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         chatList.setLayoutManager(layoutManager);
         chatList.setItemAnimator(new DefaultItemAnimator());
-        chatList.setAdapter(eventAdapter);
+        chatList.setAdapter(chatMessageAdapter);
 
         didGetChatList();
 
@@ -141,10 +146,12 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         }
     }
 
-    private void sendQuery(){
+    private void didSendQuery(){
         String query = rqText.getText().toString();
         aiRequest.setQuery(query);
         rqText.setText(null);
+
+        addUserMessage(query);
 
         new AsyncTask<AIRequest, Void, AIResponse>() {
             @Override
@@ -161,49 +168,82 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             @Override
             protected void onPostExecute(AIResponse response) {
                 if (response != null) {
-                    didShowResponse(response);
+                    addAgentMessage(response, false);
                 }
             }
         }.execute(aiRequest);
     }
 
-    private void didShowResponse(AIResponse response){
+    private void addAgentMessage(AIResponse response, boolean fromMic){
         Result result = response.getResult();
-        didSendMessage(result.getResolvedQuery(), result.getFulfillment().getSpeech());
-    }
 
-    private void didSendMessage(String query, String response){
-        Event event_query = new Event(query, true);
-        chatItems.add(event_query);
-        didStoreMessage(event_query);
-
-        if(response != null){
-            Event event_response = new Event(response, false);
-            chatItems.add(event_response);
-            didStoreMessage(event_response);
+        if(fromMic){
+            ChatMessage msg = new ChatMessage(result.getResolvedQuery(), true, ChatMessage.TEXT_TYPE);
+            chatItems.add(msg);
+            didStoreMessage(msg);
         }
 
-        eventAdapter.notifyDataSetChanged();
+        ChatMessage msg = new ChatMessage(result.getFulfillment().getSpeech(), false, ChatMessage.TEXT_TYPE);
+        chatItems.add(msg);
+        didStoreMessage(msg);
+
+        notifyChange();
+
+        if (result.getParameters() != null && !result.getParameters().isEmpty()) {
+            didRetrieveAgentQuery(result.getParameters());
+        }
+    }
+
+    private void addUserMessage(String query){
+        ChatMessage msg = new ChatMessage(query, true, ChatMessage.TEXT_TYPE);
+        chatItems.add(msg);
+        didStoreMessage(msg);
+
+        notifyChange();
+    }
+
+    private void didRetrieveAgentQuery(HashMap<String, JsonElement> params){
+        for (final Map.Entry<String, JsonElement> entry : params.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue().getAsString();
+
+            if(key.equals("places") && (!value.isEmpty() && value.equals("restaurantes"))){
+                List<Event> listEvents = new ArrayList<>();
+                Event event = new Event("http://cdn5.upsocl.com/wp-content/uploads/2014/05/awebic-restaurantes-7.jpg",
+                        "Cuzco", "Medellin", "Colombia", "The most valuable experience", null, null, null, 5.8, value,
+                        true, 4, null, "Medellin");
+                listEvents.add(event);
+
+                Event event2 = new Event("http://www.vacazionaviajes.com/blog/wp-content/uploads/2012/08/restaurante-principal.jpg",
+                        "Paseo de los Corderos", "Medellin", "Colombia",
+                        "The most valuable experience", null, null, null, 1.3,
+                        value, true, 4, null, "Medellin");
+                listEvents.add(event2);
+
+                ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
+                chatItems.add(msg);
+
+                notifyChange();
+            }
+        }
+    }
+
+    private void notifyChange(){
+        chatMessageAdapter.notifyDataSetChanged();
         chatList.scrollToPosition(chatItems.size()-1);
     }
 
-    private void didStoreMessage(Event event){
+    private void didStoreMessage(ChatMessage msg){
 
     }
 
     private void didGetChatList(){
-        /*Event event = new Event("Hola");
-        chatItems.add(event);
 
-        Event event2 = new Event("Hola Tourister");
-        chatItems.add(event2);
-
-        eventAdapter.notifyDataSetChanged();*/
     }
 
     @Override
     public void onResult(AIResponse result) {
-        didShowResponse(result);
+        addAgentMessage(result, true);
     }
 
     @Override
@@ -246,7 +286,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                 break;
 
             case R.id.btnText:
-                sendQuery();
+                didSendQuery();
                 break;
         }
     }

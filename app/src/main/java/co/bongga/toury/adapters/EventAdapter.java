@@ -2,74 +2,78 @@ package co.bongga.toury.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import java.util.List;
 import co.bongga.toury.R;
 import co.bongga.toury.models.Event;
 
+
 /**
- * Created by spval on 14/01/2017.
+ * Created by bongga on 12/20/16.
  */
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder> {
     private Context context;
-    private ArrayList<Event> chatList;
+    private List<Event> eventList;
+    private int rowIndex = -1;
 
-    public EventAdapter(Context context, ArrayList<Event> chatList){
+    public EventAdapter(Context context){
         this.context = context;
-        this.chatList = chatList;
+    }
+
+    public void setData(List<Event> eventList){
+        if (this.eventList != eventList) {
+            this.eventList = eventList;
+            notifyDataSetChanged();
+        }
+    }
+
+    public void setRowIndex(int index) {
+        this.rowIndex = index;
     }
 
     @Override
     public EventHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View rootView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_chat, parent, false);
-
-        return new EventHolder(rootView);
+        View view = LayoutInflater.from(parent.getContext())
+                                  .inflate(R.layout.item_chat_event_type_row, parent, false);
+        EventHolder holder = new EventHolder(view);
+        return holder;
     }
 
     @Override
     public void onBindViewHolder(EventHolder holder, int position) {
-        Event event = chatList.get(position);
+        Event event = eventList.get(position);
+
+        Glide.with(context).load(event.getThumbnail())
+                .placeholder(R.drawable.placeholder_img)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(holder.thumbnail);
 
         holder.name.setText(event.getName());
-
-        if (event.isSelf()) {
-            holder.name.setBackgroundResource(R.drawable.bg_msg_you);
-            holder.icon.setVisibility(View.GONE);
-            holder.itemWrapper.setGravity(Gravity.END);
-        }
-        else {
-            holder.name.setBackgroundResource(R.drawable.bg_msg_from);
-            holder.icon.setVisibility(View.VISIBLE);
-            holder.itemWrapper.setGravity(Gravity.START);
-        }
+        holder.category.setText(event.getCategory());
     }
 
     @Override
     public int getItemCount() {
-        return chatList.size();
+        return eventList.size();
     }
 
-    public class EventHolder extends RecyclerView.ViewHolder {
-        public LinearLayout itemWrapper;
-        public ImageView icon;
-        public TextView name;
+    public static class EventHolder extends RecyclerView.ViewHolder {
+        public TextView name, category;
+        public ImageView thumbnail;
 
-        EventHolder(View view){
+        public EventHolder(View view){
             super(view);
 
-            itemWrapper = (LinearLayout) view.findViewById(R.id.itemWrapper);
-            icon = (ImageView) view.findViewById(R.id.chat_user_icon);
-            name = (TextView) view.findViewById(R.id.name);
+            thumbnail = (ImageView) view.findViewById(R.id.event_icon);
+            name = (TextView)view.findViewById(R.id.event_name);
+            category = (TextView)view.findViewById(R.id.event_category);
         }
     }
 }
