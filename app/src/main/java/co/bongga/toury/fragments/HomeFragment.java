@@ -1,7 +1,6 @@
 package co.bongga.toury.fragments;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -20,12 +19,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.google.gson.JsonElement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import ai.api.AIServiceException;
@@ -43,6 +44,9 @@ import co.bongga.toury.models.ChatMessage;
 import co.bongga.toury.models.Event;
 import co.bongga.toury.utils.Constants;
 import co.bongga.toury.utils.UtilityManager;
+import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmResults;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -52,15 +56,18 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     private ChatMessageAdapter chatMessageAdapter;
     private ArrayList<ChatMessage> chatItems = new ArrayList();
 
+    private LinearLayout chatBottomContainer;
     private EditText rqText;
     private ImageButton btnSpeech;
     private ImageButton btnText;
+    private ProgressBar progressBar;
+    private ImageView chatLeftAction;
 
     private AIService aiService;
     private AIRequest aiRequest;
     private AIDataService aiDataService;
 
-    private ProgressDialog loader;
+    private Realm db;
 
     private static final int REQUEST_RECORD_PERMISSION = 1;
 
@@ -70,6 +77,25 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupAPIAI();
+        db = Realm.getDefaultInstance();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (aiService != null) {
+            aiService.pause();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (aiService != null) {
+            aiService.resume();
+        }
     }
 
     @Override
@@ -78,7 +104,9 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        loader = UtilityManager.showLoader(getActivity(), getString(R.string.loader_message));
+        chatBottomContainer = (LinearLayout) view.findViewById(R.id.chat_bottom_container);
+        progressBar = (ProgressBar) view.findViewById(R.id.chat_response_progress);
+        chatLeftAction = (ImageView) view.findViewById(R.id.chat_left_action);
 
         rqText = (EditText) view.findViewById(R.id.rqText);
         rqText.addTextChangedListener(new TextWatcher() {
@@ -128,9 +156,15 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                 AIConfiguration.SupportedLanguages.Spanish,
                 AIConfiguration.RecognitionEngine.System);
 
+        //Needed for sending query text
         aiDataService = new AIDataService(getActivity(), config);
         aiRequest = new AIRequest();
 
+        if (aiService != null) {
+            aiService.pause();
+        }
+
+        //Needed for sending query speech
         aiService = AIService.getService(getActivity(), config);
         aiService.setListener(this);
     }
@@ -152,6 +186,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         rqText.setText(null);
 
         addUserMessage(query);
+        didToggleLoader(false);
 
         new AsyncTask<AIRequest, Void, AIResponse>() {
             @Override
@@ -177,20 +212,34 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     private void addAgentMessage(AIResponse response, boolean fromMic){
         Result result = response.getResult();
 
-        if(fromMic){
-            ChatMessage msg = new ChatMessage(result.getResolvedQuery(), true, ChatMessage.TEXT_TYPE);
+        //TODO: Revisar respuesta para refinar validacion
+        if(!result.getFulfillment().getSpeech().isEmpty()){
+            if(fromMic){
+                ChatMessage msg = new ChatMessage(result.getResolvedQuery(), true, ChatMessage.TEXT_TYPE);
+                chatItems.add(msg);
+                didStoreMessage(msg);
+            }
+
+            ChatMessage msg = new ChatMessage(result.getFulfillment().getSpeech(), false, ChatMessage.TEXT_TYPE);
             chatItems.add(msg);
             didStoreMessage(msg);
+
+            notifyChange();
+
+            if (result.getParameters() != null && !result.getParameters().isEmpty()) {
+                didRetrieveAgentQuery(result.getParameters());
+            }
+            else{
+                didToggleLoader(true);
+            }
         }
+        else{
+            ChatMessage msg = new ChatMessage(getString(R.string.generic_agent_no_content), false, ChatMessage.TEXT_TYPE);
+            chatItems.add(msg);
+            didStoreMessage(msg);
 
-        ChatMessage msg = new ChatMessage(result.getFulfillment().getSpeech(), false, ChatMessage.TEXT_TYPE);
-        chatItems.add(msg);
-        didStoreMessage(msg);
-
-        notifyChange();
-
-        if (result.getParameters() != null && !result.getParameters().isEmpty()) {
-            didRetrieveAgentQuery(result.getParameters());
+            notifyChange();
+            didToggleLoader(true);
         }
     }
 
@@ -207,25 +256,76 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             String key = entry.getKey();
             String value = entry.getValue().getAsString();
 
-            if(key.equals("places") && (!value.isEmpty() && value.equals("restaurantes"))){
-                List<Event> listEvents = new ArrayList<>();
-                Event event = new Event("http://cdn5.upsocl.com/wp-content/uploads/2014/05/awebic-restaurantes-7.jpg",
-                        "Cuzco", "Medellin", "Colombia", "The most valuable experience", null, null, null, 5.8, value,
-                        true, 4, null, "Medellin");
-                listEvents.add(event);
+            if(key.equals("places")){
+                if(!value.isEmpty() && value.equals("restaurantes")){
+                    RealmList<Event> listEvents = new RealmList<>();
+                    Event event = new Event("http://cdn5.upsocl.com/wp-content/uploads/2014/05/awebic-restaurantes-7.jpg",
+                            "Cuzco", "Medellin", "Colombia", "The most valuable experience", null, null, null, 5.8, value,
+                            true, 4, null, "Medellin");
+                    listEvents.add(event);
 
-                Event event2 = new Event("http://www.vacazionaviajes.com/blog/wp-content/uploads/2012/08/restaurante-principal.jpg",
-                        "Paseo de los Corderos", "Medellin", "Colombia",
-                        "The most valuable experience", null, null, null, 1.3,
-                        value, true, 4, null, "Medellin");
-                listEvents.add(event2);
+                    Event event2 = new Event("http://www.vacazionaviajes.com/blog/wp-content/uploads/2012/08/restaurante-principal.jpg",
+                            "Paseo de los Corderos", "Medellin", "Colombia",
+                            "The most valuable experience", null, null, null, 1.3,
+                            value, true, 4, null, "Medellin");
+                    listEvents.add(event2);
 
-                ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
-                chatItems.add(msg);
+                    ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
+                    chatItems.add(msg);
+                    didStoreMessage(msg);
+                }
+                else  if(!value.isEmpty() && value.equals("cines")){
+                    RealmList<Event> listEvents = new RealmList<>();
+                    Event event = new Event("http://www.puertadelnorte.com/images/puertadelnorte/almacenes/cinemas-procinal/cinemas-procinal-puerta-del-norte.jpg",
+                            "Cinemas Procinal", "Medellin", "Colombia", "The most valuable experience", null, null, null, 5.8, value,
+                            true, 4, null, "Medellin");
+                    listEvents.add(event);
+
+                    Event event2 = new Event("http://noticias.caracoltv.com/sites/default/files/cine-colombia-nuevas-salas.jpg",
+                            "Cine Colombia", "Medellin", "Colombia",
+                            "The most valuable experience", null, null, null, 1.3,
+                            value, true, 4, null, "Medellin");
+                    listEvents.add(event2);
+
+                    ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
+                    chatItems.add(msg);
+                    didStoreMessage(msg);
+                }
+                else  if(!value.isEmpty() && value.equals("canchas de f\u00fatbol")){
+                    RealmList<Event> listEvents = new RealmList<>();
+                    Event event = new Event("http://elgolazo.co/wp-content/uploads/2015/08/IMG_0856-1180x720.jpg",
+                            "El Golazo", "Medellin", "Colombia", "The most valuable experience", null, null, null, 5.8, value,
+                            true, 4, null, "Medellin");
+                    listEvents.add(event);
+
+                    Event event2 = new Event("https://i.ytimg.com/vi/rmtBGWVmm2E/maxresdefault.jpg",
+                            "Il Campo", "Medellin", "Colombia",
+                            "The most valuable experience", null, null, null, 1.3,
+                            value, true, 4, null, "Medellin");
+                    listEvents.add(event2);
+
+                    Event event3 = new Event("http://www.canchasfutbolmedellin.com/media/k2/items/cache/2fa67f482133f1c934235b73c2a03954_XL.jpg",
+                            "Elite Futbol", "Medellin", "Colombia",
+                            "The most valuable experience", null, null, null, 1.3,
+                            value, true, 4, null, "Medellin");
+                    listEvents.add(event3);
+
+                    Event event4 = new Event("http://tuciudadenred.com/data/foto/gr_1401480138_714077533.jpg",
+                            "El Parque de los Principes", "Medellin", "Colombia",
+                            "The most valuable experience", null, null, null, 1.3,
+                            value, true, 4, null, "Medellin");
+                    listEvents.add(event4);
+
+                    ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
+                    chatItems.add(msg);
+                    didStoreMessage(msg);
+                }
 
                 notifyChange();
             }
         }
+
+        didToggleLoader(true);
     }
 
     private void notifyChange(){
@@ -234,22 +334,62 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     }
 
     private void didStoreMessage(ChatMessage msg){
-
+        db.beginTransaction();
+        db.copyToRealm(msg);
+        db.commitTransaction();
     }
 
     private void didGetChatList(){
+        RealmResults<ChatMessage> messages = db.where(ChatMessage.class)
+                .findAll();
+        for(ChatMessage msg : messages){
+            chatItems.add(msg);
+        }
 
+        notifyChange();
+    }
+
+    private void didShowAgentError(){
+        rqText.setHint(R.string.txt_placeholder_chat_input);
+        btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+
+        ChatMessage msg = new ChatMessage(getString(R.string.generic_agent_error), false, ChatMessage.TEXT_TYPE);
+        chatItems.add(msg);
+        didStoreMessage(msg);
+
+        notifyChange();
+        didToggleLoader(true);
+    }
+
+    private void didToggleLoader(boolean isHidden){
+        if(isHidden){
+            progressBar.setVisibility(View.GONE);
+            chatLeftAction.setVisibility(View.VISIBLE);
+        }
+        else {
+            progressBar.setVisibility(View.VISIBLE);
+            chatLeftAction.setVisibility(View.GONE);
+        }
     }
 
     @Override
-    public void onResult(AIResponse result) {
-        addAgentMessage(result, true);
+    public void onResult(final AIResponse result) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                addAgentMessage(result, true);
+            }
+        });
     }
 
     @Override
     public void onError(AIError error) {
-        rqText.setHint(R.string.txt_placeholder_chat_input);
-        btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                didShowAgentError();
+            }
+        });
     }
 
     @Override
@@ -259,20 +399,37 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
     @Override
     public void onListeningStarted() {
-        rqText.setHint(R.string.txt_placeholder_chat_listening);
-        btnSpeech.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rqText.setHint(R.string.txt_placeholder_chat_listening);
+                btnSpeech.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+
+                didToggleLoader(false);
+            }
+        });
     }
 
     @Override
     public void onListeningCanceled() {
-        rqText.setHint(R.string.txt_placeholder_chat_input);
-        btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rqText.setHint(R.string.txt_placeholder_chat_input);
+                btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+            }
+        });
     }
 
     @Override
     public void onListeningFinished() {
-        rqText.setHint(R.string.txt_placeholder_chat_input);
-        btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rqText.setHint(R.string.txt_placeholder_chat_input);
+                btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+            }
+        });
     }
 
     @Override

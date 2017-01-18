@@ -9,9 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import java.util.List;
 import co.bongga.toury.R;
 import co.bongga.toury.models.Event;
+import io.realm.RealmList;
 
 
 /**
@@ -20,14 +20,14 @@ import co.bongga.toury.models.Event;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder> {
     private Context context;
-    private List<Event> eventList;
+    private RealmList<Event> eventList;
     private int rowIndex = -1;
 
     public EventAdapter(Context context){
         this.context = context;
     }
 
-    public void setData(List<Event> eventList){
+    public void setData(RealmList<Event> eventList){
         if (this.eventList != eventList) {
             this.eventList = eventList;
             notifyDataSetChanged();

@@ -1,10 +1,12 @@
 package co.bongga.toury.models;
 
+import io.realm.RealmObject;
+
 /**
  * Created by bongga on 12/23/16.
  */
 
-public class Price {
+public class Price extends RealmObject {
     private String currency;
     private Long value;
 

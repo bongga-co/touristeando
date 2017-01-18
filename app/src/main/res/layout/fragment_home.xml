@@ -16,6 +16,7 @@
             android:paddingBottom="70dp"
             android:clipToPadding="false"/>
         <LinearLayout
+            android:id="@+id/chat_bottom_container"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:orientation="horizontal"
@@ -24,7 +25,20 @@
             android:layout_margin="10dp"
             android:elevation="10dp"
             android:background="@drawable/rounded_corners">
+            <ProgressBar
+                android:id="@+id/chat_response_progress"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginRight="5dp"
+                android:indeterminate="true"
+                android:layout_marginEnd="5dp"
+                android:elevation="5dp"
+                android:layout_gravity="center_vertical"
+                android:visibility="gone"/>
             <ImageView
+                android:id="@+id/chat_left_action"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@mipmap/ic_launcher"

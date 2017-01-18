@@ -11,6 +11,6 @@
 
     <!-- Cards -->
     <dimen name="event_cover_height">160dp</dimen>
-    <dimen name="card_margin">10dp</dimen>
+    <dimen name="card_margin">5dp</dimen>
     <dimen name="card_radius">0dp</dimen>
 </resources>

@@ -1,7 +1,7 @@
 package co.bongga.toury.adapters;
 
 import android.content.Context;
-import android.support.v7.widget.DefaultItemAnimator;
+import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -11,14 +11,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-
 import java.util.ArrayList;
-
 import co.bongga.toury.R;
+import co.bongga.toury.activities.EventDetail;
+import co.bongga.toury.interfaces.RecyclerClickListener;
 import co.bongga.toury.models.ChatMessage;
+import co.bongga.toury.models.Event;
+import co.bongga.toury.utils.Globals;
+import co.bongga.toury.utils.RecyclerItemClickListener;
+import io.realm.RealmList;
 
 /**
  * Created by spval on 14/01/2017.
@@ -27,7 +28,7 @@ import co.bongga.toury.models.ChatMessage;
 public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context context;
     private static ArrayList<ChatMessage> chatList;
-    private static RecyclerView eventList;
+    private static RealmList innerEventList;
 
     public ChatMessageAdapter(Context context, ArrayList<ChatMessage> chatList){
         this.context = context;
@@ -110,8 +111,9 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
         else if(genHolder instanceof ListEventsMessageHolder){
             ListEventsMessageHolder holder = (ListEventsMessageHolder) genHolder;
+            innerEventList = chatList.get(position).getEvent();
 
-            holder.eventAdapter.setData(chatList.get(position).getEvent());
+            holder.eventAdapter.setData(innerEventList);
             holder.eventAdapter.setRowIndex(position);
         }
         else if(genHolder instanceof ListPlacesMessageHolder){
@@ -187,13 +189,28 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         ListEventsMessageHolder(View view){
             super(view);
 
-            Context context = itemView.getContext();
+            final Context context = itemView.getContext();
 
-            eventList = (RecyclerView) itemView.findViewById(R.id.eventList);
+            RecyclerView eventList = (RecyclerView) itemView.findViewById(R.id.eventList);
             eventList.setHasFixedSize(true);
             eventList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
             eventAdapter = new EventAdapter(context);
             eventList.setAdapter(eventAdapter);
+
+            eventList.addOnItemTouchListener(new RecyclerItemClickListener(context, eventList, new RecyclerClickListener() {
+                @Override
+                public void onClick(View view, int position) {
+                    Event newEvent = (Event) innerEventList.get(position);
+                    Globals.currentEvent = newEvent;
+
+                    context.startActivity(new Intent(context, EventDetail.class));
+                }
+
+                @Override
+                public void onLongClick(View view, int position) {
+
+                }
+            }));
         }
     }
 

@@ -8,6 +8,7 @@
     tools:context="co.bongga.toury.activities.Splash">
 
     <TextView
+        android:id="@+id/splash_app_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -15,6 +16,16 @@
         android:textSize="50sp"
         android:textStyle="bold"
         android:textColor="@android:color/white" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_below="@+id/splash_app_name"
+        android:text="@string/slogan"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/light_gray" />
 
     <ImageView
         android:layout_width="wrap_content"

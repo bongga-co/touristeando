@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">Toury</string>
+    <string name="app_name">Touristeando</string>
+    <string name="slogan">Conecta tus emociones</string>
 
     <!-- Drawer -->
     <string name="openDrawer">open_drawer</string>
@@ -11,11 +12,13 @@
     <string name="action_clear_all">Limpiar Todo</string>
 
     <!-- Activities -->
-    <string name="nav_home">Assistant</string>
+    <string name="nav_home">Preg\u00fantale a Toury</string>
     <string name="txt_placeholder_chat_input">Preg\u00fantale a Toury...</string>
     <string name="permission_denied">Permiso denegado</string>
     <string name="loader_message">Cargando...</string>
     <string name="txt_placeholder_chat_listening">Escuchando...</string>
+    <string name="generic_agent_error">No pude procesar lo que me pediste, intenta de nuevo.</string>
+    <string name="generic_agent_no_content">Lo siento, no pude encontrar informaci\u00f3n</string>
 
     <!-- Navigation Drawer Toolbar Titles -->
     <string-array name="nav_item_activity_titles">

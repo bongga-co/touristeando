@@ -1,10 +1,12 @@
 package co.bongga.toury.models;
 
+import io.realm.RealmObject;
+
 /**
  * Created by spval on 14/01/2017.
  */
 
-public class Event {
+public class Event extends RealmObject {
     private String id;
     private String thumbnail;
     private String name;

@@ -1,10 +1,12 @@
 package co.bongga.toury.models;
 
+import io.realm.RealmObject;
+
 /**
  * Created by bongga on 12/23/16.
  */
 
-public class Coordinate {
+public class Coordinate extends RealmObject {
     private double latitude;
     private double longitude;
 
