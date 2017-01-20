@@ -176,11 +176,25 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             }, REQUEST_RECORD_PERMISSION);
         }
         else {
-            aiService.startListening();
+            didSpeechQuery();
         }
     }
 
+    private void didSpeechQuery(){
+        if(!UtilityManager.isConnected(getActivity())){
+            UtilityManager.showMessage(rqText, getString(R.string.no_network_connection));
+            return;
+        }
+
+        aiService.startListening();
+    }
+
     private void didSendQuery(){
+        if(!UtilityManager.isConnected(getActivity())){
+            UtilityManager.showMessage(rqText, getString(R.string.no_network_connection));
+            return;
+        }
+
         String query = rqText.getText().toString();
         aiRequest.setQuery(query);
         rqText.setText(null);
@@ -372,6 +386,15 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         }
     }
 
+    public void didClearAllData(){
+        db.beginTransaction();
+        db.where(ChatMessage.class).findAll().deleteAllFromRealm();
+        db.commitTransaction();
+
+        chatItems.clear();
+        chatMessageAdapter.notifyDataSetChanged();
+    }
+
     @Override
     public void onResult(final AIResponse result) {
         getActivity().runOnUiThread(new Runnable() {
@@ -453,7 +476,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             switch (requestCode) {
                 case REQUEST_RECORD_PERMISSION:
-                    aiService.startListening();
+                    didSpeechQuery();
                     break;
             }
         }

@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -22,8 +23,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import co.bongga.toury.R;
 import co.bongga.toury.fragments.HomeFragment;
+import co.bongga.toury.models.ChatMessage;
 import co.bongga.toury.utils.CircleTransform;
 import co.bongga.toury.utils.Constants;
+import io.realm.Realm;
 
 public class Main extends AppCompatActivity {
     private DrawerLayout drawer;
@@ -33,6 +36,7 @@ public class Main extends AppCompatActivity {
 
     private static int navItemIndex = 0;
     private static final String TAG_HOME = "home";
+    private static final String TAG_SETTING = "settings";
     private static String CURRENT_TAG = TAG_HOME;
 
     private String[] activityTitles;
@@ -97,7 +101,7 @@ public class Main extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        return false;
+        return true;
     }
 
     @Override
@@ -109,36 +113,13 @@ public class Main extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_clear_all) {
+            HomeFragment fragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag(TAG_HOME);
+            fragment.didClearAllData();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
-    /*@SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_home) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }*/
 
     private void loadNavHeader(){
         String urlNavHeaderBg = Constants.DEFAULT_HEADER_IMAGE;
@@ -147,15 +128,18 @@ public class Main extends AppCompatActivity {
         // loading header background image
         Glide.with(this).load(urlNavHeaderBg)
                 .crossFade()
+                .placeholder(R.drawable.nav_menu_header_bg)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imgNavHeaderBg);
 
         // Loading profile image
         Glide.with(this).load(urlProfileImg)
                 .crossFade()
+                //.placeholder(R.drawable.bongga_logo_light)
                 .thumbnail(0.5f)
                 .bitmapTransform(new CircleTransform(this))
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.drawable.nav_placeholder_profile)
                 .into(imgProfile);
     }
 
