@@ -17,6 +17,7 @@ public class ConfigApp extends MultiDexApplication {
         Realm.init(this);
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .name("toury.realm")
+                .deleteRealmIfMigrationNeeded()
                 .build();
         Realm.setDefaultConfiguration(config);
     }

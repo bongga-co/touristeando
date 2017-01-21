@@ -19,7 +19,7 @@ public class Event extends RealmObject {
     private Double distance;
     private String category;
     private boolean outstanding;
-    private Integer rating;
+    private Double rating;
     private Coordinate coordinates;
     private String place;
 
@@ -27,7 +27,7 @@ public class Event extends RealmObject {
 
     }
 
-    public Event(String thumbnail, String name, String city, String country, String description, Price price, String startDate, String endDate, Double distance, String category, boolean outstanding, Integer rating, Coordinate coordinates, String place) {
+    public Event(String thumbnail, String name, String city, String country, String description, Price price, String startDate, String endDate, Double distance, String category, boolean outstanding, Double rating, Coordinate coordinates, String place) {
         this.thumbnail = thumbnail;
         this.name = name;
         this.city = city;
@@ -131,11 +131,11 @@ public class Event extends RealmObject {
         this.outstanding = outstanding;
     }
 
-    public Integer getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 

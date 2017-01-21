@@ -27,6 +27,7 @@ import com.google.gson.JsonElement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ai.api.AIServiceException;
@@ -40,13 +41,16 @@ import ai.api.model.AIResponse;
 import ai.api.model.Result;
 import co.bongga.toury.R;
 import co.bongga.toury.adapters.ChatMessageAdapter;
+import co.bongga.toury.interfaces.DataCallback;
 import co.bongga.toury.models.ChatMessage;
 import co.bongga.toury.models.Event;
 import co.bongga.toury.utils.Constants;
+import co.bongga.toury.utils.DataManager;
 import co.bongga.toury.utils.UtilityManager;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -275,22 +279,24 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                     RealmList<Event> listEvents = new RealmList<>();
                     Event event = new Event("http://cdn5.upsocl.com/wp-content/uploads/2014/05/awebic-restaurantes-7.jpg",
                             "Cuzco", "Medellin", "Colombia", "The most valuable experience", null, null, null, 5.8, value,
-                            true, 4, null, "Medellin");
+                            true, 4.8, null, "Medellin");
                     listEvents.add(event);
 
                     Event event2 = new Event("http://www.vacazionaviajes.com/blog/wp-content/uploads/2012/08/restaurante-principal.jpg",
                             "Paseo de los Corderos", "Medellin", "Colombia",
                             "The most valuable experience", null, null, null, 1.3,
-                            value, true, 4, null, "Medellin");
+                            value, true, 4.0, null, "Medellin");
                     listEvents.add(event2);
 
                     ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
                     chatItems.add(msg);
                     didStoreMessage(msg);
+
+                    notifyChange();
                 }
                 else  if(!value.isEmpty() && value.equals("cines")){
-                    RealmList<Event> listEvents = new RealmList<>();
-                    Event event = new Event("http://www.puertadelnorte.com/images/puertadelnorte/almacenes/cinemas-procinal/cinemas-procinal-puerta-del-norte.jpg",
+                    final RealmList<Event> listEvents = new RealmList<>();
+                    /*Event event = new Event("http://www.puertadelnorte.com/images/puertadelnorte/almacenes/cinemas-procinal/cinemas-procinal-puerta-del-norte.jpg",
                             "Cinemas Procinal", "Medellin", "Colombia", "The most valuable experience", null, null, null, 5.8, value,
                             true, 4, null, "Medellin");
                     listEvents.add(event);
@@ -304,38 +310,57 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                     ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
                     chatItems.add(msg);
                     didStoreMessage(msg);
+
+                    */
+
+                    DataManager.willGetAllAttractions(new DataCallback() {
+                        @Override
+                        public void didReceiveData(List<Event> data) {
+                            if(data != null){
+                                for(Event event : data){
+                                    listEvents.add(event);
+                                }
+
+                                ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
+                                chatItems.add(msg);
+                                didStoreMessage(msg);
+
+                                notifyChange();
+                            }
+                        }
+                    });
                 }
                 else  if(!value.isEmpty() && value.equals("canchas de f\u00fatbol")){
                     RealmList<Event> listEvents = new RealmList<>();
                     Event event = new Event("http://elgolazo.co/wp-content/uploads/2015/08/IMG_0856-1180x720.jpg",
                             "El Golazo", "Medellin", "Colombia", "The most valuable experience", null, null, null, 5.8, value,
-                            true, 4, null, "Medellin");
+                            true, 4.0, null, "Medellin");
                     listEvents.add(event);
 
                     Event event2 = new Event("https://i.ytimg.com/vi/rmtBGWVmm2E/maxresdefault.jpg",
                             "Il Campo", "Medellin", "Colombia",
                             "The most valuable experience", null, null, null, 1.3,
-                            value, true, 4, null, "Medellin");
+                            value, true, 4.0, null, "Medellin");
                     listEvents.add(event2);
 
                     Event event3 = new Event("http://www.canchasfutbolmedellin.com/media/k2/items/cache/2fa67f482133f1c934235b73c2a03954_XL.jpg",
                             "Elite Futbol", "Medellin", "Colombia",
                             "The most valuable experience", null, null, null, 1.3,
-                            value, true, 4, null, "Medellin");
+                            value, true, 4.0, null, "Medellin");
                     listEvents.add(event3);
 
                     Event event4 = new Event("http://tuciudadenred.com/data/foto/gr_1401480138_714077533.jpg",
                             "El Parque de los Principes", "Medellin", "Colombia",
                             "The most valuable experience", null, null, null, 1.3,
-                            value, true, 4, null, "Medellin");
+                            value, true, 4.0, null, "Medellin");
                     listEvents.add(event4);
 
                     ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
                     chatItems.add(msg);
                     didStoreMessage(msg);
-                }
 
-                notifyChange();
+                    notifyChange();
+                }
             }
         }
 
