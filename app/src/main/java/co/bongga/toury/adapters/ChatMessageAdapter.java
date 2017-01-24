@@ -14,9 +14,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import co.bongga.toury.R;
 import co.bongga.toury.activities.EventDetail;
+import co.bongga.toury.activities.PlaceDetail;
 import co.bongga.toury.interfaces.RecyclerClickListener;
 import co.bongga.toury.models.ChatMessage;
 import co.bongga.toury.models.Event;
+import co.bongga.toury.models.Place;
 import co.bongga.toury.utils.Globals;
 import co.bongga.toury.utils.RecyclerItemClickListener;
 import io.realm.RealmList;
@@ -29,6 +31,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private final Context context;
     private static ArrayList<ChatMessage> chatList;
     private static RealmList innerEventList;
+    private static RealmList innerPlacesList;
 
     public ChatMessageAdapter(Context context, ArrayList<ChatMessage> chatList){
         this.context = context;
@@ -118,6 +121,11 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
         else if(genHolder instanceof ListPlacesMessageHolder){
             ListPlacesMessageHolder holder = (ListPlacesMessageHolder) genHolder;
+
+            innerPlacesList = chatList.get(position).getPlace();
+
+            holder.placeAdapter.setData(innerPlacesList);
+            holder.placeAdapter.setRowIndex(position);
         }
         else{
             TextMessageHolder holder = (TextMessageHolder) genHolder;
@@ -215,16 +223,33 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public static class ListPlacesMessageHolder extends RecyclerView.ViewHolder {
-        public LinearLayout itemWrapper;
-        public ImageView icon;
-        public TextView name;
+        private PlaceAdapter placeAdapter;
 
         ListPlacesMessageHolder(View view){
             super(view);
 
-            itemWrapper = (LinearLayout) view.findViewById(R.id.itemWrapper);
-            icon = (ImageView) view.findViewById(R.id.chat_user_icon);
-            name = (TextView) view.findViewById(R.id.name);
+            final Context context = itemView.getContext();
+
+            RecyclerView eventList = (RecyclerView) itemView.findViewById(R.id.eventList);
+            eventList.setHasFixedSize(true);
+            eventList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+            placeAdapter = new PlaceAdapter(context);
+            eventList.setAdapter(placeAdapter);
+
+            eventList.addOnItemTouchListener(new RecyclerItemClickListener(context, eventList, new RecyclerClickListener() {
+                @Override
+                public void onClick(View view, int position) {
+                    Place newPlace = (Place) innerPlacesList.get(position);
+                    Globals.currentPlace = newPlace;
+
+                    context.startActivity(new Intent(context, PlaceDetail.class));
+                }
+
+                @Override
+                public void onLongClick(View view, int position) {
+
+                }
+            }));
         }
     }
 }

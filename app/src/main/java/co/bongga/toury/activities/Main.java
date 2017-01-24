@@ -1,7 +1,13 @@
 package co.bongga.toury.activities;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -20,15 +26,21 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationSettingsRequest;
 
 import co.bongga.toury.R;
 import co.bongga.toury.fragments.HomeFragment;
 import co.bongga.toury.models.ChatMessage;
+import co.bongga.toury.services.LocationService;
 import co.bongga.toury.utils.CircleTransform;
 import co.bongga.toury.utils.Constants;
 import io.realm.Realm;
 
 public class Main extends AppCompatActivity {
+    LocationService mService;
+    public boolean isServiceBound = false;
+
     private DrawerLayout drawer;
     private NavigationView navigationView;
     private Handler handler;
@@ -88,6 +100,24 @@ public class Main extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        Intent intent = new Intent(this, LocationService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (isServiceBound) {
+            unbindService(mConnection);
+            isServiceBound = false;
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -119,6 +149,17 @@ public class Main extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == HomeFragment.REQUEST_CHECK_SETTINGS){
+            HomeFragment fragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag(TAG_HOME);
+            fragment.onActivityResult(requestCode, resultCode, data);
+        }
+        else{
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private void loadNavHeader(){
@@ -256,5 +297,37 @@ public class Main extends AppCompatActivity {
             default:
                 return new HomeFragment();
         }
+    }
+
+    //Manage the connection with the LocationService
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
+            mService = binder.getService();
+            isServiceBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            isServiceBound = false;
+        }
+    };
+
+    public LocationSettingsRequest getLocationSetting(){
+        return mService.buildLocationSetting();
+    }
+
+    public GoogleApiClient getGoogleAPIClient(){
+        return mService.getGoogleApiClient();
+    }
+
+    public void startLocationUpdates(){
+        mService.startLocationUpdates();
+    }
+
+    public Location getCurrentLocation(){
+        return mService.getCurrentLocation();
     }
 }

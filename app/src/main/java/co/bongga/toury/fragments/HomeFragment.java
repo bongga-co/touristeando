@@ -1,14 +1,21 @@
 package co.bongga.toury.fragments;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,16 +27,19 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.gson.JsonElement;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import ai.api.AIServiceException;
 import ai.api.android.AIDataService;
 import ai.api.AIListener;
@@ -40,27 +50,27 @@ import ai.api.model.AIRequest;
 import ai.api.model.AIResponse;
 import ai.api.model.Result;
 import co.bongga.toury.R;
+import co.bongga.toury.activities.Main;
 import co.bongga.toury.adapters.ChatMessageAdapter;
 import co.bongga.toury.interfaces.DataCallback;
 import co.bongga.toury.models.ChatMessage;
 import co.bongga.toury.models.Event;
+import co.bongga.toury.models.Place;
 import co.bongga.toury.utils.Constants;
 import co.bongga.toury.utils.DataManager;
 import co.bongga.toury.utils.UtilityManager;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
-import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment implements AIListener, View.OnClickListener {
+public class HomeFragment extends Fragment implements AIListener, View.OnClickListener, ResultCallback<LocationSettingsResult> {
     private RecyclerView chatList;
     private ChatMessageAdapter chatMessageAdapter;
     private ArrayList<ChatMessage> chatItems = new ArrayList();
 
-    private LinearLayout chatBottomContainer;
     private EditText rqText;
     private ImageButton btnSpeech;
     private ImageButton btnText;
@@ -70,10 +80,14 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     private AIService aiService;
     private AIRequest aiRequest;
     private AIDataService aiDataService;
+    private static HashMap<String, JsonElement> agentParams;
 
     private Realm db;
 
     private static final int REQUEST_RECORD_PERMISSION = 1;
+    private static final int REQUEST_COARSE_LOCATION_PERMISSION = 2;
+    private static final int REQUEST_FINE_LOCATION_PERMISSION = 3;
+    public static final int REQUEST_CHECK_SETTINGS = 4;
 
     public HomeFragment() {}
 
@@ -82,15 +96,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         super.onCreate(savedInstanceState);
         setupAPIAI();
         db = Realm.getDefaultInstance();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        if (aiService != null) {
-            aiService.pause();
-        }
     }
 
     @Override
@@ -103,12 +108,20 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        if (aiService != null) {
+            aiService.pause();
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        chatBottomContainer = (LinearLayout) view.findViewById(R.id.chat_bottom_container);
         progressBar = (ProgressBar) view.findViewById(R.id.chat_response_progress);
         chatLeftAction = (ImageView) view.findViewById(R.id.chat_left_action);
 
@@ -174,12 +187,17 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     }
 
     private void requestRecordPermission(){
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{
-                    Manifest.permission.RECORD_AUDIO
-            }, REQUEST_RECORD_PERMISSION);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{
+                        Manifest.permission.RECORD_AUDIO
+                }, REQUEST_RECORD_PERMISSION);
+            }
+            else {
+                didSpeechQuery();
+            }
         }
-        else {
+        else{
             didSpeechQuery();
         }
     }
@@ -230,7 +248,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     private void addAgentMessage(AIResponse response, boolean fromMic){
         Result result = response.getResult();
 
-        //TODO: Revisar respuesta para refinar validacion
         if(!result.getFulfillment().getSpeech().isEmpty()){
             if(fromMic){
                 ChatMessage msg = new ChatMessage(result.getResolvedQuery(), true, ChatMessage.TEXT_TYPE);
@@ -245,19 +262,38 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             notifyChange();
 
             if (result.getParameters() != null && !result.getParameters().isEmpty()) {
-                didRetrieveAgentQuery(result.getParameters());
+                agentParams = result.getParameters();
+
+                if(result.getAction().equals(Constants.PLACES_ACTION)){
+                    String city = null;
+                    String thing = null;
+
+                    if(agentParams.get("thing") != null){
+                        thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
+
+                        if(agentParams.get("city") != null){
+                            city = agentParams.get("city").getAsString();
+                            didRetrieveAgentQuery(city, 0, 0, thing);
+                        }
+                        else{
+                            requestForLocationPermission();
+                        }
+                    }
+                    else {
+                        didShowAgentError();
+                    }
+                }
+                else{
+                    //Another action
+                    didToggleLoader(true);
+                }
             }
             else{
                 didToggleLoader(true);
             }
         }
         else{
-            ChatMessage msg = new ChatMessage(getString(R.string.generic_agent_no_content), false, ChatMessage.TEXT_TYPE);
-            chatItems.add(msg);
-            didStoreMessage(msg);
-
-            notifyChange();
-            didToggleLoader(true);
+            didShowAgentError();
         }
     }
 
@@ -269,102 +305,39 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         notifyChange();
     }
 
-    private void didRetrieveAgentQuery(HashMap<String, JsonElement> params){
-        for (final Map.Entry<String, JsonElement> entry : params.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue().getAsString();
+    private void didRetrieveAgentQuery(String city, double latitude, double longitude, String thing){
+        final RealmList<Place> listPlaces = new RealmList<>();
 
-            if(key.equals("places")){
-                if(!value.isEmpty() && value.equals("restaurantes")){
-                    RealmList<Event> listEvents = new RealmList<>();
-                    Event event = new Event("http://cdn5.upsocl.com/wp-content/uploads/2014/05/awebic-restaurantes-7.jpg",
-                            "Cuzco", "Medellin", "Colombia", "The most valuable experience", null, null, null, 5.8, value,
-                            true, 4.8, null, "Medellin");
-                    listEvents.add(event);
+        DataManager.willGetAllPlaces(city, latitude, longitude, thing, new DataCallback() {
+            @Override
+            public void didReceiveEvent(List<Event> data) {
 
-                    Event event2 = new Event("http://www.vacazionaviajes.com/blog/wp-content/uploads/2012/08/restaurante-principal.jpg",
-                            "Paseo de los Corderos", "Medellin", "Colombia",
-                            "The most valuable experience", null, null, null, 1.3,
-                            value, true, 4.0, null, "Medellin");
-                    listEvents.add(event2);
+            }
 
-                    ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
-                    chatItems.add(msg);
-                    didStoreMessage(msg);
-
-                    notifyChange();
-                }
-                else  if(!value.isEmpty() && value.equals("cines")){
-                    final RealmList<Event> listEvents = new RealmList<>();
-                    /*Event event = new Event("http://www.puertadelnorte.com/images/puertadelnorte/almacenes/cinemas-procinal/cinemas-procinal-puerta-del-norte.jpg",
-                            "Cinemas Procinal", "Medellin", "Colombia", "The most valuable experience", null, null, null, 5.8, value,
-                            true, 4, null, "Medellin");
-                    listEvents.add(event);
-
-                    Event event2 = new Event("http://noticias.caracoltv.com/sites/default/files/cine-colombia-nuevas-salas.jpg",
-                            "Cine Colombia", "Medellin", "Colombia",
-                            "The most valuable experience", null, null, null, 1.3,
-                            value, true, 4, null, "Medellin");
-                    listEvents.add(event2);
-
-                    ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
-                    chatItems.add(msg);
-                    didStoreMessage(msg);
-
-                    */
-
-                    DataManager.willGetAllAttractions(new DataCallback() {
-                        @Override
-                        public void didReceiveData(List<Event> data) {
-                            if(data != null){
-                                for(Event event : data){
-                                    listEvents.add(event);
-                                }
-
-                                ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
-                                chatItems.add(msg);
-                                didStoreMessage(msg);
-
-                                notifyChange();
-                            }
+            @Override
+            public void didReceivePlace(List<Place> data) {
+                if(data != null){
+                    if(data.size() > 0){
+                        for(Place place : data){
+                            listPlaces.add(place);
                         }
-                    });
+
+                        ChatMessage msg = new ChatMessage(listPlaces, false, ChatMessage.PLACES_TYPE);
+                        chatItems.add(msg);
+                        didStoreMessage(msg);
+
+                        notifyChange();
+                        didToggleLoader(true);
+                    }
+                    else{
+                        showDefaultMessage();
+                    }
                 }
-                else  if(!value.isEmpty() && value.equals("canchas de f\u00fatbol")){
-                    RealmList<Event> listEvents = new RealmList<>();
-                    Event event = new Event("http://elgolazo.co/wp-content/uploads/2015/08/IMG_0856-1180x720.jpg",
-                            "El Golazo", "Medellin", "Colombia", "The most valuable experience", null, null, null, 5.8, value,
-                            true, 4.0, null, "Medellin");
-                    listEvents.add(event);
-
-                    Event event2 = new Event("https://i.ytimg.com/vi/rmtBGWVmm2E/maxresdefault.jpg",
-                            "Il Campo", "Medellin", "Colombia",
-                            "The most valuable experience", null, null, null, 1.3,
-                            value, true, 4.0, null, "Medellin");
-                    listEvents.add(event2);
-
-                    Event event3 = new Event("http://www.canchasfutbolmedellin.com/media/k2/items/cache/2fa67f482133f1c934235b73c2a03954_XL.jpg",
-                            "Elite Futbol", "Medellin", "Colombia",
-                            "The most valuable experience", null, null, null, 1.3,
-                            value, true, 4.0, null, "Medellin");
-                    listEvents.add(event3);
-
-                    Event event4 = new Event("http://tuciudadenred.com/data/foto/gr_1401480138_714077533.jpg",
-                            "El Parque de los Principes", "Medellin", "Colombia",
-                            "The most valuable experience", null, null, null, 1.3,
-                            value, true, 4.0, null, "Medellin");
-                    listEvents.add(event4);
-
-                    ChatMessage msg = new ChatMessage(listEvents, false, ChatMessage.EVENT_TYPE);
-                    chatItems.add(msg);
-                    didStoreMessage(msg);
-
-                    notifyChange();
+                else{
+                    didShowAgentError();
                 }
             }
-        }
-
-        didToggleLoader(true);
+        });
     }
 
     private void notifyChange(){
@@ -418,6 +391,61 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
         chatItems.clear();
         chatMessageAdapter.notifyDataSetChanged();
+    }
+
+    protected void requestForLocationSettings() {
+        LocationSettingsRequest locationSettingsRequest = ((Main)getActivity()).getLocationSetting();
+        GoogleApiClient googleApiClient = ((Main)getActivity()).getGoogleAPIClient();
+
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(
+                        googleApiClient,
+                        locationSettingsRequest
+                );
+        result.setResultCallback(this);
+    }
+
+    private void requestForLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{
+                        android.Manifest.permission.ACCESS_FINE_LOCATION
+                }, REQUEST_FINE_LOCATION_PERMISSION);
+            }
+            else if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(getActivity(), new String[]{
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION
+                }, REQUEST_COARSE_LOCATION_PERMISSION);
+            }
+            else {
+                requestForLocationSettings();
+            }
+        }
+        else{
+            requestForLocationSettings();
+        }
+    }
+
+    private void startLocationUpdates(){
+        ((Main)getActivity()).startLocationUpdates();
+        Location location = ((Main)getActivity()).getCurrentLocation();
+        String thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
+
+        if(location != null){
+            didRetrieveAgentQuery("", location.getLatitude(), location.getLongitude(), thing);
+        }
+        else{
+            didShowAgentError();
+        }
+    }
+
+    private void showDefaultMessage(){
+        ChatMessage msg = new ChatMessage(getString(R.string.generic_agent_no_content), false, ChatMessage.TEXT_TYPE);
+        chatItems.add(msg);
+        didStoreMessage(msg);
+
+        notifyChange();
+        didToggleLoader(true);
     }
 
     @Override
@@ -503,10 +531,58 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                 case REQUEST_RECORD_PERMISSION:
                     didSpeechQuery();
                     break;
+
+                case REQUEST_COARSE_LOCATION_PERMISSION:
+                case REQUEST_FINE_LOCATION_PERMISSION:
+                    requestForLocationSettings();
+                    break;
             }
         }
         else {
+            didToggleLoader(true);
             UtilityManager.showMessage(rqText, getString(R.string.permission_denied));
+        }
+    }
+
+    @Override
+    public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+        final Status status = locationSettingsResult.getStatus();
+        switch (status.getStatusCode()) {
+            case LocationSettingsStatusCodes.SUCCESS:
+                startLocationUpdates();
+                break;
+            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                try {
+                    status.startResolutionForResult(getActivity(), REQUEST_CHECK_SETTINGS);
+                }
+                catch (IntentSender.SendIntentException e) {
+                    didShowAgentError();
+                }
+                break;
+            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                didShowAgentError();
+                break;
+            case LocationSettingsStatusCodes.CANCELED:
+                didShowAgentError();
+                break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        startLocationUpdates();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        didShowAgentError();
+                        break;
+                }
+                break;
         }
     }
 }

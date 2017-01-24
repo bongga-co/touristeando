@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".ConfigApp"
@@ -16,19 +19,25 @@
         <activity
             android:name=".activities.Splash"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.FullScreen"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
+            android:name=".activities.Welcome"
+            android:label="@string/title_activity_welcome"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name=".activities.Main"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.EventDetail"
             android:parentActivityName=".activities.Main"
@@ -37,6 +46,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.Main" />
         </activity>
+        <activity
+            android:name=".activities.PlaceDetail"
+            android:parentActivityName=".activities.Main"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.Main" />
+        </activity>
+        <service
+            android:name=".services.LocationService"
+            android:exported="false" />
     </application>
 
 </manifest>

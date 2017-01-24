@@ -21,6 +21,7 @@ public class ChatMessage extends RealmObject {
     private String message;
     private int layout_type;
     private RealmList<Event> event;
+    private RealmList<Place> place;
 
     public ChatMessage(){
 
@@ -33,9 +34,16 @@ public class ChatMessage extends RealmObject {
         this.layout_type = layout_type;
     }
 
-    public ChatMessage(RealmList<Event> event, boolean isSelf, int layout_type){
+    /*public ChatMessage(RealmList<Event> event, boolean isSelf, int layout_type){
         this.id = UUID.randomUUID().toString();
         this.event = event;
+        this.isSelf = isSelf;
+        this.layout_type = layout_type;
+    }*/
+
+    public ChatMessage(RealmList<Place> place, boolean isSelf, int layout_type){
+        this.id = UUID.randomUUID().toString();
+        this.place = place;
         this.isSelf = isSelf;
         this.layout_type = layout_type;
     }
@@ -78,5 +86,13 @@ public class ChatMessage extends RealmObject {
 
     public void setEvent(RealmList<Event> event) {
         this.event = event;
+    }
+
+    public RealmList<Place> getPlace() {
+        return place;
+    }
+
+    public void setPlace(RealmList<Place> place) {
+        this.place = place;
     }
 }
