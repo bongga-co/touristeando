@@ -11,6 +11,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -272,7 +273,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                         thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
 
                         if(agentParams.get("city") != null){
-                            city = agentParams.get("city").getAsString();
+                            city = UtilityManager.removeAccents(agentParams.get("city").getAsString());
                             didRetrieveAgentQuery(city, 0, 0, thing);
                         }
                         else{
@@ -373,6 +374,15 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         didToggleLoader(true);
     }
 
+    private void didCancelLocation(){
+        ChatMessage msg = new ChatMessage(getString(R.string.location_canceled_by_user), false, ChatMessage.TEXT_TYPE);
+        chatItems.add(msg);
+        didStoreMessage(msg);
+
+        notifyChange();
+        didToggleLoader(true);
+    }
+
     private void didToggleLoader(boolean isHidden){
         if(isHidden){
             progressBar.setVisibility(View.GONE);
@@ -428,8 +438,8 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
     private void startLocationUpdates(){
         ((Main)getActivity()).startLocationUpdates();
-        Location location = ((Main)getActivity()).getCurrentLocation();
-        String thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
+        final Location location = ((Main)getActivity()).getCurrentLocation();
+        final String thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
 
         if(location != null){
             didRetrieveAgentQuery("", location.getLatitude(), location.getLongitude(), thing);
@@ -539,8 +549,14 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             }
         }
         else {
-            didToggleLoader(true);
-            UtilityManager.showMessage(rqText, getString(R.string.permission_denied));
+            if(requestCode == REQUEST_COARSE_LOCATION_PERMISSION ||
+                    requestCode == REQUEST_FINE_LOCATION_PERMISSION){
+                didCancelLocation();
+            }
+            else{
+                didToggleLoader(true);
+                UtilityManager.showMessage(rqText, getString(R.string.permission_denied));
+            }
         }
     }
 
@@ -579,7 +595,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                         startLocationUpdates();
                         break;
                     case Activity.RESULT_CANCELED:
-                        didShowAgentError();
+                        didCancelLocation();
                         break;
                 }
                 break;

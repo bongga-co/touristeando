@@ -1,9 +1,8 @@
 package co.bongga.toury.interfaces;
 
+import com.google.gson.JsonElement;
 import java.util.List;
-
 import co.bongga.toury.models.Event;
-import co.bongga.toury.models.Place;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -14,11 +13,12 @@ import retrofit2.http.Header;
 
 public interface APIEndpoints {
     @GET("places")
-    Call<List<Place>> willGetAllPlaces(
+    Call<JsonElement> willGetAllPlaces(
         @Header("city") String city,
-        @Header("lat") double latitude,
-        @Header("lng") double longitude,
-        @Header("category") String category
+        @Header("latitude") double latitude,
+        @Header("longitude") double longitude,
+        @Header("category") String category,
+        @Header("distance") int distance
     );
 
     @GET("attractions")
@@ -26,6 +26,7 @@ public interface APIEndpoints {
         @Header("city") String city,
         @Header("lat") double latitude,
         @Header("lng") double longitude,
-        @Header("category") String category
+        @Header("category") String category,
+        @Header("distance") int distance
     );
 }

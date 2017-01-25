@@ -33,7 +33,8 @@
     <string name="txt_placeholder_chat_input">Preg\u00fantale a Toury...</string>
     <string name="txt_placeholder_chat_listening">Escuchando...</string>
     <string name="generic_agent_error">No pude procesar lo que me pediste, intenta de nuevo.</string>
-    <string name="generic_agent_no_content">Lo siento, no pude encontrar informaci\u00f3n</string>
+    <string name="generic_agent_no_content">Lo siento, no pude encontrar informaci\u00f3n.</string>
+    <string name="location_canceled_by_user">Necesito tu ubicaci\u00f3n para mostrarte los mejores lugares cerca de ti.</string>
 
     <!-- Welcome -->
     <!-- Intro Slider -->
