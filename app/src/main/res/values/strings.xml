@@ -8,9 +8,8 @@
     <string name="loader_message">Cargando...</string>
     <string name="no_network_connection">No tienes conexi\u00f3n a internet</string>
     <string name="no_location_provided">Debes proveer tu ubicaci\u00f3n</string>
-
-    <!-- Menu -->
-    <string name="action_clear_all">Limpiar Todo</string>
+    <string name="btn_ok">Aceptar</string>
+    <string name="btn_cancel">Cancelar</string>
 
     <!-- Main Activity -->
     <!-- Drawer -->
@@ -20,13 +19,17 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!-- Drawer Items -->
+    <string name="nav_section_others">Otros</string>
+
     <string name="nav_home">Preg\u00fantale a Toury</string>
     <string name="nav_setting">Ajustes</string>
+    <string name="nav_feedback">Feedback \u0026 Ayuda</string>
+    <string name="nav_profile">Perfil</string>
 
     <!-- Navigation Drawer Toolbar Titles -->
     <string-array name="nav_item_activity_titles">
         <item>@string/nav_home</item>
-        <item>@string/nav_setting</item>
+        <item>@string/nav_profile</item>
     </string-array>
 
     <!-- Assistant Activity -->
@@ -54,4 +57,12 @@
     <string name="slide_4_title">Social Media</string>
     <string name="slide_4_desc">Get your personality traits from your public information on your social networks</string>
 
+    <!-- Preferences / Settings -->
+    <string name="pref_clear_all">Borrar Historial</string>
+    <string name="pref_clear_all_sum">Borra todos los mensajes de la conversaci\u00f3n con el asistente</string>
+    <string name="pref_clear_all_dialog_msg">¿Desea borrar el historial de conversaci\u00f3n?</string>
+    <string name="pref_default_distance">Distancia</string>
+    <string name="pref_default_distance_sum">3 kms</string>
+    <string name="pref_default_distance_dialog_title">Actualizar Distancia</string>
+    <string name="pref_default_distance_dialog_msg">Establece la distancia por defecto para encontrar tus lugares favoritos</string>
 </resources>

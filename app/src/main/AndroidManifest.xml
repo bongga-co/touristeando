@@ -30,8 +30,8 @@
         <activity
             android:name=".activities.Welcome"
             android:label="@string/title_activity_welcome"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.Main"
             android:label="@string/app_name"
@@ -54,6 +54,29 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.Main" />
         </activity>
+        <activity
+            android:name=".activities.Settings"
+            android:parentActivityName=".activities.Main"
+            android:screenOrientation="portrait"
+            android:label="@string/nav_setting">
+            <intent-filter>
+                <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.Main" />
+        </activity>
+        <activity
+            android:name=".activities.Feedback"
+            android:parentActivityName=".activities.Main"
+            android:screenOrientation="portrait"
+            android:label="@string/nav_feedback">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.Main" />
+        </activity>
+
         <service
             android:name=".services.LocationService"
             android:exported="false" />

@@ -36,10 +36,11 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private Location lastLocation;
     private LocationRequest locationRequest;
     private LocationSettingsRequest locationSettingsRequest;
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 3000;
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
     private PreferencesManager preferencesManager;
+    private int counter = 0;
 
     public class LocalBinder extends Binder {
         public LocationService getService() {
@@ -162,7 +163,12 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         coordinate.setLongitude(lastLocation.getLongitude());
 
         preferencesManager.setCurrentLocation(coordinate);
-        stopLocationUpdates();
+
+        if(counter >= 4){
+            stopLocationUpdates();
+        }
+
+        counter++;
     }
 
     public LocationSettingsRequest buildLocationSetting() {

@@ -31,10 +31,12 @@ import com.google.android.gms.location.LocationSettingsRequest;
 
 import co.bongga.toury.R;
 import co.bongga.toury.fragments.HomeFragment;
+import co.bongga.toury.fragments.ProfileFragment;
 import co.bongga.toury.models.ChatMessage;
 import co.bongga.toury.services.LocationService;
 import co.bongga.toury.utils.CircleTransform;
 import co.bongga.toury.utils.Constants;
+import co.bongga.toury.utils.PreferencesManager;
 import io.realm.Realm;
 
 public class Main extends AppCompatActivity {
@@ -48,13 +50,14 @@ public class Main extends AppCompatActivity {
 
     private static int navItemIndex = 0;
     private static final String TAG_HOME = "home";
-    private static final String TAG_SETTING = "settings";
+    private static final String TAG_PROFILE = "profile";
     private static String CURRENT_TAG = TAG_HOME;
 
     private String[] activityTitles;
 
     private View navHeader;
     private ImageView imgNavHeaderBg, imgProfile;
+    private PreferencesManager preferencesManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,8 @@ public class Main extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        preferencesManager = new PreferencesManager(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -118,6 +123,12 @@ public class Main extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        preferencesManager.setCurrentLocation(null);
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -129,22 +140,16 @@ public class Main extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        return false;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_clear_all) {
-            HomeFragment fragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag(TAG_HOME);
-            fragment.didClearAllData();
+
             return true;
         }
 
@@ -154,12 +159,23 @@ public class Main extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == HomeFragment.REQUEST_CHECK_SETTINGS){
-            HomeFragment fragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag(TAG_HOME);
+            HomeFragment fragment = getHomeFragment();
             fragment.onActivityResult(requestCode, resultCode, data);
         }
         else{
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        HomeFragment fragment = getHomeFragment();
+        fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private HomeFragment getHomeFragment(){
+        HomeFragment fragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag(TAG_HOME);
+        return fragment;
     }
 
     private void loadNavHeader(){
@@ -196,20 +212,28 @@ public class Main extends AppCompatActivity {
                     case R.id.nav_home:
                         navItemIndex = 0;
                         CURRENT_TAG = TAG_HOME;
+
+                        setCheckMenuItem(menuItem);
+                        loadHomeFragment();
+                        break;
+                    case R.id.nav_profile:
+                        navItemIndex = 1;
+                        CURRENT_TAG = TAG_PROFILE;
+
+                        setCheckMenuItem(menuItem);
+                        loadHomeFragment();
+                        break;
+                    case R.id.nav_setting:
+                        startActivity(new Intent(Main.this, Settings.class));
+                        setCloseDrawer();
+                        break;
+                    case R.id.nav_feedback:
+                        startActivity(new Intent(Main.this, Feedback.class));
+                        setCloseDrawer();
                         break;
                     default:
                         navItemIndex = 0;
                 }
-
-                //Checking if the item is in checked state or not, if not make it in checked state
-                if (menuItem.isChecked()) {
-                    menuItem.setChecked(false);
-                }
-                else {
-                    menuItem.setChecked(true);
-                }
-                menuItem.setChecked(true);
-                loadHomeFragment();
 
                 return true;
             }
@@ -232,6 +256,22 @@ public class Main extends AppCompatActivity {
 
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
+    }
+
+    private void setCloseDrawer(){
+        drawer.closeDrawers();
+        invalidateOptionsMenu();
+    }
+
+    private void setCheckMenuItem(MenuItem menuItem){
+        //Checking if the item is in checked state or not, if not make it in checked state
+        if (menuItem.isChecked()) {
+            menuItem.setChecked(false);
+        }
+        else {
+            menuItem.setChecked(true);
+        }
+        menuItem.setChecked(true);
     }
 
     private void loadHomeFragment() {
@@ -294,6 +334,9 @@ public class Main extends AppCompatActivity {
             case 0:
                 HomeFragment homeFragment = new HomeFragment();
                 return homeFragment;
+            case 1:
+                ProfileFragment profileFragment = new ProfileFragment();
+                return profileFragment;
             default:
                 return new HomeFragment();
         }
@@ -323,11 +366,8 @@ public class Main extends AppCompatActivity {
         return mService.getGoogleApiClient();
     }
 
-    public void startLocationUpdates(){
-        mService.startLocationUpdates();
-    }
-
     public Location getCurrentLocation(){
+        mService.startLocationUpdates();
         return mService.getCurrentLocation();
     }
 }

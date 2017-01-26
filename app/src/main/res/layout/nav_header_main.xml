@@ -20,7 +20,8 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:orientation="vertical"
-        android:padding="@dimen/activity_horizontal_margin">
+        android:padding="@dimen/activity_horizontal_margin"
+        android:visibility="invisible">
 
         <ImageView
             android:id="@+id/img_header_profile"

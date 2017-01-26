@@ -2,6 +2,7 @@ package co.bongga.toury.fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -11,7 +12,6 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -38,7 +38,6 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.gson.JsonElement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import ai.api.AIServiceException;
@@ -55,10 +54,13 @@ import co.bongga.toury.activities.Main;
 import co.bongga.toury.adapters.ChatMessageAdapter;
 import co.bongga.toury.interfaces.DataCallback;
 import co.bongga.toury.models.ChatMessage;
+import co.bongga.toury.models.Coordinate;
 import co.bongga.toury.models.Event;
 import co.bongga.toury.models.Place;
 import co.bongga.toury.utils.Constants;
 import co.bongga.toury.utils.DataManager;
+import co.bongga.toury.utils.Globals;
+import co.bongga.toury.utils.PreferencesManager;
 import co.bongga.toury.utils.UtilityManager;
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -70,7 +72,6 @@ import io.realm.RealmResults;
 public class HomeFragment extends Fragment implements AIListener, View.OnClickListener, ResultCallback<LocationSettingsResult> {
     private RecyclerView chatList;
     private ChatMessageAdapter chatMessageAdapter;
-    private ArrayList<ChatMessage> chatItems = new ArrayList();
 
     private EditText rqText;
     private ImageButton btnSpeech;
@@ -84,6 +85,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     private static HashMap<String, JsonElement> agentParams;
 
     private Realm db;
+    private PreferencesManager preferencesManager;
 
     private static final int REQUEST_RECORD_PERMISSION = 1;
     private static final int REQUEST_COARSE_LOCATION_PERMISSION = 2;
@@ -95,8 +97,13 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setupAPIAI();
+
         db = Realm.getDefaultInstance();
+        preferencesManager = new PreferencesManager(getActivity());
+
+        chatMessageAdapter = new ChatMessageAdapter(getActivity(), Globals.chatItems);
     }
 
     @Override
@@ -106,6 +113,8 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         if (aiService != null) {
             aiService.resume();
         }
+
+        chatMessageAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -155,8 +164,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         btnText.setOnClickListener(this);
 
         chatList = (RecyclerView) view.findViewById(R.id.chatList);
-
-        chatMessageAdapter = new ChatMessageAdapter(getActivity(), chatItems);
 
         chatList.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -218,7 +225,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             return;
         }
 
-        String query = rqText.getText().toString();
+        String query = rqText.getText().toString().trim();
         aiRequest.setQuery(query);
         rqText.setText(null);
 
@@ -252,12 +259,12 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         if(!result.getFulfillment().getSpeech().isEmpty()){
             if(fromMic){
                 ChatMessage msg = new ChatMessage(result.getResolvedQuery(), true, ChatMessage.TEXT_TYPE);
-                chatItems.add(msg);
+                Globals.chatItems.add(msg);
                 didStoreMessage(msg);
             }
 
             ChatMessage msg = new ChatMessage(result.getFulfillment().getSpeech(), false, ChatMessage.TEXT_TYPE);
-            chatItems.add(msg);
+            Globals.chatItems.add(msg);
             didStoreMessage(msg);
 
             notifyChange();
@@ -277,7 +284,13 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                             didRetrieveAgentQuery(city, 0, 0, thing);
                         }
                         else{
-                            requestForLocationPermission();
+                            Coordinate location = preferencesManager.getCurrentLocation();
+                            if(location != null){
+                                didRetrieveAgentQuery("", location.getLatitude(), location.getLongitude(), thing);
+                            }
+                            else{
+                                requestForLocationPermission();
+                            }
                         }
                     }
                     else {
@@ -300,7 +313,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
     private void addUserMessage(String query){
         ChatMessage msg = new ChatMessage(query, true, ChatMessage.TEXT_TYPE);
-        chatItems.add(msg);
+        Globals.chatItems.add(msg);
         didStoreMessage(msg);
 
         notifyChange();
@@ -309,7 +322,12 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     private void didRetrieveAgentQuery(String city, double latitude, double longitude, String thing){
         final RealmList<Place> listPlaces = new RealmList<>();
 
-        DataManager.willGetAllPlaces(city, latitude, longitude, thing, new DataCallback() {
+        int distance = preferencesManager.getDistance();
+        if(distance == 0){
+            distance = getResources().getInteger(R.integer.default_distance);
+        }
+
+        DataManager.willGetAllPlaces(city, latitude, longitude, thing, distance, new DataCallback() {
             @Override
             public void didReceiveEvent(List<Event> data) {
 
@@ -324,7 +342,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                         }
 
                         ChatMessage msg = new ChatMessage(listPlaces, false, ChatMessage.PLACES_TYPE);
-                        chatItems.add(msg);
+                        Globals.chatItems.add(msg);
                         didStoreMessage(msg);
 
                         notifyChange();
@@ -343,7 +361,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
     private void notifyChange(){
         chatMessageAdapter.notifyDataSetChanged();
-        chatList.scrollToPosition(chatItems.size()-1);
+        chatList.scrollToPosition(Globals.chatItems.size()-1);
     }
 
     private void didStoreMessage(ChatMessage msg){
@@ -356,7 +374,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         RealmResults<ChatMessage> messages = db.where(ChatMessage.class)
                 .findAll();
         for(ChatMessage msg : messages){
-            chatItems.add(msg);
+            Globals.chatItems.add(msg);
         }
 
         notifyChange();
@@ -367,7 +385,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
 
         ChatMessage msg = new ChatMessage(getString(R.string.generic_agent_error), false, ChatMessage.TEXT_TYPE);
-        chatItems.add(msg);
+        Globals.chatItems.add(msg);
         didStoreMessage(msg);
 
         notifyChange();
@@ -376,7 +394,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
     private void didCancelLocation(){
         ChatMessage msg = new ChatMessage(getString(R.string.location_canceled_by_user), false, ChatMessage.TEXT_TYPE);
-        chatItems.add(msg);
+        Globals.chatItems.add(msg);
         didStoreMessage(msg);
 
         notifyChange();
@@ -392,15 +410,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             progressBar.setVisibility(View.VISIBLE);
             chatLeftAction.setVisibility(View.GONE);
         }
-    }
-
-    public void didClearAllData(){
-        db.beginTransaction();
-        db.where(ChatMessage.class).findAll().deleteAllFromRealm();
-        db.commitTransaction();
-
-        chatItems.clear();
-        chatMessageAdapter.notifyDataSetChanged();
     }
 
     protected void requestForLocationSettings() {
@@ -437,21 +446,21 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     }
 
     private void startLocationUpdates(){
-        ((Main)getActivity()).startLocationUpdates();
         final Location location = ((Main)getActivity()).getCurrentLocation();
         final String thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
 
-        if(location != null){
+        if(location != null && location.getLatitude() != 0.0 && location.getLongitude() != 0.0){
             didRetrieveAgentQuery("", location.getLatitude(), location.getLongitude(), thing);
         }
         else{
+            preferencesManager.setCurrentLocation(null);
             didShowAgentError();
         }
     }
 
     private void showDefaultMessage(){
         ChatMessage msg = new ChatMessage(getString(R.string.generic_agent_no_content), false, ChatMessage.TEXT_TYPE);
-        chatItems.add(msg);
+        Globals.chatItems.add(msg);
         didStoreMessage(msg);
 
         notifyChange();

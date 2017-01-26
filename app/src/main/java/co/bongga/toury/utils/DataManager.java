@@ -21,8 +21,8 @@ import retrofit2.Response;
 public class DataManager {
     private static APIEndpoints apiService = APIClient.getClient().create(APIEndpoints.class);
 
-    public static List<Event> willGetAllAttractions(String city, double lat, double lng, String category, final DataCallback callback){
-        Call<List<Event>> call = apiService.willGetAllAttractions(city, lat, lng, category, 0);
+    public static List<Event> willGetAllAttractions(String city, double lat, double lng, String category, int distance, final DataCallback callback){
+        Call<List<Event>> call = apiService.willGetAllAttractions(city, lat, lng, category, distance);
         call.enqueue(new Callback<List<Event>>() {
             @Override
             public void onResponse(Call<List<Event>>call, Response<List<Event>> response) {
@@ -37,8 +37,8 @@ public class DataManager {
         return null;
     }
 
-    public static JsonElement willGetAllPlaces(String city, double lat, double lng, String category, final DataCallback callback){
-        Call<JsonElement> call = apiService.willGetAllPlaces(city, lat, lng, category, 0);
+    public static JsonElement willGetAllPlaces(String city, double lat, double lng, String category, int distance, final DataCallback callback){
+        Call<JsonElement> call = apiService.willGetAllPlaces(city, lat, lng, category, distance);
         call.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement>call, Response<JsonElement> response) {

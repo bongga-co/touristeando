@@ -105,4 +105,9 @@ public class UtilityManager {
         s = s.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
         return s;
     }
+
+    public static double convertKmToMi(double kilometers) {
+        double miles = kilometers * 0.621;
+        return miles;
+    }
 }

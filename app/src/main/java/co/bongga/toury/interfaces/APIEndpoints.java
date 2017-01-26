@@ -18,15 +18,15 @@ public interface APIEndpoints {
         @Header("latitude") double latitude,
         @Header("longitude") double longitude,
         @Header("category") String category,
-        @Header("distance") int distance
+        @Header("radius") int distance
     );
 
     @GET("attractions")
     Call<List<Event>> willGetAllAttractions(
         @Header("city") String city,
-        @Header("lat") double latitude,
-        @Header("lng") double longitude,
+        @Header("latitude") double latitude,
+        @Header("longitude") double longitude,
         @Header("category") String category,
-        @Header("distance") int distance
+        @Header("radius") int distance
     );
 }
