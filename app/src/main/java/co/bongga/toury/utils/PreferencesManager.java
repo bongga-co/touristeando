@@ -26,6 +26,7 @@ public class PreferencesManager {
     private static final String IS_FIRST_TIME_LAUNCH = "isFirstTimeLaunch";
     private static final String CURRENT_LOCATION = "currentLocation";
     private static final String DEFAULT_DISTANCE = "defaultDistance";
+    private static final String HELP_MESSAGE = "helpMessage";
 
     private Gson gson;
 
@@ -62,5 +63,14 @@ public class PreferencesManager {
 
     public int getDistance() {
         return pref.getInt(DEFAULT_DISTANCE, 0);
+    }
+
+    public void setHelpMessage(boolean shown){
+        editor.putBoolean(HELP_MESSAGE, shown);
+        editor.commit();
+    }
+
+    public boolean isShownHelpMessage(){
+        return pref.getBoolean(HELP_MESSAGE, true);
     }
 }

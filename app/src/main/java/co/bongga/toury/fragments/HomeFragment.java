@@ -2,7 +2,6 @@ package co.bongga.toury.fragments;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -21,6 +20,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -171,7 +172,13 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         chatList.setItemAnimator(new DefaultItemAnimator());
         chatList.setAdapter(chatMessageAdapter);
 
-        didGetChatList();
+        if(preferencesManager.isShownHelpMessage()){
+            setHelpMessage();
+            preferencesManager.setHelpMessage(false);
+        }
+        else{
+            didGetChatList();
+        }
 
         return view;
     }
@@ -251,6 +258,23 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                 }
             }
         }.execute(aiRequest);
+    }
+
+    private void setHelpMessage(){
+        Spanned chatText = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            chatText = Html.fromHtml(getString(R.string.agent_initial_message), Html.FROM_HTML_MODE_LEGACY);
+        }
+        else {
+            chatText = Html.fromHtml(getString(R.string.agent_initial_message));
+        }
+
+        ChatMessage msg = new ChatMessage(chatText.toString(), false, ChatMessage.TEXT_TYPE);
+        Globals.chatItems.add(msg);
+        didStoreMessage(msg);
+
+        notifyChange();
     }
 
     private void addAgentMessage(AIResponse response, boolean fromMic){
@@ -416,12 +440,18 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         LocationSettingsRequest locationSettingsRequest = ((Main)getActivity()).getLocationSetting();
         GoogleApiClient googleApiClient = ((Main)getActivity()).getGoogleAPIClient();
 
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(
-                        googleApiClient,
-                        locationSettingsRequest
-                );
-        result.setResultCallback(this);
+        if(googleApiClient != null){
+            PendingResult<LocationSettingsResult> result =
+                    LocationServices.SettingsApi.checkLocationSettings(
+                            googleApiClient,
+                            locationSettingsRequest
+                    );
+            result.setResultCallback(this);
+        }
+        else{
+            didToggleLoader(true);
+            UtilityManager.showMessage(rqText, getString(R.string.no_location_services));
+        }
     }
 
     private void requestForLocationPermission() {

@@ -1,4 +1,6 @@
 package co.bongga.toury.models;
+import android.text.Spanned;
+
 import java.util.UUID;
 import io.realm.RealmList;
 import io.realm.RealmObject;

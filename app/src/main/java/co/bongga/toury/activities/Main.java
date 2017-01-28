@@ -32,12 +32,10 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import co.bongga.toury.R;
 import co.bongga.toury.fragments.HomeFragment;
 import co.bongga.toury.fragments.ProfileFragment;
-import co.bongga.toury.models.ChatMessage;
 import co.bongga.toury.services.LocationService;
 import co.bongga.toury.utils.CircleTransform;
 import co.bongga.toury.utils.Constants;
 import co.bongga.toury.utils.PreferencesManager;
-import io.realm.Realm;
 
 public class Main extends AppCompatActivity {
     LocationService mService;
@@ -141,15 +139,15 @@ public class Main extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        return false;
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_clear_all) {
-
+        if (id == R.id.action_share) {
+            shareApp();
             return true;
         }
 
@@ -229,6 +227,10 @@ public class Main extends AppCompatActivity {
                         break;
                     case R.id.nav_feedback:
                         startActivity(new Intent(Main.this, Feedback.class));
+                        setCloseDrawer();
+                        break;
+                    case R.id.nav_terms:
+                        startActivity(new Intent(Main.this, Terms.class));
                         setCloseDrawer();
                         break;
                     default:
@@ -340,6 +342,14 @@ public class Main extends AppCompatActivity {
             default:
                 return new HomeFragment();
         }
+    }
+
+    private void shareApp(){
+        Intent send = new Intent(Intent.ACTION_SEND);
+        send.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.share_text));
+        send.setType("text/plain");
+
+        startActivity(Intent.createChooser(send, getResources().getString(R.string.share_chooser_title)));
     }
 
     //Manage the connection with the LocationService

@@ -10,15 +10,17 @@ public class Place extends RealmObject {
     private String name;
     private String category;
     private String thumbnail;
+    private float rating;
 
     public Place(){
 
     }
 
-    public Place(String name, String category, String thumbnail) {
+    public Place(String name, String category, String thumbnail, float rating) {
         this.name = name;
         this.category = category;
         this.thumbnail = thumbnail;
+        this.rating = rating;
     }
 
     public String getName() {
@@ -43,5 +45,13 @@ public class Place extends RealmObject {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
     }
 }

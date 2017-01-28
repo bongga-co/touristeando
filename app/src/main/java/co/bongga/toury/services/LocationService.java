@@ -62,8 +62,10 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     @Override
     public IBinder onBind(Intent intent) {
-        if(googleApiClient != null || !googleApiClient.isConnected()){
-            googleApiClient.connect();
+        if(googleApiClient != null){
+            if(!googleApiClient.isConnected()){
+                googleApiClient.connect();
+            }
         }
 
         return mBinder;

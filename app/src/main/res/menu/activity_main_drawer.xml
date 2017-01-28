@@ -8,7 +8,23 @@
         <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_menu_camera"
-            android:title="@string/nav_profile" />
+            android:title="@string/nav_profile"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_booking"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/nav_bookings"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_offer"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/nav_offers"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_invitation"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/nav_invitations"
+            android:visible="false" />
     </group>
 
     <item android:title="@string/nav_section_others">
@@ -21,6 +37,11 @@
                 android:id="@+id/nav_feedback"
                 android:icon="@drawable/ic_menu_slideshow"
                 android:title="@string/nav_feedback" />
+            <item
+                android:id="@+id/nav_terms"
+                android:icon="@drawable/ic_menu_slideshow"
+                android:title="@string/nav_terms"
+                android:visible="false" />
         </menu>
     </item>
 </menu>

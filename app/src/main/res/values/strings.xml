@@ -2,6 +2,9 @@
     <string name="app_name">Touristeando</string>
     <string name="slogan">Descubre tu ciudad</string>
     <string name="title_activity_welcome">Welcome</string>
+    <string name="share_app">Compartir Touristeando</string>
+    <string name="share_text">Prueba Touristeando!!\n\nDescubre lo que tu ciudad tiene para ofrecerte.\n\nhttps://goo.gl/aiVTqy \n\n</string>
+    <string name="share_chooser_title">@string/share_app</string>
 
     <!-- Misc Messages -->
     <string name="permission_denied">Permiso denegado</string>
@@ -10,6 +13,20 @@
     <string name="no_location_provided">Debes proveer tu ubicaci\u00f3n</string>
     <string name="btn_ok">Aceptar</string>
     <string name="btn_cancel">Cancelar</string>
+    <string name="no_location_services">Instala o actualiza Google Play Services para acceder a tu ubicaci\u00f3n.</string>
+    <string name="agent_initial_message">
+        <![CDATA[
+            <strong>Hola Tourister!! Soy Toury.</strong>\n
+            <p>Estoy aquí para ayudarte a descubrir las mejores cosas para hacer y lugares que la ciudad tiene para ofrecerte. Puedes preguntarme:</p>\n
+            <p>
+                - ¿Dónde puedo encontrar un lugar para comer?
+                - Búscame lugares para jugar fútbol
+                - Quiero ver una película
+                - ¿Dónde puedo jugar paintball en Bogotá?
+            </p>\n
+            <p>En cualquier momento escribe ayuda para asistirte.</p>
+        ]]>
+    </string>
 
     <!-- Main Activity -->
     <!-- Drawer -->
@@ -25,11 +42,18 @@
     <string name="nav_setting">Ajustes</string>
     <string name="nav_feedback">Feedback \u0026 Ayuda</string>
     <string name="nav_profile">Perfil</string>
+    <string name="nav_terms">T\u00e9rminos de Servicio</string>
+    <string name="nav_offers">Ofertas \u0026 Promiciones</string>
+    <string name="nav_bookings">Citas \u0026 Reservaciones</string>
+    <string name="nav_invitations">Invitaciones</string>
 
     <!-- Navigation Drawer Toolbar Titles -->
     <string-array name="nav_item_activity_titles">
         <item>@string/nav_home</item>
         <item>@string/nav_profile</item>
+        <item>@string/nav_bookings</item>
+        <item>@string/nav_offers</item>
+        <item>@string/nav_invitations</item>
     </string-array>
 
     <!-- Assistant Activity -->
@@ -65,4 +89,10 @@
     <string name="pref_default_distance_sum">3 kms</string>
     <string name="pref_default_distance_dialog_title">Actualizar Distancia</string>
     <string name="pref_default_distance_dialog_msg">Establece la distancia por defecto para encontrar tus lugares favoritos</string>
+
+    <string name="feedback_name">Nombre</string>
+    <string name="feedback_email">Correo Electr\u00f3nico</string>
+    <string name="feedback_msg">Comentario</string>
+    <string name="feedback_intro">Env\u00edanos tus comentarios, sugerencias y todo lo que nos sirva para mejorar.</string>
+    <string name="feedback_submit">Enviar</string>
 </resources>

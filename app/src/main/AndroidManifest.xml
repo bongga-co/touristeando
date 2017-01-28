@@ -56,27 +56,37 @@
         </activity>
         <activity
             android:name=".activities.Settings"
+            android:label="@string/nav_setting"
             android:parentActivityName=".activities.Main"
-            android:screenOrientation="portrait"
-            android:label="@string/nav_setting">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.Main" />
         </activity>
         <activity
             android:name=".activities.Feedback"
+            android:label="@string/nav_feedback"
             android:parentActivityName=".activities.Main"
-            android:screenOrientation="portrait"
-            android:label="@string/nav_feedback">
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.Main" />
         </activity>
-
+        <activity
+            android:name=".activities.Terms"
+            android:label="@string/nav_terms"
+            android:parentActivityName=".activities.Main"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.Main" />
+        </activity>
         <service
             android:name=".services.LocationService"
             android:exported="false" />
