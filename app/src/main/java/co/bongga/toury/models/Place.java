@@ -11,16 +11,20 @@ public class Place extends RealmObject {
     private String category;
     private String thumbnail;
     private float rating;
+    private Price price;
+    private Coordinate coordinates;
 
     public Place(){
 
     }
 
-    public Place(String name, String category, String thumbnail, float rating) {
+    public Place(String name, String category, String thumbnail, float rating, Price price, Coordinate coordinates) {
         this.name = name;
         this.category = category;
         this.thumbnail = thumbnail;
         this.rating = rating;
+        this.price = price;
+        this.coordinates = coordinates;
     }
 
     public String getName() {
@@ -53,5 +57,21 @@ public class Place extends RealmObject {
 
     public void setRating(float rating) {
         this.rating = rating;
+    }
+
+    public Price getPrice() {
+        return price;
+    }
+
+    public void setPrice(Price price) {
+        this.price = price;
+    }
+
+    public Coordinate getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(Coordinate coordinates) {
+        this.coordinates = coordinates;
     }
 }

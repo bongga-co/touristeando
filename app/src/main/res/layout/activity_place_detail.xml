@@ -3,7 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+    android:scrollbars="none">
     <LinearLayout
         android:id="@+id/activity_place_detail"
         android:layout_width="match_parent"
@@ -21,25 +23,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginLeft="@dimen/generic_margin"
-            android:layout_marginStart="@dimen/generic_margin"
-            android:layout_marginRight="@dimen/generic_margin"
-            android:layout_marginEnd="@dimen/generic_margin"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
+            android:padding="10dp"
             android:gravity="center_horizontal"
             android:background="@android:color/white">
             <TextView
                 android:id="@+id/dt_place_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="30sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
             <TextView
                 android:id="@+id/dt_place_category"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"/>
+                android:textSize="14sp"/>
             <RatingBar
                 android:id="@+id/dt_rating"
                 android:layout_width="wrap_content"
@@ -49,6 +46,91 @@
                 android:rating="0"
                 android:layout_marginTop="10dp" />
         </LinearLayout>
-
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:layout_margin="20dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginRight="30dp"
+            android:gravity="center_horizontal"
+            android:background="@drawable/container_shadow"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="@string/dt_price_lbl"/>
+            <TextView
+                android:id="@+id/dt_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorAccent" />
+        </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="250dp">
+            <ImageView
+                android:id="@+id/dt_location_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"
+                android:background="@android:color/darker_gray" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="30dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/container_shadow"
+                android:gravity="start"
+                android:padding="20dp"
+                android:elevation="10dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Carrera 70 Nº 119-17"
+                    android:gravity="center_vertical"
+                    android:drawableLeft="@android:drawable/ic_menu_add"
+                    android:drawableStart="@android:drawable/ic_menu_add" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="5049580"
+                    android:drawableLeft="@android:drawable/ic_menu_add"
+                    android:drawableStart="@android:drawable/ic_menu_add" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="Medellin, Colombia"
+                    android:drawableLeft="@android:drawable/ic_menu_add"
+                    android:drawableStart="@android:drawable/ic_menu_add" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="Florencia"
+                    android:drawableLeft="@android:drawable/ic_menu_add"
+                    android:drawableStart="@android:drawable/ic_menu_add" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="5 Kms"
+                    android:drawableLeft="@android:drawable/ic_menu_add"
+                    android:drawableStart="@android:drawable/ic_menu_add" />
+            </LinearLayout>
+        </RelativeLayout>
     </LinearLayout>
 </ScrollView>

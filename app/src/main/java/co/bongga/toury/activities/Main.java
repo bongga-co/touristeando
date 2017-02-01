@@ -167,8 +167,15 @@ public class Main extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        HomeFragment fragment = getHomeFragment();
-        fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == HomeFragment.REQUEST_COARSE_LOCATION_PERMISSION ||
+                requestCode == HomeFragment.REQUEST_FINE_LOCATION_PERMISSION ||
+                requestCode == HomeFragment.REQUEST_RECORD_PERMISSION){
+            HomeFragment fragment = getHomeFragment();
+            fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+        else{
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     private HomeFragment getHomeFragment(){
@@ -376,8 +383,7 @@ public class Main extends AppCompatActivity {
         return mService.getGoogleApiClient();
     }
 
-    public Location getCurrentLocation(){
+    public void startLocationUpdates(){
         mService.startLocationUpdates();
-        return mService.getCurrentLocation();
     }
 }

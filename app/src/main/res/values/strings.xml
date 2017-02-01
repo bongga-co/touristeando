@@ -95,4 +95,8 @@
     <string name="feedback_msg">Comentario</string>
     <string name="feedback_intro">Env\u00edanos tus comentarios, sugerencias y todo lo que nos sirva para mejorar.</string>
     <string name="feedback_submit">Enviar</string>
+
+    <!-- Place Detail -->
+    <string name="dt_price_lbl">Desde</string>
+    <string name="dt_place_price">%1$s %2$s</string>
 </resources>

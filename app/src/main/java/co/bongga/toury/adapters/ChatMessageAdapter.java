@@ -28,13 +28,9 @@ import io.realm.RealmList;
  */
 
 public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final Context context;
-    private static ArrayList<ChatMessage> chatList;
-    private static RealmList innerEventList;
-    private static RealmList innerPlacesList;
+    private ArrayList<ChatMessage> chatList;
 
-    public ChatMessageAdapter(Context context, ArrayList<ChatMessage> chatList){
-        this.context = context;
+    public ChatMessageAdapter(ArrayList<ChatMessage> chatList){
         this.chatList = chatList;
     }
 
@@ -114,17 +110,18 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
         else if(genHolder instanceof ListEventsMessageHolder){
             ListEventsMessageHolder holder = (ListEventsMessageHolder) genHolder;
-            innerEventList = chatList.get(position).getEvent();
 
-            holder.eventAdapter.setData(innerEventList);
+            RealmList<Event> events = chatList.get(position).getEvent();
+
+            holder.eventAdapter.setData(events);
             holder.eventAdapter.setRowIndex(position);
         }
         else if(genHolder instanceof ListPlacesMessageHolder){
             ListPlacesMessageHolder holder = (ListPlacesMessageHolder) genHolder;
 
-            innerPlacesList = chatList.get(position).getPlace();
+            RealmList<Place> places = chatList.get(position).getPlace();
 
-            holder.placeAdapter.setData(innerPlacesList);
+            holder.placeAdapter.setData(places);
             holder.placeAdapter.setRowIndex(position);
         }
         else{
@@ -208,7 +205,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             eventList.addOnItemTouchListener(new RecyclerItemClickListener(context, eventList, new RecyclerClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-                    Event newEvent = (Event) innerEventList.get(position);
+                    Event newEvent = eventAdapter.getData().get(position);
                     Globals.currentEvent = newEvent;
 
                     context.startActivity(new Intent(context, EventDetail.class));
@@ -231,7 +228,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             final Context context = itemView.getContext();
 
             RecyclerView eventList = (RecyclerView) itemView.findViewById(R.id.eventList);
-            eventList.setHasFixedSize(true);
             eventList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
             placeAdapter = new PlaceAdapter(context);
             eventList.setAdapter(placeAdapter);
@@ -239,7 +235,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             eventList.addOnItemTouchListener(new RecyclerItemClickListener(context, eventList, new RecyclerClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-                    Place newPlace = (Place) innerPlacesList.get(position);
+                    //Place newPlace = innerPlacesList.get(position);
+                    Place newPlace = placeAdapter.getData().get(position);
                     Globals.currentPlace = newPlace;
 
                     context.startActivity(new Intent(context, PlaceDetail.class));

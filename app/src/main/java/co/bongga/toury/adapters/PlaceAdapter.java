@@ -33,6 +33,10 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceHolder>
         }
     }
 
+    public RealmList<Place> getData(){
+        return this.placesList;
+    }
+
     public void setRowIndex(int index) {
         this.rowIndex = index;
     }

@@ -51,31 +51,23 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     @Override
     public void onCreate() {
         super.onCreate();
+        preferencesManager = new PreferencesManager(this);
 
         if(isPlayServicesEnable()){
             buildGoogleApiClient();
             createLocationRequest();
         }
-
-        preferencesManager = new PreferencesManager(this);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        if(googleApiClient != null){
-            if(!googleApiClient.isConnected()){
-                googleApiClient.connect();
-            }
-        }
-
+        connectAPIClient();
         return mBinder;
     }
 
     @Override
     public void onDestroy() {
         if(googleApiClient != null){
-            stopLocationUpdates();
-
             googleApiClient.unregisterConnectionCallbacks(this);
             googleApiClient.unregisterConnectionFailedListener(this);
             googleApiClient.disconnect();
@@ -92,7 +84,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     @Override
     public void onConnectionSuspended(int i) {
-        startLocationUpdates();
+        stopLocationUpdates();
         googleApiClient = null;
     }
 
@@ -151,6 +143,14 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         }
     }
 
+    private void connectAPIClient(){
+        if(googleApiClient != null){
+            if(!googleApiClient.isConnected()){
+                googleApiClient.connect();
+            }
+        }
+    }
+
     public void stopLocationUpdates(){
         LocationServices.FusedLocationApi.removeLocationUpdates(
                 googleApiClient,
@@ -161,7 +161,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private void saveCurrentLocation(){
         Coordinate coordinate = new Coordinate();
 
-        coordinate.setLongitude(lastLocation.getLatitude());
+        coordinate.setLatitude(lastLocation.getLatitude());
         coordinate.setLongitude(lastLocation.getLongitude());
 
         preferencesManager.setCurrentLocation(coordinate);
@@ -175,7 +175,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     public LocationSettingsRequest buildLocationSetting() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                    .addLocationRequest(locationRequest);
+                .addLocationRequest(locationRequest)
+                .setAlwaysShow(true);
         locationSettingsRequest = builder.build();
 
         return locationSettingsRequest;
@@ -183,9 +184,5 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     public GoogleApiClient getGoogleApiClient(){
         return googleApiClient;
-    }
-
-    public Location getCurrentLocation(){
-        return lastLocation;
     }
 }

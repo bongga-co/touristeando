@@ -8,15 +8,15 @@ import io.realm.RealmObject;
 
 public class Price extends RealmObject {
     private String currency;
-    private Long value;
+    private Long amount;
 
     public Price(){
 
     }
 
-    public Price(String currency, Long value) {
+    public Price(String currency, Long amount) {
         this.currency = currency;
-        this.value = value;
+        this.amount = amount;
     }
 
     public String getCurrency() {
@@ -27,11 +27,11 @@ public class Price extends RealmObject {
         this.currency = currency;
     }
 
-    public Long getValue() {
-        return value;
+    public Long getAmount() {
+        return amount;
     }
 
-    public void setValue(Long value) {
-        this.value = value;
+    public void setAmount(Long amount) {
+        this.amount = amount;
     }
 }

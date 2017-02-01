@@ -7,10 +7,10 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -70,7 +70,7 @@ import io.realm.RealmResults;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment implements AIListener, View.OnClickListener, ResultCallback<LocationSettingsResult> {
+public class HomeFragment extends Fragment implements AIListener, View.OnClickListener {
     private RecyclerView chatList;
     private ChatMessageAdapter chatMessageAdapter;
 
@@ -88,9 +88,9 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     private Realm db;
     private PreferencesManager preferencesManager;
 
-    private static final int REQUEST_RECORD_PERMISSION = 1;
-    private static final int REQUEST_COARSE_LOCATION_PERMISSION = 2;
-    private static final int REQUEST_FINE_LOCATION_PERMISSION = 3;
+    public static final int REQUEST_RECORD_PERMISSION = 1;
+    public static final int REQUEST_COARSE_LOCATION_PERMISSION = 2;
+    public static final int REQUEST_FINE_LOCATION_PERMISSION = 3;
     public static final int REQUEST_CHECK_SETTINGS = 4;
 
     public HomeFragment() {}
@@ -104,7 +104,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         db = Realm.getDefaultInstance();
         preferencesManager = new PreferencesManager(getActivity());
 
-        chatMessageAdapter = new ChatMessageAdapter(getActivity(), Globals.chatItems);
+        chatMessageAdapter = new ChatMessageAdapter(Globals.chatItems);
     }
 
     @Override
@@ -304,13 +304,14 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                         thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
 
                         if(agentParams.get("city") != null){
+                            //Get location as well
                             city = UtilityManager.removeAccents(agentParams.get("city").getAsString());
                             didRetrieveAgentQuery(city, 0, 0, thing);
                         }
                         else{
                             Coordinate location = preferencesManager.getCurrentLocation();
                             if(location != null){
-                                didRetrieveAgentQuery("", location.getLatitude(), location.getLongitude(), thing);
+                                didRetrieveAgentQuery(null, location.getLatitude(), location.getLongitude(), thing);
                             }
                             else{
                                 requestForLocationPermission();
@@ -446,7 +447,28 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                             googleApiClient,
                             locationSettingsRequest
                     );
-            result.setResultCallback(this);
+            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+                @Override
+                public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+                    final Status status = locationSettingsResult.getStatus();
+                    switch (status.getStatusCode()) {
+                        case LocationSettingsStatusCodes.SUCCESS:
+                            startLocationUpdates();
+                            break;
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            try {
+                                status.startResolutionForResult(getActivity(), REQUEST_CHECK_SETTINGS);
+                            }
+                            catch (IntentSender.SendIntentException e) {
+                                didShowAgentError();
+                            }
+                            break;
+                        default:
+                            didShowAgentError();
+                            break;
+                    }
+                }
+            });
         }
         else{
             didToggleLoader(true);
@@ -476,10 +498,10 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     }
 
     private void startLocationUpdates(){
-        final Location location = ((Main)getActivity()).getCurrentLocation();
         final String thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
+        final Coordinate location = preferencesManager.getCurrentLocation();
 
-        if(location != null && location.getLatitude() != 0.0 && location.getLongitude() != 0.0){
+        if(location != null){
             didRetrieveAgentQuery("", location.getLatitude(), location.getLongitude(), thing);
         }
         else{
@@ -600,33 +622,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     }
 
     @Override
-    public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
-        final Status status = locationSettingsResult.getStatus();
-        switch (status.getStatusCode()) {
-            case LocationSettingsStatusCodes.SUCCESS:
-                startLocationUpdates();
-                break;
-            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                try {
-                    status.startResolutionForResult(getActivity(), REQUEST_CHECK_SETTINGS);
-                }
-                catch (IntentSender.SendIntentException e) {
-                    didShowAgentError();
-                }
-                break;
-            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                didShowAgentError();
-                break;
-            case LocationSettingsStatusCodes.CANCELED:
-                didShowAgentError();
-                break;
-        }
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
         switch (requestCode) {
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
@@ -639,5 +635,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                 }
                 break;
         }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

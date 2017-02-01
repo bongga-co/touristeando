@@ -34,6 +34,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
         }
     }
 
+    public RealmList<Event> getData(){
+        return this.eventList;
+    }
+
     public void setRowIndex(int index) {
         this.rowIndex = index;
     }
