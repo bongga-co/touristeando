@@ -2,6 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/light_gray"
@@ -10,6 +11,7 @@
         android:id="@+id/activity_place_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingBottom="20dp"
         android:orientation="vertical"
         tools:context="co.bongga.toury.activities.PlaceDetail">
         <ImageView
@@ -73,7 +75,8 @@
         </LinearLayout>
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="250dp">
+            android:layout_height="250dp"
+            android:background="@drawable/container_shadow">
             <ImageView
                 android:id="@+id/dt_location_bg"
                 android:layout_width="match_parent"
@@ -90,47 +93,94 @@
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
                 android:layout_marginEnd="30dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="15dp"
                 android:background="@drawable/container_shadow"
                 android:gravity="start"
                 android:padding="20dp"
                 android:elevation="10dp">
                 <TextView
+                    android:id="@+id/dt_place_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Carrera 70 Nº 119-17"
                     android:gravity="center_vertical"
                     android:drawableLeft="@android:drawable/ic_menu_add"
                     android:drawableStart="@android:drawable/ic_menu_add" />
                 <TextView
+                    android:id="@+id/dt_place_phone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="5049580"
                     android:drawableLeft="@android:drawable/ic_menu_add"
                     android:drawableStart="@android:drawable/ic_menu_add" />
                 <TextView
+                    android:id="@+id/dt_place_city"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="Medellin, Colombia"
                     android:drawableLeft="@android:drawable/ic_menu_add"
                     android:drawableStart="@android:drawable/ic_menu_add" />
                 <TextView
+                    android:id="@+id/dt_place_city_place"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="Florencia"
                     android:drawableLeft="@android:drawable/ic_menu_add"
                     android:drawableStart="@android:drawable/ic_menu_add" />
                 <TextView
+                    android:id="@+id/dt_place_distance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="5 Kms"
                     android:drawableLeft="@android:drawable/ic_menu_add"
                     android:drawableStart="@android:drawable/ic_menu_add" />
             </LinearLayout>
         </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="20dp">
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@mipmap/ic_launcher"
+                android:background="@null" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:background="@drawable/container_shadow">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="@string/dt_place_description"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorAccent" />
+            <TextView
+                android:id="@+id/dt_place_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center" />
+            <View
+                android:id="@+id/desc_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_gray"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp" />
+            <Button
+                android:id="@+id/btn_toggle_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_toggle_place_description"
+                android:background="@drawable/component_bordered_with_shadow"
+                android:textColor="@android:color/darker_gray"
+                android:padding="10dp" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

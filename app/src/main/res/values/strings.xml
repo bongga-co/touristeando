@@ -99,4 +99,7 @@
     <!-- Place Detail -->
     <string name="dt_price_lbl">Desde</string>
     <string name="dt_place_price">%1$s %2$s</string>
+    <string name="dt_place_description">Descripci\u00f3n</string>
+    <string name="btn_toggle_place_description">Ver M\u00e1s</string>
+    <string name="btn_toggle_place_description_minus">Ver Menos</string>
 </resources>

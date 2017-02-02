@@ -15,4 +15,6 @@ public class Constants {
     public static final String ATTRACTIONS_ACTION = "attractions";
     public static final String PLACES_ACTION = "places";
     public static final String HELP_ACTION = "help";
+
+    public static final int DESCRIPTION_LENGHT = 150;
 }

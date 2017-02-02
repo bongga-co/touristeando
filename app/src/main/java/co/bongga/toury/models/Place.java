@@ -13,18 +13,34 @@ public class Place extends RealmObject {
     private float rating;
     private Price price;
     private Coordinate coordinates;
+    private String description;
+    private String city;
+    private String country;
+    private String address;
+    private String place;
+    private Phone phone;
+    private boolean outstanding;
 
     public Place(){
 
     }
 
-    public Place(String name, String category, String thumbnail, float rating, Price price, Coordinate coordinates) {
+    public Place(String name, String category, String thumbnail, float rating, Price price,
+                 Coordinate coordinates, String description, String city, String country,
+                 String address, String place, Phone phone, boolean outstanding) {
         this.name = name;
         this.category = category;
         this.thumbnail = thumbnail;
         this.rating = rating;
         this.price = price;
         this.coordinates = coordinates;
+        this.description = description;
+        this.city = city;
+        this.country = country;
+        this.address = address;
+        this.place = place;
+        this.phone = phone;
+        this.outstanding = outstanding;
     }
 
     public String getName() {
@@ -73,5 +89,61 @@ public class Place extends RealmObject {
 
     public void setCoordinates(Coordinate coordinates) {
         this.coordinates = coordinates;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPlace() {
+        return place;
+    }
+
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
+    public Phone getPhone() {
+        return phone;
+    }
+
+    public void setPhone(Phone phone) {
+        this.phone = phone;
+    }
+
+    public boolean isOutstanding() {
+        return outstanding;
+    }
+
+    public void setOutstanding(boolean outstanding) {
+        this.outstanding = outstanding;
     }
 }
