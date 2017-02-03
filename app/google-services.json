@@ -1,0 +1,109 @@
+{
+  "project_info": {
+    "project_number": "661006396496",
+    "firebase_url": "https://touristeando-881da.firebaseio.com",
+    "project_id": "touristeando-881da",
+    "storage_bucket": "touristeando-881da.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661006396496:android:bfd08ea95d5f3c00",
+        "android_client_info": {
+          "package_name": "co.bongga.android.touristeando"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "661006396496-5r67ov44rkno2h9g52o9774muc2kpf2m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3oCLnAzte96KIMBaLzwL7bblqLiuphJk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "661006396496-5r67ov44rkno2h9g52o9774muc2kpf2m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661006396496:android:4cbc7037ab920821",
+        "android_client_info": {
+          "package_name": "co.bongga.android.testy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "661006396496-5r67ov44rkno2h9g52o9774muc2kpf2m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3oCLnAzte96KIMBaLzwL7bblqLiuphJk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661006396496:android:444de9ff66ff60f7",
+        "android_client_info": {
+          "package_name": "co.bongga.touristeando"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "661006396496-5r67ov44rkno2h9g52o9774muc2kpf2m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3oCLnAzte96KIMBaLzwL7bblqLiuphJk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

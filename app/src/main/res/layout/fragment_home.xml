@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/tile_bg"
-    tools:context="co.bongga.toury.fragments.HomeFragment">
+    tools:context="co.bongga.touristeando.fragments.HomeFragment">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

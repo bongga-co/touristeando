@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="20dp"
         android:orientation="vertical"
-        tools:context="co.bongga.toury.activities.PlaceDetail">
+        tools:context="co.bongga.touristeando.activities.PlaceDetail">
         <ImageView
             android:id="@+id/dt_header_img"
             android:layout_width="match_parent"

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    tools:context="co.bongga.toury.activities.Splash">
+    tools:context="co.bongga.touristeando.activities.Splash">
 
     <TextView
         android:id="@+id/splash_app_name"

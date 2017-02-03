@@ -22,7 +22,7 @@
                 - ¿Dónde puedo encontrar un lugar para comer?
                 - Búscame lugares para jugar fútbol
                 - Quiero ver una película
-                - ¿Dónde puedo jugar paintball en Bogotá?
+                - ¿Dónde puedo jugar paintball en Bogotá? y más.
             </p>\n
             <p>En cualquier momento escribe ayuda para asistirte.</p>
         ]]>
@@ -69,17 +69,14 @@
     <string name="skip">SKIP</string>
     <string name="start">GOT IT</string>
 
-    <string name="slide_1_title">Things to Do</string>
-    <string name="slide_1_desc">Get recommendations on things to do according to your personality</string>
+    <string name="slide_1_title">Preg\u00fantale a Toury</string>
+    <string name="slide_1_desc">Toury es tu asistente y te ayudar\u00e1 a descubrir tu ciudad de otra manera.</string>
 
-    <string name="slide_2_title">See What\'s Nearby</string>
-    <string name="slide_2_desc">Discover amazing places close to you.\n<strong>Note:</strong> It is necessary your location services is on.</string>
+    <string name="slide_2_title">Cosas para hacer</string>
+    <string name="slide_2_desc">Encuentra lugares donde puedes: tener asistencia odontológica, motilarte, tomarte un caf\u00e9, ir a comer, volar en parapente y m\u00e1s.</string>
 
-    <string name="slide_3_title">Go With Friends</string>
-    <string name="slide_3_desc">Invite people with similar preferences to do what you like</string>
-
-    <string name="slide_4_title">Social Media</string>
-    <string name="slide_4_desc">Get your personality traits from your public information on your social networks</string>
+    <string name="slide_3_title">Comparte con amigos</string>
+    <string name="slide_3_desc">Saca tiempo para hacer eso que m\u00e1s te gusta con nuevas personas o con aquellos que ya conoces.</string>
 
     <!-- Preferences / Settings -->
     <string name="pref_clear_all">Borrar Historial</string>
@@ -102,4 +99,13 @@
     <string name="dt_place_description">Descripci\u00f3n</string>
     <string name="btn_toggle_place_description">Ver M\u00e1s</string>
     <string name="btn_toggle_place_description_minus">Ver Menos</string>
+
+    <!-- Feedback -->
+    <string name="feedback_empty_name">Ingresa tu nombre</string>
+    <string name="feedback_invalid_name">Ingresa un nombre v\u00e1lido</string>
+    <string name="feedback_empty_email">Ingresa tu correo electr\u00f3nico</string>
+    <string name="feedback_invalid_email">Ingresa un correo electru00f3nico v\u00e1lido</string>
+    <string name="feedback_empty_msg">Ingresa el comentario que quieres enviarnos</string>
+    <string name="feedback_sent_successfully">Gracias por tu ayuda!\nMejoramos constantemente para hacer tu vida mucho mejor.</string>
+    <string name="feedback_error_sending">No pudimos enviar tus comentarios, ¿Quieres intentar de nuevo?</string>
 </resources>
