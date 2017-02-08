@@ -30,14 +30,14 @@
             android:paddingTop="@dimen/nav_header_vertical_spacing"
             app:srcCompat="@android:drawable/sym_def_app_icon" />
 
-        <TextView
+        <co.bongga.touristeando.ui.TouryTextViewPier
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="@dimen/generic_margin"
             android:text="Silvio Palacios"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-        <TextView
+        <co.bongga.touristeando.ui.TouryTextViewPier
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

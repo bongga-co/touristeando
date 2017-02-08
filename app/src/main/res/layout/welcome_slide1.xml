@@ -16,7 +16,7 @@
             android:layout_height="@dimen/img_width_height"
             android:src="@mipmap/ic_agent" />
 
-        <TextView
+        <co.bongga.touristeando.ui.TouryTextViewPier
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/slide_1_title"
@@ -24,7 +24,7 @@
             android:textSize="@dimen/slide_title"
             android:textStyle="bold" />
 
-        <TextView
+        <co.bongga.touristeando.ui.TouryTextViewPier
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"

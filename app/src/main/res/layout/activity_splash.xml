@@ -7,7 +7,7 @@
     android:background="@color/colorPrimary"
     tools:context="co.bongga.touristeando.activities.Splash">
 
-    <TextView
+    <co.bongga.touristeando.ui.TouryTextView
         android:id="@+id/splash_app_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,7 +17,7 @@
         android:textStyle="bold"
         android:textColor="@android:color/white" />
 
-    <TextView
+    <co.bongga.touristeando.ui.TouryTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"

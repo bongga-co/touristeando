@@ -11,7 +11,7 @@
         android:orientation="vertical"
         android:padding="@dimen/activity_horizontal_margin"
         tools:context="co.bongga.touristeando.activities.Feedback">
-        <TextView
+        <co.bongga.touristeando.ui.TouryTextViewPier
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/feedback_intro"

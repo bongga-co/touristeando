@@ -1,10 +1,17 @@
 package co.bongga.touristeando.activities;
 
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -15,12 +22,15 @@ import java.util.Currency;
 import java.util.Locale;
 
 import co.bongga.touristeando.R;
+import co.bongga.touristeando.adapters.ServicesAdapter;
 import co.bongga.touristeando.models.Coordinate;
 import co.bongga.touristeando.models.Place;
 import co.bongga.touristeando.models.Price;
+import co.bongga.touristeando.models.Service;
 import co.bongga.touristeando.utils.Constants;
 import co.bongga.touristeando.utils.Globals;
 import co.bongga.touristeando.utils.PreferencesManager;
+import io.realm.RealmList;
 
 public class PlaceDetail extends AppCompatActivity implements View.OnClickListener {
     private ScrollView scrollView;
@@ -39,9 +49,15 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     private TextView placeDistance;
     private TextView placePhone;
 
+    private LinearLayout servicesLabelWrapper;
+    private LinearLayout servicesWrapper;
+    private RecyclerView serviceList;
+
     private static int isExpanded = 0;
     private static String shortenDescription;
     private PreferencesManager preferencesManager;
+    private ServicesAdapter servicesAdapter;
+    private RealmList<Service> serviceItems = new RealmList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +85,16 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         placeCityPlace = (TextView) findViewById(R.id.dt_place_city_place);
         placeDistance = (TextView) findViewById(R.id.dt_place_distance);
         placePhone = (TextView) findViewById(R.id.dt_place_phone);
+
+        servicesLabelWrapper = (LinearLayout) findViewById(R.id.dt_place_services_label_wrapper);
+        servicesWrapper = (LinearLayout) findViewById(R.id.dt_place_services_wrapper);
+
+        serviceList = (RecyclerView) findViewById(R.id.dt_services_list);
+        serviceList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        serviceList.setItemAnimator(new DefaultItemAnimator());
+
+        servicesAdapter = new ServicesAdapter(this, serviceItems);
+        serviceList.setAdapter(servicesAdapter);
 
         setupUI(place);
     }
@@ -98,7 +124,14 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         placeDescription.setText(checkDescriptionLength(place.getDescription()));
         placeCity.setText(place.getCity() + ", " + place.getCountry());
         placeAddress.setText(place.getAddress());
-        placeCityPlace.setText(place.getPlace());
+
+        if(place.getPlace() != null){
+            placeCityPlace.setVisibility(View.VISIBLE);
+            placeCityPlace.setText(place.getPlace());
+        }
+        else{
+            placeCityPlace.setVisibility(View.GONE);
+        }
 
         Coordinate userLocation = preferencesManager.getCurrentLocation();
         if(userLocation != null){
@@ -127,6 +160,17 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         }
         else{
             placePhone.setText(String.format(Locale.getDefault(), "%d - %d", cell, phone));
+        }
+
+        if(place.getServices() != null && place.getServices().size() > 0){
+            servicesLabelWrapper.setVisibility(View.VISIBLE);
+            servicesWrapper.setVisibility(View.VISIBLE);
+
+            for(Service service : place.getServices()){
+                serviceItems.add(service);
+            }
+
+            servicesAdapter.notifyDataSetChanged();
         }
     }
 

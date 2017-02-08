@@ -3,7 +3,7 @@
     <string name="slogan">Descubre tu ciudad</string>
     <string name="title_activity_welcome">Welcome</string>
     <string name="share_app">Compartir Touristeando</string>
-    <string name="share_text">Prueba Touristeando!!\n\nDescubre lo que tu ciudad tiene para ofrecerte.\n\nhttps://goo.gl/aiVTqy \n\n</string>
+    <string name="share_text">Prueba Touristeando!!\n\nDescubre lo que tu ciudad tiene para ofrecerte.\n\nhttps://goo.gl/HQR3eQ \n\n</string>
     <string name="share_chooser_title">@string/share_app</string>
 
     <!-- Misc Messages -->
@@ -97,6 +97,7 @@
     <string name="dt_price_lbl">Desde</string>
     <string name="dt_place_price">%1$s %2$s</string>
     <string name="dt_place_description">Descripci\u00f3n</string>
+    <string name="dt_place_services">Servicios</string>
     <string name="btn_toggle_place_description">Ver M\u00e1s</string>
     <string name="btn_toggle_place_description_minus">Ver Menos</string>
 

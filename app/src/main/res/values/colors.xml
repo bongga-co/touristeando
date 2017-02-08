@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="standar_primary">#d94a29</color>
+    <color name="standar_second">#69a578</color>
+    <color name="standar_third">#e1a227</color>
+
+    <color name="colorPrimary">@color/standar_primary</color>
+    <color name="colorPrimaryDark">#c34224</color>
+    <color name="colorAccent">@color/standar_second</color>
 
     <color name="light_gray">#EEEEEE</color>
+
 
     <color name="bg_msg_you">#5eb964</color>
     <color name="bg_msg_from">#e5e7eb</color>

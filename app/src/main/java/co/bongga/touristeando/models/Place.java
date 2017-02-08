@@ -1,5 +1,6 @@
 package co.bongga.touristeando.models;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 
 /**
@@ -20,6 +21,7 @@ public class Place extends RealmObject {
     private String place;
     private Phone phone;
     private boolean outstanding;
+    private RealmList<Service> services;
 
     public Place(){
 
@@ -27,7 +29,7 @@ public class Place extends RealmObject {
 
     public Place(String name, String category, String thumbnail, float rating, Price price,
                  Coordinate coordinates, String description, String city, String country,
-                 String address, String place, Phone phone, boolean outstanding) {
+                 String address, String place, Phone phone, boolean outstanding, RealmList<Service> services) {
         this.name = name;
         this.category = category;
         this.thumbnail = thumbnail;
@@ -41,6 +43,7 @@ public class Place extends RealmObject {
         this.place = place;
         this.phone = phone;
         this.outstanding = outstanding;
+        this.services = services;
     }
 
     public String getName() {
@@ -145,5 +148,13 @@ public class Place extends RealmObject {
 
     public void setOutstanding(boolean outstanding) {
         this.outstanding = outstanding;
+    }
+
+    public RealmList<Service> getServices() {
+        return services;
+    }
+
+    public void setServices(RealmList<Service> services) {
+        this.services = services;
     }
 }
