@@ -69,7 +69,7 @@
                 android:id="@+id/btnText"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@android:drawable/ic_menu_send"
+                android:src="@drawable/ic_query_send"
                 android:background="@null"
                 android:visibility="gone" />
         </LinearLayout>

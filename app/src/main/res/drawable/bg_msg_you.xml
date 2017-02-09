@@ -3,7 +3,7 @@
     android:shape="rectangle" >
 
     <!-- view background color -->
-    <solid android:color="@color/bg_msg_you" >
+    <solid android:color="@color/standar_second" >
     </solid>
 
     <corners android:radius="20dp" >

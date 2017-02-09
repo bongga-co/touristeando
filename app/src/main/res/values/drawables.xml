@@ -2,4 +2,5 @@
     <item name="ic_menu_assistant" type="drawable">@mipmap/ic_menu_assistant</item>
     <item name="ic_menu_settings" type="drawable">@mipmap/ic_menu_settings</item>
     <item name="ic_menu_feedback" type="drawable">@mipmap/ic_menu_feedback</item>
+    <item name="ic_query_send" type="drawable">@mipmap/ic_query_send</item>
 </resources>

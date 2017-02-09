@@ -160,7 +160,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         btnSpeech.setOnClickListener(this);
 
         btnText = (ImageButton) view.findViewById(R.id.btnText);
-        btnText.setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_ATOP);
+        btnText.setColorFilter(ContextCompat.getColor(getActivity(), R.color.standar_primary));
         btnText.setOnClickListener(this);
 
         chatList = (RecyclerView) view.findViewById(R.id.chatList);

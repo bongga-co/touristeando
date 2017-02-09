@@ -116,11 +116,8 @@ public class Main extends AppCompatActivity {
             unbindService(mConnection);
             isServiceBound = false;
         }
-    }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+        //Delete current location
         preferencesManager.setCurrentLocation(null);
     }
 

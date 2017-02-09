@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import co.bongga.touristeando.interfaces.SnackCallback;
+import co.bongga.touristeando.models.Coordinate;
 
 public class UtilityManager {
     private static UtilityManager ourInstance = new UtilityManager();
@@ -130,5 +131,40 @@ public class UtilityManager {
         Matcher matcher = pattern.matcher(name);
 
         return matcher.matches();
+    }
+
+    public static double calculateDistance(Coordinate origin, Coordinate destination) {
+        double theta = origin.getLongitude() - destination.getLongitude();
+        double dist = Math.sin(deg2rad(origin.getLatitude()))
+                * Math.sin(deg2rad(destination.getLatitude()))
+                + Math.cos(deg2rad(origin.getLatitude()))
+                * Math.cos(deg2rad(destination.getLatitude()))
+                * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist);
+    }
+
+    public static double calculateDistance2(Coordinate origin, Coordinate destination){
+        double R = 6371000f; // Radius of the earth in m
+        double dLat = (origin.getLatitude() - destination.getLatitude()) * Math.PI / 180f;
+        double dLon = (origin.getLongitude() - destination.getLongitude()) * Math.PI / 180f;
+
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(origin.getLatitude() * Math.PI / 180f) * Math.cos(destination.getLatitude() * Math.PI / 180f) *
+                        Math.sin(dLon/2) * Math.sin(dLon/2);
+        double c = 2f * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double d = R * c;
+
+        return d/1000f;
+    }
+
+    private static double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private static double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
     }
 }

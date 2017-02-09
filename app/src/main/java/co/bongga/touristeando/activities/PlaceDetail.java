@@ -1,13 +1,12 @@
 package co.bongga.touristeando.activities;
 
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -20,7 +19,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import java.text.NumberFormat;
 import java.util.Currency;
 import java.util.Locale;
-
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.adapters.ServicesAdapter;
 import co.bongga.touristeando.models.Coordinate;
@@ -30,6 +28,7 @@ import co.bongga.touristeando.models.Service;
 import co.bongga.touristeando.utils.Constants;
 import co.bongga.touristeando.utils.Globals;
 import co.bongga.touristeando.utils.PreferencesManager;
+import co.bongga.touristeando.utils.UtilityManager;
 import io.realm.RealmList;
 
 public class PlaceDetail extends AppCompatActivity implements View.OnClickListener {
@@ -99,6 +98,23 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         setupUI(place);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.place_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.ic_action_invite_friend) {
+            return false;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void setupUI(Place place){
         Glide.with(this).load(place.getThumbnail())
             .crossFade()
@@ -136,7 +152,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         Coordinate userLocation = preferencesManager.getCurrentLocation();
         if(userLocation != null){
             Coordinate placeLocation = place.getCoordinates();
-            double distance = calculateDistance(userLocation, placeLocation);
+            double distance = UtilityManager.calculateDistance(userLocation, placeLocation);
 
             if(distance < 1){
                 placeDistance.setText(String.format(Locale.getDefault(), "%.2f m", distance*1000));
@@ -242,20 +258,6 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                 isExpanded=0;
                 break;
         }
-    }
-
-    private double calculateDistance(Coordinate origin, Coordinate destination){
-        double R = 6371000f; // Radius of the earth in m
-        double dLat = (origin.getLatitude() - destination.getLatitude()) * Math.PI / 180f;
-        double dLon = (origin.getLongitude() - destination.getLongitude()) * Math.PI / 180f;
-
-        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(origin.getLatitude() * Math.PI / 180f) * Math.cos(destination.getLatitude() * Math.PI / 180f) *
-                        Math.sin(dLon/2) * Math.sin(dLon/2);
-        double c = 2f * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        double d = R * c;
-
-        return d/1000f;
     }
 
     @Override

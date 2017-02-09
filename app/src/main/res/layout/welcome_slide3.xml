@@ -14,7 +14,7 @@
         <ImageView
             android:layout_width="@dimen/img_width_height"
             android:layout_height="@dimen/img_width_height"
-            android:src="@mipmap/ic_discount" />
+            android:src="@mipmap/ic_share" />
 
         <co.bongga.touristeando.ui.TouryTextViewPier
             android:layout_width="wrap_content"
