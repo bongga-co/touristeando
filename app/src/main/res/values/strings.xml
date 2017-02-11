@@ -11,6 +11,7 @@
     <string name="loader_message">Cargando...</string>
     <string name="no_network_connection">No tienes conexi\u00f3n a internet</string>
     <string name="no_location_provided">Debes proveer tu ubicaci\u00f3n</string>
+    <string name="no_location_found">No pude obtener tu ubicaci\u00f3n, intenta de nuevo</string>
     <string name="btn_ok">Aceptar</string>
     <string name="btn_cancel">Cancelar</string>
     <string name="no_location_services">Instala o actualiza Google Play Services para acceder a tu ubicaci\u00f3n.</string>
@@ -101,6 +102,7 @@
     <string name="btn_toggle_place_description_minus">Ver Menos</string>
     <string name="invite_friend">Invitar Amigo</string>
     <string name="free_label">Gratis</string>
+    <string name="undefined_price">Precio No Definido</string>
 
     <!-- Feedback -->
     <string name="feedback_empty_name">Ingresa tu nombre</string>

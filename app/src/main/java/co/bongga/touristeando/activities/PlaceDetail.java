@@ -129,6 +129,9 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         if(place.getPrice() == null || place.getPrice().getAmount() == 0){
             placePrice.setText(getString(R.string.free_label));
         }
+        else if(place.getPrice().getAmount() < 0){
+            placePrice.setText(getString(R.string.undefined_price));
+        }
         else{
             placePrice.setText(getString(R.string.dt_place_price, setCurrencySymbol(place.getPrice().getCurrency()), setCurrencyFormat(place.getPrice())));
         }

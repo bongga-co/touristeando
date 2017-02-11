@@ -416,6 +416,18 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         didToggleLoader(true);
     }
 
+    private void didShowLocationError(){
+        rqText.setHint(R.string.txt_placeholder_chat_input);
+        btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+
+        ChatMessage msg = new ChatMessage(getString(R.string.no_location_found), false, ChatMessage.TEXT_TYPE);
+        Globals.chatItems.add(msg);
+        didStoreMessage(msg);
+
+        notifyChange();
+        didToggleLoader(true);
+    }
+
     private void didCancelLocation(){
         ChatMessage msg = new ChatMessage(getString(R.string.location_canceled_by_user), false, ChatMessage.TEXT_TYPE);
         Globals.chatItems.add(msg);
@@ -505,7 +517,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         }
         else{
             preferencesManager.setCurrentLocation(null);
-            didShowAgentError();
+            didShowLocationError();
         }
     }
 
