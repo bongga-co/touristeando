@@ -101,7 +101,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.place_detail, menu);
-        return true;
+        return false;
     }
 
     @Override
@@ -125,7 +125,13 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         placeName.setText(place.getName());
         placeCategory.setText(place.getCategory());
         placeRating.setRating(place.getRating());
-        placePrice.setText(getString(R.string.dt_place_price, setCurrencySymbol(place.getPrice().getCurrency()), setCurrencyFormat(place.getPrice())));
+
+        if(place.getPrice() == null || place.getPrice().getAmount() == 0){
+            placePrice.setText(getString(R.string.free_label));
+        }
+        else{
+            placePrice.setText(getString(R.string.dt_place_price, setCurrencySymbol(place.getPrice().getCurrency()), setCurrencyFormat(place.getPrice())));
+        }
 
         String staticMapImageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" +
                 place.getCoordinates().getLatitude()+"," +place.getCoordinates().getLongitude() +
@@ -168,7 +174,10 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         long cell = place.getPhone().getCell();
         long phone = place.getPhone().getPhone();
 
-        if(cell == 0 && phone != 0){
+        if(cell == 0 && phone == 0){
+            placePhone.setVisibility(View.GONE);
+        }
+        else if(cell == 0 && phone != 0){
             placePhone.setText(String.format(Locale.getDefault(), "%d", phone));
         }
         else if(cell != 0 && phone == 0){

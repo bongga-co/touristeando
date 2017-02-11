@@ -16,15 +16,14 @@
     <string name="no_location_services">Instala o actualiza Google Play Services para acceder a tu ubicaci\u00f3n.</string>
     <string name="agent_initial_message">
         <![CDATA[
-            <strong>Hola Tourister!! Soy Toury.</strong>\n
-            <p>Estoy aquí para ayudarte a descubrir las mejores cosas para hacer y lugares que la ciudad tiene para ofrecerte. Puedes preguntarme:</p>\n
+            <strong>Hola Tourister!!</strong>\n
+            <p>Estoy aquí para ayudarte a descubrir las mejores cosas para hacer y lugares que la ciudad tiene para ofrecerte. Puedes preguntarme sobre donde:</p>\n
             <p>
-                - ¿Dónde puedo encontrar un lugar para comer?
-                - Búscame lugares para jugar fútbol
-                - Quiero ver una película
-                - ¿Dónde puedo jugar paintball en Bogotá? y más.
+                * Jugar Fútbol
+                * Tomar un Café
+                * Hacer Ejercicio
             </p>\n
-            <p>En cualquier momento escribe ayuda para asistirte.</p>
+            <p>En cualquier momento escribe ayuda para que conozcas que otras cosas puedo hacer por ti.</p>
         ]]>
     </string>
 
@@ -65,9 +64,9 @@
 
     <!-- Welcome -->
     <!-- Intro Slider -->
-    <string name="next">NEXT</string>
-    <string name="skip">SKIP</string>
-    <string name="start">GOT IT</string>
+    <string name="next">Siguiente</string>
+    <string name="skip">Omitir</string>
+    <string name="start">Empezar</string>
 
     <string name="slide_1_title">Preg\u00fantale a Toury</string>
     <string name="slide_1_desc">Toury es tu asistente y te ayudar\u00e1 a descubrir tu ciudad de otra manera.</string>
@@ -101,6 +100,7 @@
     <string name="btn_toggle_place_description">Ver M\u00e1s</string>
     <string name="btn_toggle_place_description_minus">Ver Menos</string>
     <string name="invite_friend">Invitar Amigo</string>
+    <string name="free_label">Gratis</string>
 
     <!-- Feedback -->
     <string name="feedback_empty_name">Ingresa tu nombre</string>
