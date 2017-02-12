@@ -37,6 +37,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.JsonElement;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +59,7 @@ import co.bongga.touristeando.models.ChatMessage;
 import co.bongga.touristeando.models.Coordinate;
 import co.bongga.touristeando.models.Event;
 import co.bongga.touristeando.models.Place;
+import co.bongga.touristeando.models.Query;
 import co.bongga.touristeando.utils.Constants;
 import co.bongga.touristeando.utils.DataManager;
 import co.bongga.touristeando.utils.Globals;
@@ -86,6 +89,8 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
     private Realm db;
     private PreferencesManager preferencesManager;
+    private FirebaseDatabase firebaseDb;
+    private DatabaseReference databaseReference;
 
     public static final int REQUEST_RECORD_PERMISSION = 1;
     public static final int REQUEST_COARSE_LOCATION_PERMISSION = 2;
@@ -102,6 +107,9 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
         db = Realm.getDefaultInstance();
         preferencesManager = new PreferencesManager(getActivity());
+
+        firebaseDb = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDb.getReference("queries");
 
         chatMessageAdapter = new ChatMessageAdapter(Globals.chatItems);
     }
@@ -339,6 +347,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         ChatMessage msg = new ChatMessage(query, true, ChatMessage.TEXT_TYPE);
         Globals.chatItems.add(msg);
         didStoreMessage(msg);
+        didSaveQuerySearch(msg);
 
         notifyChange();
     }
@@ -528,6 +537,12 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
         notifyChange();
         didToggleLoader(true);
+    }
+
+    private void didSaveQuerySearch(ChatMessage msg){
+        Query q = new Query(msg.getMessage(), msg.getTimestamp(),
+                Constants.BASE_OS.concat(": " + Build.VERSION.SDK_INT + " (" + Build.VERSION.RELEASE + ")"));
+        databaseReference.push().setValue(q);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package co.bongga.touristeando.models;
 
+import java.util.Date;
 import java.util.UUID;
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -23,6 +24,7 @@ public class ChatMessage extends RealmObject {
     private int layout_type;
     private RealmList<Event> event;
     private RealmList<Place> place;
+    private long timestamp;
 
     public ChatMessage(){
 
@@ -33,6 +35,7 @@ public class ChatMessage extends RealmObject {
         this.message = message;
         this.isSelf = isSelf;
         this.layout_type = layout_type;
+        this.timestamp = new Date().getTime();
     }
 
     /*public ChatMessage(RealmList<Event> event, boolean isSelf, int layout_type){
@@ -47,6 +50,7 @@ public class ChatMessage extends RealmObject {
         this.place = place;
         this.isSelf = isSelf;
         this.layout_type = layout_type;
+        this.timestamp = new Date().getTime();
     }
 
     public String getId() {
@@ -95,5 +99,13 @@ public class ChatMessage extends RealmObject {
 
     public void setPlace(RealmList<Place> place) {
         this.place = place;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

@@ -17,7 +17,7 @@
     <!-- Welcome Slider -->
     <!-- Screens background color-->
     <color name="bg_screen1">#f6734c</color>
-    <color name="bg_screen2">#bbd220</color>
+    <color name="bg_screen2">@color/standar_third</color>
     <color name="bg_screen3">#3395ff</color>
 
     <!-- dots inactive colors -->

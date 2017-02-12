@@ -5,6 +5,7 @@ package co.bongga.touristeando.utils;
  */
 
 public class Constants {
+    public static final String BASE_OS = "Android SDK";
     public static final String API_AI_KEY = "416855e204a74ea4813328dab1cae292";
 
     public static final String API_BASE_URL = "https://touristeando.herokuapp.com/api/";
