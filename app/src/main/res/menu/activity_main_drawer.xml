@@ -11,14 +11,13 @@
             android:title="@string/nav_profile"
             android:visible="false" />
         <item
+            android:id="@+id/nav_offer"
+            android:icon="@drawable/ic_menu_offer"
+            android:title="@string/nav_offers" />
+        <item
             android:id="@+id/nav_booking"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/nav_bookings"
-            android:visible="false" />
-        <item
-            android:id="@+id/nav_offer"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/nav_offers"
             android:visible="false" />
         <item
             android:id="@+id/nav_invitation"

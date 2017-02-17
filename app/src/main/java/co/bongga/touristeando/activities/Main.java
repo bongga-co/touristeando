@@ -7,8 +7,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -21,14 +19,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationSettingsRequest;
-
+import com.google.firebase.messaging.FirebaseMessaging;
 import co.bongga.touristeando.R;
+import co.bongga.touristeando.controllers.NotificationsPresenter;
 import co.bongga.touristeando.fragments.HomeFragment;
+import co.bongga.touristeando.fragments.NotificationFragment;
 import co.bongga.touristeando.fragments.ProfileFragment;
 import co.bongga.touristeando.services.LocationService;
 import co.bongga.touristeando.utils.CircleTransform;
@@ -47,6 +46,7 @@ public class Main extends AppCompatActivity {
     private static int navItemIndex = 0;
     private static final String TAG_HOME = "home";
     private static final String TAG_PROFILE = "profile";
+    private static final String TAG_OFFER = "offer";
     private static String CURRENT_TAG = TAG_HOME;
 
     private String[] activityTitles;
@@ -55,23 +55,17 @@ public class Main extends AppCompatActivity {
     private ImageView imgNavHeaderBg, imgProfile;
     private PreferencesManager preferencesManager;
 
+    NotificationsPresenter notificationsPresenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         preferencesManager = new PreferencesManager(this);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
 
@@ -96,6 +90,16 @@ public class Main extends AppCompatActivity {
         if (savedInstanceState == null) {
             navItemIndex = 0;
             CURRENT_TAG = TAG_HOME;
+
+            Bundle extras = getIntent().getExtras();
+            if(extras != null){
+                boolean hasNotification = extras.getBoolean("hasNotification");
+                if(hasNotification){
+                    navItemIndex = 2;
+                    CURRENT_TAG = TAG_OFFER;
+                }
+            }
+
             loadHomeFragment();
         }
     }
@@ -103,7 +107,6 @@ public class Main extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
         Intent intent = new Intent(this, LocationService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
@@ -111,7 +114,6 @@ public class Main extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-
         if (isServiceBound) {
             unbindService(mConnection);
             isServiceBound = false;
@@ -122,11 +124,28 @@ public class Main extends AppCompatActivity {
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        Bundle extras = intent.getExtras();
+        if(extras != null){
+            boolean hasNotification = extras.getBoolean("hasNotification");
+            if(hasNotification){
+                navItemIndex = 2;
+                CURRENT_TAG = TAG_OFFER;
+            }
+
+            loadHomeFragment();
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        }
+        else {
             super.onBackPressed();
         }
     }
@@ -184,20 +203,19 @@ public class Main extends AppCompatActivity {
 
         // loading header background image
         Glide.with(this).load(urlNavHeaderBg)
-                .crossFade()
-                .placeholder(R.drawable.nav_menu_header_bg)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(imgNavHeaderBg);
+            .crossFade()
+            .placeholder(R.drawable.nav_menu_header_bg)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .into(imgNavHeaderBg);
 
         // Loading profile image
         Glide.with(this).load(urlProfileImg)
-                .crossFade()
-                //.placeholder(R.drawable.bongga_logo_light)
-                .thumbnail(0.5f)
-                .bitmapTransform(new CircleTransform(this))
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.nav_placeholder_profile)
-                .into(imgProfile);
+            .crossFade()
+            .thumbnail(0.5f)
+            .bitmapTransform(new CircleTransform(this))
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .placeholder(R.drawable.nav_placeholder_profile)
+            .into(imgProfile);
     }
 
     private void setUpNavigationView() {
@@ -207,44 +225,50 @@ public class Main extends AppCompatActivity {
             // This method will trigger on item Click of navigation menu
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                //Check to see which item was being clicked and perform appropriate action
-                switch (menuItem.getItemId()) {
-                    case R.id.nav_home:
-                        navItemIndex = 0;
-                        CURRENT_TAG = TAG_HOME;
+            //Check to see which item was being clicked and perform appropriate action
+            switch (menuItem.getItemId()) {
+                case R.id.nav_home:
+                    navItemIndex = 0;
+                    CURRENT_TAG = TAG_HOME;
 
-                        setCheckMenuItem(menuItem);
-                        loadHomeFragment();
-                        break;
-                    case R.id.nav_profile:
-                        navItemIndex = 1;
-                        CURRENT_TAG = TAG_PROFILE;
+                    setCheckMenuItem(menuItem);
+                    loadHomeFragment();
+                    break;
+                case R.id.nav_profile:
+                    navItemIndex = 1;
+                    CURRENT_TAG = TAG_PROFILE;
 
-                        setCheckMenuItem(menuItem);
-                        loadHomeFragment();
-                        break;
-                    case R.id.nav_setting:
-                        startActivity(new Intent(Main.this, Settings.class));
-                        setCloseDrawer();
-                        break;
-                    case R.id.nav_feedback:
-                        startActivity(new Intent(Main.this, Feedback.class));
-                        setCloseDrawer();
-                        break;
-                    case R.id.nav_terms:
-                        startActivity(new Intent(Main.this, Terms.class));
-                        setCloseDrawer();
-                        break;
-                    default:
-                        navItemIndex = 0;
-                }
+                    setCheckMenuItem(menuItem);
+                    loadHomeFragment();
+                    break;
+                case R.id.nav_offer:
+                    navItemIndex = 2;
+                    CURRENT_TAG = TAG_OFFER;
 
-                return true;
+                    setCheckMenuItem(menuItem);
+                    loadHomeFragment();
+                    break;
+                case R.id.nav_setting:
+                    startActivity(new Intent(Main.this, Settings.class));
+                    setCloseDrawer();
+                    break;
+                case R.id.nav_feedback:
+                    startActivity(new Intent(Main.this, Feedback.class));
+                    setCloseDrawer();
+                    break;
+                case R.id.nav_terms:
+                    startActivity(new Intent(Main.this, Terms.class));
+                    setCloseDrawer();
+                    break;
+                default:
+                    navItemIndex = 0;
+            }
+
+            return true;
             }
         });
 
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer) {
-
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
@@ -341,6 +365,11 @@ public class Main extends AppCompatActivity {
             case 1:
                 ProfileFragment profileFragment = new ProfileFragment();
                 return profileFragment;
+            case 2:
+                NotificationFragment notificationFragment = new NotificationFragment();
+                notificationsPresenter = new NotificationsPresenter(
+                        notificationFragment, FirebaseMessaging.getInstance());
+                return notificationFragment;
             default:
                 return new HomeFragment();
         }
@@ -376,9 +405,5 @@ public class Main extends AppCompatActivity {
 
     public GoogleApiClient getGoogleAPIClient(){
         return mService.getGoogleApiClient();
-    }
-
-    public void startLocationUpdates(){
-        mService.startLocationUpdates();
     }
 }

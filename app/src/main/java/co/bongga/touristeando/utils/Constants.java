@@ -18,4 +18,5 @@ public class Constants {
     public static final String HELP_ACTION = "help";
 
     public static final int DESCRIPTION_LENGHT = 150;
+    public static final String GENERAL_TOPIC = "general";
 }

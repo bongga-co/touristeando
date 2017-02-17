@@ -176,6 +176,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         chatList.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         chatList.setLayoutManager(layoutManager);
+        chatList.setHasFixedSize(true);
         chatList.setItemAnimator(new DefaultItemAnimator());
         chatList.setAdapter(chatMessageAdapter);
 

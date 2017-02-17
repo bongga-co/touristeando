@@ -229,13 +229,13 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             RecyclerView eventList = (RecyclerView) itemView.findViewById(R.id.eventList);
             eventList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+            eventList.setHasFixedSize(true);
             placeAdapter = new PlaceAdapter(context);
             eventList.setAdapter(placeAdapter);
 
             eventList.addOnItemTouchListener(new RecyclerItemClickListener(context, eventList, new RecyclerClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-                    //Place newPlace = innerPlacesList.get(position);
                     Place newPlace = placeAdapter.getData().get(position);
                     Globals.currentPlace = newPlace;
 
