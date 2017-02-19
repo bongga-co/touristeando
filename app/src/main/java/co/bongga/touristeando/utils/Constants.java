@@ -5,8 +5,10 @@ package co.bongga.touristeando.utils;
  */
 
 public class Constants {
+    //Generals
     public static final String BASE_OS = "Android SDK";
     public static final String API_AI_KEY = "416855e204a74ea4813328dab1cae292";
+    public static final int DESCRIPTION_LENGHT = 150;
 
     public static final String API_BASE_URL = "https://touristeando.herokuapp.com/api/";
     public static final String DEFAULT_HEADER_IMAGE = "http://bongga.co/global_res/images/nav_menu_header_bg.jpg";
@@ -17,6 +19,11 @@ public class Constants {
     public static final String PLACES_ACTION = "places";
     public static final String HELP_ACTION = "help";
 
-    public static final int DESCRIPTION_LENGHT = 150;
+    //Action types
+    public static final String SEARCH_ACTION_TYPE = "search";
+    public static final String BOOKING_ACTION_TYPE = "book";
+
+    //Notifications Channels
     public static final String GENERAL_TOPIC = "general";
+    public static final String OFFER_TOPIC = "offer";
 }

@@ -37,8 +37,8 @@ public class DataManager {
         return null;
     }
 
-    public static JsonElement willGetAllPlaces(String city, double lat, double lng, String category, int distance, final DataCallback callback){
-        Call<JsonElement> call = apiService.willGetAllPlaces(city, lat, lng, category, distance);
+    public static JsonElement willGetAllPlaces(String city, double lat, double lng, String category, int distance, String sort, final DataCallback callback){
+        Call<JsonElement> call = apiService.willGetAllPlaces(city, lat, lng, category, distance, sort);
         call.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement>call, Response<JsonElement> response) {

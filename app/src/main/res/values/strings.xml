@@ -19,12 +19,13 @@
     <string name="agent_initial_message">
         <![CDATA[
             <strong>Hola Tourister!!</strong>\n
-            <p>Estoy aquí para ayudarte a descubrir las mejores cosas para hacer y lugares que la ciudad tiene para ofrecerte. Puedes preguntarme sobre donde:</p>\n
+            <p>Descubre las mejores cosas para hacer y lugares que la ciudad tiene para ofrecerte. Puedes preguntarme sobre donde:</p>\n
             <p>
                 * Jugar Fútbol
                 * Tomar un Café
                 * Hacer Ejercicio (Gimnasios)
                 * Jugar Paintball
+                * Tener Asistencia Odontológica y más.
             </p>\n
             <p>En cualquier momento escribe ayuda para que conozcas que otras cosas puedo hacer por ti.</p>
         ]]>

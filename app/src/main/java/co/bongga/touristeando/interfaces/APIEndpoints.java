@@ -18,7 +18,8 @@ public interface APIEndpoints {
         @Header("latitude") double latitude,
         @Header("longitude") double longitude,
         @Header("category") String category,
-        @Header("radius") int distance
+        @Header("radius") int distance,
+        @Header("sorting") String sorting
     );
 
     @GET("attractions")

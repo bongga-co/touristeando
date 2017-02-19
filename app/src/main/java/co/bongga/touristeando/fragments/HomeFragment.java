@@ -173,7 +173,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
         chatList = (RecyclerView) view.findViewById(R.id.chatList);
 
-        chatList.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         chatList.setLayoutManager(layoutManager);
         chatList.setHasFixedSize(true);
@@ -307,19 +306,22 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                 if(result.getAction().equals(Constants.PLACES_ACTION)){
                     String city = null;
                     String thing = null;
+                    String sort = (agentParams.get("sorting") != null) ?
+                            UtilityManager.removeAccents(agentParams.get("sorting").getAsString()) : null;
+                    String actionType = null;
 
                     if(agentParams.get("thing") != null){
                         thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
 
                         if(agentParams.get("city") != null){
-                            //Get location as well
+                            //TODO: Get location as well
                             city = UtilityManager.removeAccents(agentParams.get("city").getAsString());
-                            didRetrieveAgentQuery(city, 0, 0, thing);
+                            didRetrieveAgentQuery(city, 0, 0, thing, sort);
                         }
                         else{
                             Coordinate location = preferencesManager.getCurrentLocation();
                             if(location != null){
-                                didRetrieveAgentQuery(null, location.getLatitude(), location.getLongitude(), thing);
+                                didRetrieveAgentQuery(null, location.getLatitude(), location.getLongitude(), thing, sort);
                             }
                             else{
                                 requestForLocationPermission();
@@ -353,7 +355,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         notifyChange();
     }
 
-    private void didRetrieveAgentQuery(String city, double latitude, double longitude, String thing){
+    private void didRetrieveAgentQuery(String city, double latitude, double longitude, String thing, String sort){
         final RealmList<Place> listPlaces = new RealmList<>();
 
         int distance = preferencesManager.getDistance();
@@ -361,7 +363,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             distance = getResources().getInteger(R.integer.default_distance);
         }
 
-        DataManager.willGetAllPlaces(city, latitude, longitude, thing, distance, new DataCallback() {
+        DataManager.willGetAllPlaces(city, latitude, longitude, thing, distance, sort, new DataCallback() {
             @Override
             public void didReceiveEvent(List<Event> data) {
 
@@ -520,10 +522,11 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
     private void startLocationUpdates(){
         final String thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
+        final String sort = UtilityManager.removeAccents(agentParams.get("sorting").getAsString());
         final Coordinate location = preferencesManager.getCurrentLocation();
 
         if(location != null){
-            didRetrieveAgentQuery("", location.getLatitude(), location.getLongitude(), thing);
+            didRetrieveAgentQuery("", location.getLatitude(), location.getLongitude(), thing, sort);
         }
         else{
             preferencesManager.setCurrentLocation(null);
