@@ -1,15 +1,10 @@
 package co.bongga.touristeando.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
-
 import java.util.List;
 import co.bongga.touristeando.interfaces.APIEndpoints;
 import co.bongga.touristeando.interfaces.DataCallback;
+import co.bongga.touristeando.models.CollectionPlace;
 import co.bongga.touristeando.models.Event;
-import co.bongga.touristeando.models.Place;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,25 +32,19 @@ public class DataManager {
         return null;
     }
 
-    public static JsonElement willGetAllPlaces(String city, double lat, double lng, String category, int distance, String sort, final DataCallback callback){
-        Call<JsonElement> call = apiService.willGetAllPlaces(city, lat, lng, category, distance, sort);
-        call.enqueue(new Callback<JsonElement>() {
+    public static CollectionPlace willGetAllPlaces(String city, double lat, double lng, String category, int distance, String sort, final DataCallback callback){
+        Call<CollectionPlace> call = apiService.willGetAllPlaces(city, lat, lng, category, distance, sort);
+        call.enqueue(new Callback<CollectionPlace>() {
             @Override
-            public void onResponse(Call<JsonElement>call, Response<JsonElement> response) {
-                JsonElement rObj = response.body();
-                if(rObj.getAsJsonObject().get("data") != null){
-                    JsonArray array = rObj.getAsJsonObject().get("data").getAsJsonArray();
-                    List<Place> places = new Gson().fromJson(array.toString(), new TypeToken<List<Place>>(){}.getType());
-
-                    callback.didReceivePlace(places);
-                }
-                else{
-                    callback.didReceivePlace(null);
+            public void onResponse(Call<CollectionPlace>call, Response<CollectionPlace> response) {
+                CollectionPlace places = response.body();
+                if(places.getListPlace() != null){
+                    callback.didReceivePlace(places.getListPlace());
                 }
             }
 
             @Override
-            public void onFailure(Call<JsonElement>call, Throwable t) {
+            public void onFailure(Call<CollectionPlace>call, Throwable t) {
                 callback.didReceivePlace(null);
             }
         });

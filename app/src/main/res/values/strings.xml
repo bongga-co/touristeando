@@ -65,6 +65,7 @@
     <string name="generic_agent_error">No pude procesar lo que me pediste, intenta de nuevo.</string>
     <string name="generic_agent_no_content">Lo siento, no pude encontrar informaci\u00f3n cerca de ti. Intenta buscar por ciudad.</string>
     <string name="location_canceled_by_user">Necesito tu ubicaci\u00f3n para mostrarte los mejores lugares cerca de ti.</string>
+    <string name="no_chat_msg">No hay mensajes</string>
 
     <!-- Welcome -->
     <!-- Intro Slider -->

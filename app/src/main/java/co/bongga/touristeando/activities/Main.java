@@ -1,12 +1,8 @@
 package co.bongga.touristeando.activities;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -21,23 +17,18 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.firebase.messaging.FirebaseMessaging;
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.controllers.NotificationsPresenter;
 import co.bongga.touristeando.fragments.HomeFragment;
 import co.bongga.touristeando.fragments.NotificationFragment;
 import co.bongga.touristeando.fragments.ProfileFragment;
-import co.bongga.touristeando.services.LocationService;
 import co.bongga.touristeando.utils.CircleTransform;
 import co.bongga.touristeando.utils.Constants;
 import co.bongga.touristeando.utils.PreferencesManager;
+import co.bongga.touristeando.utils.UtilityManager;
 
 public class Main extends AppCompatActivity {
-    LocationService mService;
-    public boolean isServiceBound = false;
-
     private DrawerLayout drawer;
     private NavigationView navigationView;
     private Handler handler;
@@ -105,25 +96,6 @@ public class Main extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        Intent intent = new Intent(this, LocationService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (isServiceBound) {
-            unbindService(mConnection);
-            isServiceBound = false;
-        }
-
-        //Delete current location
-        preferencesManager.setCurrentLocation(null);
-    }
-
-    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
@@ -170,7 +142,7 @@ public class Main extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == HomeFragment.REQUEST_CHECK_SETTINGS){
+        if(requestCode == Constants.REQUEST_CHECK_SETTINGS){
             HomeFragment fragment = getHomeFragment();
             fragment.onActivityResult(requestCode, resultCode, data);
         }
@@ -181,9 +153,9 @@ public class Main extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if(requestCode == HomeFragment.REQUEST_COARSE_LOCATION_PERMISSION ||
-                requestCode == HomeFragment.REQUEST_FINE_LOCATION_PERMISSION ||
-                requestCode == HomeFragment.REQUEST_RECORD_PERMISSION){
+        if(requestCode == Constants.REQUEST_COARSE_LOCATION_PERMISSION ||
+                requestCode == Constants.REQUEST_FINE_LOCATION_PERMISSION ||
+                requestCode == Constants.REQUEST_RECORD_PERMISSION){
             HomeFragment fragment = getHomeFragment();
             fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -277,6 +249,7 @@ public class Main extends AppCompatActivity {
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
+                UtilityManager.hideKeyboard(Main.this);
             }
         };
 
@@ -381,29 +354,5 @@ public class Main extends AppCompatActivity {
         send.setType("text/plain");
 
         startActivity(Intent.createChooser(send, getResources().getString(R.string.share_chooser_title)));
-    }
-
-    //Manage the connection with the LocationService
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
-            mService = binder.getService();
-            isServiceBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            isServiceBound = false;
-        }
-    };
-
-    public LocationSettingsRequest getLocationSetting(){
-        return mService.buildLocationSetting();
-    }
-
-    public GoogleApiClient getGoogleAPIClient(){
-        return mService.getGoogleApiClient();
     }
 }

@@ -16,6 +16,31 @@
             android:paddingBottom="70dp"
             android:clipToPadding="false"/>
         <LinearLayout
+            android:id="@+id/noChatMessages"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            tools:visibility="gone">
+            <ImageView
+                android:id="@+id/noMessagesIcon"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_empty_chat"
+                android:tint="@android:color/darker_gray" />
+            <TextView
+                android:id="@+id/noChatMessagesText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/no_chat_msg"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+        </LinearLayout>
+        <LinearLayout
             android:id="@+id/chat_bottom_container"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -41,7 +66,7 @@
                 android:id="@+id/chat_left_action"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@mipmap/ic_launcher"
+                android:src="@mipmap/ic_help"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginRight="5dp"

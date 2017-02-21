@@ -26,4 +26,10 @@ public class Constants {
     //Notifications Channels
     public static final String GENERAL_TOPIC = "general";
     public static final String OFFER_TOPIC = "offer";
+
+    //Request codes
+    public static final int REQUEST_RECORD_PERMISSION = 1;
+    public static final int REQUEST_COARSE_LOCATION_PERMISSION = 2;
+    public static final int REQUEST_FINE_LOCATION_PERMISSION = 3;
+    public static final int REQUEST_CHECK_SETTINGS = 4;
 }
