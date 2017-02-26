@@ -11,6 +11,7 @@ public class Constants {
     public static final int DESCRIPTION_LENGHT = 150;
 
     public static final String API_BASE_URL = "https://touristeando.herokuapp.com/api/";
+    public static final String API_SODA_URL = "https://www.datos.gov.co/resource/";
     public static final String DEFAULT_HEADER_IMAGE = "http://bongga.co/global_res/images/nav_menu_header_bg.jpg";
     public static final String DEFAULT_PROFILE_IMAGE = "http://bongga.co/global_res/images/logo.png";
 
@@ -26,10 +27,15 @@ public class Constants {
     //Notifications Channels
     public static final String GENERAL_TOPIC = "general";
     public static final String OFFER_TOPIC = "offer";
+    public static final String TEST_TOPIC = "test";
 
     //Request codes
     public static final int REQUEST_RECORD_PERMISSION = 1;
     public static final int REQUEST_COARSE_LOCATION_PERMISSION = 2;
     public static final int REQUEST_FINE_LOCATION_PERMISSION = 3;
     public static final int REQUEST_CHECK_SETTINGS = 4;
+
+    //Things to do
+    public static final String WIFI_THING = "conseguir wifi gratis";
+    public static final int WIFI_POINTS_LIMIT = 1000;
 }

@@ -23,7 +23,7 @@
             <p>
                 * Jugar Fútbol
                 * Tomar un Café
-                * Hacer Ejercicio (Gimnasios)
+                * Hacer Ejercicio
                 * Jugar Paintball
                 * Tener Asistencia Odontológica y más.
             </p>\n
@@ -41,7 +41,7 @@
     <!-- Drawer Items -->
     <string name="nav_section_others">Otros</string>
 
-    <string name="nav_home">Preg\u00fantale a Toury</string>
+    <string name="nav_home">Asistente</string>
     <string name="nav_setting">Ajustes</string>
     <string name="nav_feedback">Feedback \u0026 Ayuda</string>
     <string name="nav_profile">Perfil</string>
@@ -60,7 +60,7 @@
     </string-array>
 
     <!-- Assistant Activity -->
-    <string name="txt_placeholder_chat_input">Preg\u00fantale a Toury...</string>
+    <string name="txt_placeholder_chat_input">¿Qu\u00e9 quieres descubrir? ...</string>
     <string name="txt_placeholder_chat_listening">Escuchando...</string>
     <string name="generic_agent_error">No pude procesar lo que me pediste, intenta de nuevo.</string>
     <string name="generic_agent_no_content">Lo siento, no pude encontrar informaci\u00f3n cerca de ti. Intenta buscar por ciudad.</string>

@@ -22,7 +22,7 @@ public class ChatMessage extends RealmObject {
     private boolean isSelf;
     private String message;
     private int layout_type;
-    private RealmList<Event> event;
+    private RealmList<PublicWiFi> event;
     private RealmList<Place> place;
     private long timestamp;
 
@@ -38,12 +38,12 @@ public class ChatMessage extends RealmObject {
         this.timestamp = new Date().getTime();
     }
 
-    /*public ChatMessage(RealmList<Event> event, boolean isSelf, int layout_type){
+    public ChatMessage(RealmList<PublicWiFi> event, boolean isSelf, int layout_type, boolean test){
         this.id = UUID.randomUUID().toString();
         this.event = event;
         this.isSelf = isSelf;
         this.layout_type = layout_type;
-    }*/
+    }
 
     public ChatMessage(RealmList<Place> place, boolean isSelf, int layout_type){
         this.id = UUID.randomUUID().toString();
@@ -85,11 +85,11 @@ public class ChatMessage extends RealmObject {
         this.layout_type = layout_type;
     }
 
-    public RealmList<Event> getEvent() {
+    public RealmList<PublicWiFi> getEvent() {
         return event;
     }
 
-    public void setEvent(RealmList<Event> event) {
+    public void setEvent(RealmList<PublicWiFi> event) {
         this.event = event;
     }
 

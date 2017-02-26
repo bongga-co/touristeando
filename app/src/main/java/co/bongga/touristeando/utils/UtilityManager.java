@@ -16,6 +16,17 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,6 +38,9 @@ import java.util.regex.Pattern;
 
 import co.bongga.touristeando.interfaces.SnackCallback;
 import co.bongga.touristeando.models.Coordinate;
+import co.bongga.touristeando.models.RealmDouble;
+import io.realm.RealmList;
+import io.realm.RealmObject;
 
 public class UtilityManager {
     private static UtilityManager ourInstance = new UtilityManager();
@@ -195,5 +209,42 @@ public class UtilityManager {
         }
 
         return isInBackground;
+    }
+
+    public static Gson doubleBuilder(){
+        Type tokenInt = new TypeToken<RealmList<RealmDouble>>(){}.getType();
+
+        Gson gson = new GsonBuilder()
+            .setExclusionStrategies(new ExclusionStrategy() {
+                @Override
+                public boolean shouldSkipField(FieldAttributes f) {
+                    return f.getDeclaringClass().equals(RealmObject.class);
+                }
+
+                @Override
+                public boolean shouldSkipClass(Class<?> clazz) {
+                    return false;
+                }
+            })
+            .registerTypeAdapter(tokenInt, new TypeAdapter<RealmList<RealmDouble>>() {
+
+                @Override
+                public void write(JsonWriter out, RealmList<RealmDouble> value) throws IOException {
+                    // Ignore
+                }
+
+                @Override
+                public RealmList<RealmDouble> read(JsonReader in) throws IOException {
+                    RealmList<RealmDouble> list = new RealmList<>();
+                    in.beginArray();
+                    while (in.hasNext()) {
+                        list.add(new RealmDouble(in.nextDouble()));
+                    }
+                    in.endArray();
+                    return list;
+                }
+            })
+            .create();
+        return gson;
     }
 }

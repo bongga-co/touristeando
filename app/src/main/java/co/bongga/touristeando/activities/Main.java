@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.controllers.NotificationsPresenter;

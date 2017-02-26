@@ -10,6 +10,7 @@ import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -28,9 +29,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -41,6 +40,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.JsonElement;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+
 import ai.api.AIServiceException;
 import ai.api.android.AIDataService;
 import ai.api.AIListener;
@@ -57,6 +58,7 @@ import co.bongga.touristeando.models.ChatMessage;
 import co.bongga.touristeando.models.Coordinate;
 import co.bongga.touristeando.models.Event;
 import co.bongga.touristeando.models.Place;
+import co.bongga.touristeando.models.PublicWiFi;
 import co.bongga.touristeando.models.Query;
 import co.bongga.touristeando.utils.Constants;
 import co.bongga.touristeando.utils.DataManager;
@@ -80,7 +82,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
     private ImageButton btnText;
     private ProgressBar progressBar;
     private ImageView chatLeftAction;
-    private LinearLayout noChatMessages;
 
     private AIService aiService;
     private AIRequest aiRequest;
@@ -140,8 +141,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         progressBar = (ProgressBar) view.findViewById(R.id.chat_response_progress);
-
-        noChatMessages = (LinearLayout) view.findViewById(R.id.noChatMessages);
 
         chatLeftAction = (ImageView) view.findViewById(R.id.chat_left_action);
         chatLeftAction.setColorFilter(ContextCompat.getColor(getActivity(), R.color.standar_second), PorterDuff.Mode.SRC_ATOP);
@@ -256,6 +255,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
         aiRequest.setQuery(query);
         didToggleLoader(false);
+        UtilityManager.hideKeyboard(getActivity());
 
         new AsyncTask<AIRequest, Void, AIResponse>() {
             @Override
@@ -367,6 +367,49 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         notifyChange();
     }
 
+    private void didRetrieveWifiPoint(double latitude, double longitude){
+        final RealmList<PublicWiFi> points = new RealmList<>();
+
+        int distance = preferencesManager.getDistance();
+        if(distance == 0){
+            distance = getResources().getInteger(R.integer.default_distance);
+        }
+        int points_limit = Constants.WIFI_POINTS_LIMIT * distance;
+        String params = String.format(Locale.getDefault(), "within_circle(latitud_y,%.3f,%.3f,%d)",
+                latitude, longitude, points_limit);
+
+        DataManager.willGetPublicWifiPoints(params, new DataCallback() {
+            @Override
+            public void didReceivePoints(List<PublicWiFi> data) {
+                if(data != null){
+                    if(data.size() > 0){
+                        for(PublicWiFi point : data){
+                            points.add(point);
+                        }
+
+                        ChatMessage msg = new ChatMessage(points, false, ChatMessage.EVENT_TYPE, false);
+                        Globals.chatItems.add(msg);
+                        didStoreMessage(msg);
+
+                        notifyChange();
+                        didToggleLoader(true);
+                    }
+                    else{
+                        showDefaultMessage();
+                    }
+                }
+                else{
+                    didShowAgentError();
+                }
+            }
+
+            @Override
+            public void didReceivePlace(List<Place> data) {
+
+            }
+        });
+    }
+
     private void didRetrieveAgentQuery(String city, double latitude, double longitude, String thing, String sort){
         final RealmList<Place> listPlaces = new RealmList<>();
 
@@ -377,7 +420,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
         DataManager.willGetAllPlaces(city, latitude, longitude, thing, distance, sort, new DataCallback() {
             @Override
-            public void didReceiveEvent(List<Event> data) {
+            public void didReceivePoints(List<PublicWiFi> data) {
 
             }
 
@@ -447,6 +490,18 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         didToggleLoader(true);
     }
 
+    private void didShowLocationError(){
+        rqText.setHint(R.string.txt_placeholder_chat_input);
+        btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+
+        ChatMessage msg = new ChatMessage(getString(R.string.no_location_found), false, ChatMessage.TEXT_TYPE);
+        Globals.chatItems.add(msg);
+        didStoreMessage(msg);
+
+        notifyChange();
+        didToggleLoader(true);
+    }
+
     private void didCancelLocation(){
         ChatMessage msg = new ChatMessage(getString(R.string.location_canceled_by_user), false, ChatMessage.TEXT_TYPE);
         Globals.chatItems.add(msg);
@@ -475,10 +530,18 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                 UtilityManager.removeAccents(agentParams.get("sorting").getAsString()) : null;
         final Coordinate location = preferencesManager.getCurrentLocation();
 
-        while(location == null){}
-
-        didRetrieveAgentQuery(city, location.getLatitude(), location.getLongitude(), thing, sort);
-        preferencesManager.setCurrentLocation(null);
+        if(location != null){
+            if(thing.equals(Constants.WIFI_THING)){
+                didRetrieveWifiPoint(location.getLatitude(), location.getLongitude());
+            }
+            else{
+                didRetrieveAgentQuery(city, location.getLatitude(), location.getLongitude(), thing, sort);
+                preferencesManager.setCurrentLocation(null);
+            }
+        }
+        else{
+            didShowLocationError();
+        }
     }
 
     protected void requestForLocationSettings() {
@@ -554,12 +617,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
     private void setEmptyChat(){
         if(Globals.chatItems.size() <= 0){
-            noChatMessages.setVisibility(View.VISIBLE);
-            chatList.setVisibility(View.GONE);
-        }
-        else{
-            noChatMessages.setVisibility(View.GONE);
-            chatList.setVisibility(View.VISIBLE);
+            setHelpMessage();
         }
     }
 
@@ -675,7 +733,12 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             case Constants.REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        prepareDataRetrievement();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                prepareDataRetrievement();
+                            }
+                        }, 3000);
                         break;
                     case Activity.RESULT_CANCELED:
                         didCancelLocation();

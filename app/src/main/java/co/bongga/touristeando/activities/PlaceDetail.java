@@ -138,7 +138,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
 
         String staticMapImageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" +
                 place.getCoordinates().getLatitude()+"," +place.getCoordinates().getLongitude() +
-                "&zoom=17&size=640x640&scale=2";
+                "&zoom=19&size=1200x450&scale=2";
 
         Glide.with(this).load(staticMapImageUrl)
                 .crossFade()

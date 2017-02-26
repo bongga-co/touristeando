@@ -1,10 +1,12 @@
 package co.bongga.touristeando.utils;
 
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 import java.util.List;
 import co.bongga.touristeando.interfaces.APIEndpoints;
 import co.bongga.touristeando.interfaces.DataCallback;
 import co.bongga.touristeando.models.CollectionPlace;
-import co.bongga.touristeando.models.Event;
+import co.bongga.touristeando.models.PublicWiFi;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -15,18 +17,22 @@ import retrofit2.Response;
 
 public class DataManager {
     private static APIEndpoints apiService = APIClient.getClient().create(APIEndpoints.class);
+    private static APIEndpoints apiService2 = SODAClient.getClient().create(APIEndpoints.class);
 
-    public static List<Event> willGetAllAttractions(String city, double lat, double lng, String category, int distance, final DataCallback callback){
-        Call<List<Event>> call = apiService.willGetAllAttractions(city, lat, lng, category, distance);
-        call.enqueue(new Callback<List<Event>>() {
+    public static JsonElement willGetPublicWifiPoints(String params, final DataCallback callback){
+        Call<JsonElement> call = apiService2.willGetPublicWifiPoints(params);
+        call.enqueue(new Callback<JsonElement>() {
             @Override
-            public void onResponse(Call<List<Event>>call, Response<List<Event>> response) {
-                callback.didReceiveEvent(response.body());
+            public void onResponse(Call<JsonElement>call, Response<JsonElement> response) {
+                String body = response.body().toString();
+                List<PublicWiFi> objects = UtilityManager.doubleBuilder().fromJson(body, new TypeToken<List<PublicWiFi>>(){}.getType());
+
+                callback.didReceivePoints(objects);
             }
 
             @Override
-            public void onFailure(Call<List<Event>>call, Throwable t) {
-                callback.didReceiveEvent(null);
+            public void onFailure(Call<JsonElement>call, Throwable t) {
+                callback.didReceivePoints(null);
             }
         });
         return null;

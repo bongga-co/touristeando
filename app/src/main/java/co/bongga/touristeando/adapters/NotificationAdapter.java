@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -128,6 +129,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         public TextView description;
         public TextView discount;
         public TextView date;
+        public ImageButton btn_delete;
 
         public NotificationHolder(View view){
             super(view);
@@ -136,6 +138,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             description = (TextView) view.findViewById(R.id.nt_description);
             discount = (TextView) view.findViewById(R.id.nt_discount);
             date = (TextView) view.findViewById(R.id.nt_expiry_date);
+
+            btn_delete = (ImageButton) view.findViewById(R.id.btn_delete_notification);
+            btn_delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+                    
+                }
+            });
         }
     }
 
@@ -143,6 +154,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         public TextView title;
         public TextView description;
         public ImageView image;
+        public ImageButton btn_delete;
 
         public NotificationWithImageHolder(View view){
             super(view);
@@ -150,6 +162,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             title = (TextView) view.findViewById(R.id.nt_img_title);
             description = (TextView) view.findViewById(R.id.nt_img_description);
             image = (ImageView) view.findViewById(R.id.nt_image);
+
+            btn_delete = (ImageButton) view.findViewById(R.id.btn_delete_notification);
+            btn_delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+
+                }
+            });
         }
     }
 }
