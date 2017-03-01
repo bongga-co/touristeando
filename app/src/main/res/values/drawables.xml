@@ -6,4 +6,6 @@
     <item name="ic_query_send" type="drawable">@mipmap/ic_query_send</item>
     <item name="ic_help" type="drawable">@mipmap/ic_help</item>
     <item name="ic_empty_chat" type="drawable">@mipmap/ic_empty_chat</item>
+    <item name="ic_directions_car" type="drawable">@mipmap/ic_directions_car</item>
+    <item name="ic_call" type="drawable">@mipmap/ic_call</item>
 </resources>

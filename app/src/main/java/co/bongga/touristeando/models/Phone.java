@@ -8,12 +8,12 @@ import io.realm.RealmObject;
 
 public class Phone extends RealmObject {
     private long cell;
-    private long phone;
+    private String phone;
 
     public Phone() {
     }
 
-    public Phone(long cell, long phone) {
+    public Phone(long cell, String phone) {
         this.cell = cell;
         this.phone = phone;
     }
@@ -26,11 +26,11 @@ public class Phone extends RealmObject {
         this.cell = cell;
     }
 
-    public long getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(long phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 }

@@ -193,6 +193,35 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         return view;
     }
 
+    /*
+     * Welcome message
+     */
+    private void setHelpMessage(){
+        Spanned chatText;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            chatText = Html.fromHtml(getString(R.string.agent_initial_message), Html.FROM_HTML_MODE_LEGACY);
+        }
+        else {
+            chatText = Html.fromHtml(getString(R.string.agent_initial_message));
+        }
+
+        ChatMessage msg = new ChatMessage(chatText.toString(), false, ChatMessage.TEXT_TYPE);
+        Globals.chatItems.add(msg);
+        didStoreMessage(msg);
+
+        notifyChange();
+    }
+
+    private void setEmptyChat(){
+        if(Globals.chatItems.size() <= 0){
+            setHelpMessage();
+        }
+    }
+
+    /*
+     * API.AI Initial setup
+     */
     private void setupAPIAI(){
         final AIConfiguration config = new AIConfiguration(Constants.API_AI_KEY,
                 AIConfiguration.SupportedLanguages.Spanish,
@@ -203,14 +232,17 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         aiRequest = new AIRequest();
 
         if (aiService != null) {
-            aiService.pause();
+            aiService.cancel();
         }
 
         //Needed for sending query speech
         aiService = AIService.getService(getActivity(), config);
-        aiService.setListener(this);
+        aiService.setListener(HomeFragment.this);
     }
 
+    /*
+     * Request for permissions for getting location and audio
+     */
     private void requestRecordPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -227,6 +259,65 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         }
     }
 
+    private void requestForLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{
+                        android.Manifest.permission.ACCESS_FINE_LOCATION
+                }, Constants.REQUEST_FINE_LOCATION_PERMISSION);
+            }
+            else if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(getActivity(), new String[]{
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION
+                }, Constants.REQUEST_COARSE_LOCATION_PERMISSION);
+            }
+            else {
+                requestForLocationSettings();
+            }
+        }
+        else{
+            requestForLocationSettings();
+        }
+    }
+
+    protected void requestForLocationSettings() {
+        if(!locManager.setupLocation()){
+            didToggleLoader(true);
+            UtilityManager.showMessage(rqText, getString(R.string.no_location_services));
+
+            locManager.deleteLocation();
+        }
+        else {
+            PendingResult<LocationSettingsResult> result = locManager.buildLocationSetting();
+            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+                @Override
+                public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+                    final Status status = locationSettingsResult.getStatus();
+
+                    switch (status.getStatusCode()) {
+                        case LocationSettingsStatusCodes.SUCCESS:
+                            prepareDataRetrievement();
+                            break;
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            try {
+                                status.startResolutionForResult(getActivity(), Constants.REQUEST_CHECK_SETTINGS);
+                            }
+                            catch (IntentSender.SendIntentException e) {
+                                didShowAgentError();
+                            }
+                            break;
+                        default:
+                            didShowAgentError();
+                            break;
+                    }
+                }
+            });
+        }
+    }
+
+    /*
+     * Process query by audio
+     */
     private void didSpeechQuery(){
         if(!UtilityManager.isConnected(getActivity())){
             UtilityManager.showMessage(rqText, getString(R.string.no_network_connection));
@@ -236,6 +327,9 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         aiService.startListening();
     }
 
+    /*
+     * Process query by text
+     */
     private void didSendQuery(boolean isHelp){
         String query;
 
@@ -278,23 +372,9 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         }.execute(aiRequest);
     }
 
-    private void setHelpMessage(){
-        Spanned chatText;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            chatText = Html.fromHtml(getString(R.string.agent_initial_message), Html.FROM_HTML_MODE_LEGACY);
-        }
-        else {
-            chatText = Html.fromHtml(getString(R.string.agent_initial_message));
-        }
-
-        ChatMessage msg = new ChatMessage(chatText.toString(), false, ChatMessage.TEXT_TYPE);
-        Globals.chatItems.add(msg);
-        didStoreMessage(msg);
-
-        notifyChange();
-    }
-
+    /*
+     * Add messages from agent to chat room
+     */
     private void addAgentMessage(AIResponse response, boolean fromMic){
         Result result = response.getResult();
 
@@ -358,6 +438,9 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         }
     }
 
+    /*
+     * Add messages from user to chat room
+     */
     private void addUserMessage(String query){
         ChatMessage msg = new ChatMessage(query, true, ChatMessage.TEXT_TYPE);
         Globals.chatItems.add(msg);
@@ -367,6 +450,9 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         notifyChange();
     }
 
+    /*
+     * Getting wifi points from Medellin
+     */
     private void didRetrieveWifiPoint(double latitude, double longitude){
         final RealmList<PublicWiFi> points = new RealmList<>();
 
@@ -410,6 +496,9 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         });
     }
 
+    /*
+     * Getting remote information
+     */
     private void didRetrieveAgentQuery(String city, double latitude, double longitude, String thing, String sort){
         final RealmList<Place> listPlaces = new RealmList<>();
 
@@ -544,62 +633,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         }
     }
 
-    protected void requestForLocationSettings() {
-        if(!locManager.setupLocation()){
-            didToggleLoader(true);
-            UtilityManager.showMessage(rqText, getString(R.string.no_location_services));
-
-            locManager.deleteLocation();
-        }
-        else {
-            PendingResult<LocationSettingsResult> result = locManager.buildLocationSetting();
-            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-                @Override
-                public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
-                    final Status status = locationSettingsResult.getStatus();
-
-                    switch (status.getStatusCode()) {
-                        case LocationSettingsStatusCodes.SUCCESS:
-                            prepareDataRetrievement();
-                            break;
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            try {
-                                status.startResolutionForResult(getActivity(), Constants.REQUEST_CHECK_SETTINGS);
-                            }
-                            catch (IntentSender.SendIntentException e) {
-                                didShowAgentError();
-                            }
-                            break;
-                        default:
-                            didShowAgentError();
-                            break;
-                    }
-                }
-            });
-        }
-    }
-
-    private void requestForLocationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{
-                        android.Manifest.permission.ACCESS_FINE_LOCATION
-                }, Constants.REQUEST_FINE_LOCATION_PERMISSION);
-            }
-            else if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(getActivity(), new String[]{
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION
-                }, Constants.REQUEST_COARSE_LOCATION_PERMISSION);
-            }
-            else {
-                requestForLocationSettings();
-            }
-        }
-        else{
-            requestForLocationSettings();
-        }
-    }
-
     private void showDefaultMessage(){
         ChatMessage msg = new ChatMessage(getString(R.string.generic_agent_no_content), false, ChatMessage.TEXT_TYPE);
         Globals.chatItems.add(msg);
@@ -615,78 +648,13 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         databaseReference.push().setValue(q);
     }
 
-    private void setEmptyChat(){
-        if(Globals.chatItems.size() <= 0){
-            setHelpMessage();
-        }
-    }
-
-    @Override
-    public void onResult(final AIResponse result) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                addAgentMessage(result, true);
-            }
-        });
-    }
-
-    @Override
-    public void onError(AIError error) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                didShowAgentError();
-            }
-        });
-    }
-
-    @Override
-    public void onAudioLevel(float level) {
-
-    }
-
-    @Override
-    public void onListeningStarted() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                rqText.setHint(R.string.txt_placeholder_chat_listening);
-                btnSpeech.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
-
-                didToggleLoader(false);
-            }
-        });
-    }
-
-    @Override
-    public void onListeningCanceled() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                rqText.setHint(R.string.txt_placeholder_chat_input);
-                btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
-            }
-        });
-    }
-
-    @Override
-    public void onListeningFinished() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                rqText.setHint(R.string.txt_placeholder_chat_input);
-                btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
-            }
-        });
-    }
-
     @Override
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btnSpeech:
                 rqText.setText(null);
                 rqText.clearFocus();
+
                 UtilityManager.hideKeyboard(getActivity());
                 requestRecordPermission();
                 break;
@@ -748,5 +716,79 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    //API.AI Callbacks
+    @Override
+    public void onAudioLevel(float level) {
+
+    }
+
+    @Override
+    public void onListeningStarted() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rqText.setHint(R.string.txt_placeholder_chat_listening);
+                rqText.setEnabled(false);
+
+                btnSpeech.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+                btnSpeech.setEnabled(false);
+
+                didToggleLoader(false);
+            }
+        });
+    }
+
+    @Override
+    public void onListeningCanceled() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rqText.setHint(R.string.txt_placeholder_chat_input);
+                rqText.setEnabled(true);
+
+                btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+                btnSpeech.setEnabled(true);
+
+                aiService.cancel();
+            }
+        });
+    }
+
+    @Override
+    public void onListeningFinished() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rqText.setHint(R.string.txt_placeholder_chat_input);
+                rqText.setEnabled(true);
+
+                btnSpeech.setColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_ATOP);
+                btnSpeech.setEnabled(true);
+
+                aiService.stopListening();
+            }
+        });
+    }
+
+    @Override
+    public void onResult(final AIResponse result) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                addAgentMessage(result, true);
+            }
+        });
+    }
+
+    @Override
+    public void onError(AIError error) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                didShowAgentError();
+            }
+        });
     }
 }

@@ -1,5 +1,14 @@
 package co.bongga.touristeando.activities;
 
+import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -9,9 +18,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
@@ -47,9 +58,14 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     private TextView placeAddress;
     private TextView placeDistance;
     private TextView placePhone;
+    private ImageButton btnTakeMe;
+    private ImageButton btnCallToPlace;
 
     private LinearLayout servicesLabelWrapper;
     private LinearLayout servicesWrapper;
+    private LinearLayout phoneWrapper;
+    private LinearLayout locationWrapper;
+
     private RecyclerView serviceList;
 
     private static int isExpanded = 0;
@@ -58,6 +74,8 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     private ServicesAdapter servicesAdapter;
     private RealmList<Service> serviceItems = new RealmList<>();
 
+    private Place place;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +83,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
 
         preferencesManager = new PreferencesManager(this);
 
-        Place place = Globals.currentPlace;
+        place = Globals.currentPlace;
         setTitle(place.getName());
 
         scrollView = (ScrollView) findViewById(R.id.scrollView);
@@ -85,8 +103,17 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         placeDistance = (TextView) findViewById(R.id.dt_place_distance);
         placePhone = (TextView) findViewById(R.id.dt_place_phone);
 
+        btnTakeMe = (ImageButton) findViewById(R.id.btn_take_me_to_place);
+        btnTakeMe.setOnClickListener(this);
+
+        btnCallToPlace = (ImageButton) findViewById(R.id.btn_call_to_place);
+        btnCallToPlace.setOnClickListener(this);
+
         servicesLabelWrapper = (LinearLayout) findViewById(R.id.dt_place_services_label_wrapper);
         servicesWrapper = (LinearLayout) findViewById(R.id.dt_place_services_wrapper);
+
+        phoneWrapper = (LinearLayout) findViewById(R.id.phoneWrapper);
+        locationWrapper = (LinearLayout) findViewById(R.id.locationWrapper);
 
         serviceList = (RecyclerView) findViewById(R.id.dt_services_list);
         serviceList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -95,7 +122,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         servicesAdapter = new ServicesAdapter(this, serviceItems);
         serviceList.setAdapter(servicesAdapter);
 
-        setupUI(place);
+        setupUI();
     }
 
     @Override
@@ -115,7 +142,39 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         return super.onOptionsItemSelected(item);
     }
 
-    private void setupUI(Place place){
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btn_toggle_description:
+                toggleDescription();
+                break;
+            case R.id.btn_take_me_to_place:
+                takeMeToThePlace();
+                break;
+            case R.id.btn_call_to_place:
+                requestPhoneCallPermission();
+                break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            switch (requestCode) {
+                case Constants.REQUEST_CALL_PHONE_PERMISSION:
+                    Intent intent = callToPlace();
+                    if(intent != null){
+                        startActivity(intent);
+                    }
+                    break;
+            }
+        }
+        else {
+            UtilityManager.showMessage(btnCallToPlace, getString(R.string.permission_denied));
+        }
+    }
+
+    private void setupUI(){
         Glide.with(this).load(place.getThumbnail())
             .crossFade()
             .placeholder(R.drawable.placeholder_img)
@@ -150,7 +209,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         placeCity.setText(place.getCity() + ", " + place.getCountry());
         placeAddress.setText(place.getAddress());
 
-        if(place.getPlace() != null){
+        if(place.getPlace() != null && !place.getPlace().isEmpty()){
             placeCityPlace.setVisibility(View.VISIBLE);
             placeCityPlace.setText(place.getPlace());
         }
@@ -171,23 +230,25 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
             }
         }
         else{
+            locationWrapper.setVisibility(View.GONE);
             placeDistance.setVisibility(View.GONE);
         }
 
         long cell = place.getPhone().getCell();
-        long phone = place.getPhone().getPhone();
+        String phone = place.getPhone().getPhone();
 
-        if(cell == 0 && phone == 0){
+        if(cell == 0 && phone.equals("0")){
+            phoneWrapper.setVisibility(View.GONE);
             placePhone.setVisibility(View.GONE);
         }
-        else if(cell == 0 && phone != 0){
-            placePhone.setText(String.format(Locale.getDefault(), "%d", phone));
+        else if(cell == 0 && !phone.equals("0")){
+            placePhone.setText(String.format(Locale.getDefault(), "%s", phone));
         }
-        else if(cell != 0 && phone == 0){
-            placePhone.setText(String.format(Locale.getDefault(), "%d", cell));
+        else if(cell != 0 && phone.equals("0")){
+            placePhone.setText(String.format(Locale.getDefault(), "%s", cell));
         }
         else{
-            placePhone.setText(String.format(Locale.getDefault(), "%d - %d", cell, phone));
+            placePhone.setText(String.format(Locale.getDefault(), "%s - %s", cell, phone));
         }
 
         if(place.getServices() != null && place.getServices().size() > 0){
@@ -200,6 +261,73 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
 
             servicesAdapter.notifyDataSetChanged();
         }
+    }
+
+    private void takeMeToThePlace(){
+        final double lat = place.getCoordinates().getLatitude();
+        final double lng = place.getCoordinates().getLongitude();
+        Coordinate cLocation = preferencesManager.getCurrentLocation();
+
+        if(cLocation != null){
+            final double currentLat = cLocation.getLatitude();
+            final double currentLng = cLocation.getLongitude();
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setTitle(getResources().getString(R.string.show_route_title));
+            dialog.setMessage(getResources().getString(R.string.show_route_msg));
+            dialog.setPositiveButton(getResources().getString(R.string.take_me), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                            Uri.parse("http://maps.google.com/maps?saddr=" +
+                                    currentLat + "," +
+                                    currentLng +
+                                    "&daddr=" + lat + "," + lng + "&mode=driving"));
+                    startActivity(intent);
+                }
+            });
+
+            dialog.setNegativeButton(getResources().getString(R.string.btn_cancel), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    dialog.dismiss();
+                }
+            });
+
+            AlertDialog alertDialog = dialog.create();
+            alertDialog.show();
+        }
+    }
+
+    private void requestPhoneCallPermission(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{
+                        android.Manifest.permission.CALL_PHONE
+                }, Constants.REQUEST_CALL_PHONE_PERMISSION);
+            }
+            else {
+                Intent intent = callToPlace();
+                if(intent != null){
+                    startActivity(intent);
+                }
+            }
+        }
+        else{
+            Intent intent = callToPlace();
+            if(intent != null){
+                startActivity(intent);
+            }
+        }
+    }
+
+    private Intent callToPlace(){
+        String phone = place.getPhone().getPhone();
+        if(!phone.equals("0")){
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse("tel:" + phone));
+
+            return intent;
+        }
+        return null;
     }
 
     private String setCurrencyFormat(Price price){
@@ -268,15 +396,6 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                 placeDescription.setText(shortenDescription);
                 btnToggleDescription.setText(getString(R.string.btn_toggle_place_description));
                 isExpanded=0;
-                break;
-        }
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.btn_toggle_description:
-                toggleDescription();
                 break;
         }
     }

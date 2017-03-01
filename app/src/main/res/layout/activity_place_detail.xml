@@ -110,14 +110,30 @@
                     android:drawableLeft="@drawable/ic_place_address"
                     android:drawableStart="@drawable/ic_place_address"
                     android:drawablePadding="5dp" />
+            <LinearLayout
+                android:id="@+id/phoneWrapper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
                 <co.bongga.touristeando.ui.TouryTextViewPier
                     android:id="@+id/dt_place_phone"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="0.9"
                     android:gravity="center_vertical"
                     android:drawableLeft="@drawable/ic_place_phone"
                     android:drawableStart="@drawable/ic_place_phone"
                     android:drawablePadding="5dp"/>
+                <ImageButton
+                    android:id="@+id/btn_call_to_place"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.1"
+                    android:text="@string/take_me"
+                    android:contentDescription="@string/take_me"
+                    android:src="@drawable/ic_call"
+                    android:background="@null" />
+                </LinearLayout>
                 <co.bongga.touristeando.ui.TouryTextViewPier
                     android:id="@+id/dt_place_city"
                     android:layout_width="wrap_content"
@@ -134,14 +150,30 @@
                     android:drawableLeft="@drawable/ic_place_landmark"
                     android:drawableStart="@drawable/ic_place_landmark"
                     android:drawablePadding="5dp"/>
-                <co.bongga.touristeando.ui.TouryTextViewPier
-                    android:id="@+id/dt_place_distance"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/locationWrapper"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:drawableLeft="@drawable/ic_place_distance"
-                    android:drawableStart="@drawable/ic_place_distance"
-                    android:drawablePadding="5dp"/>
+                    android:orientation="horizontal">
+                    <co.bongga.touristeando.ui.TouryTextViewPier
+                        android:id="@+id/dt_place_distance"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.9"
+                        android:gravity="center_vertical"
+                        android:drawableLeft="@drawable/ic_place_distance"
+                        android:drawableStart="@drawable/ic_place_distance"
+                        android:drawablePadding="5dp"/>
+                    <ImageButton
+                        android:id="@+id/btn_take_me_to_place"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:text="@string/take_me"
+                        android:contentDescription="@string/take_me"
+                        android:src="@drawable/ic_directions_car"
+                        android:background="@null" />
+                </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
         <LinearLayout

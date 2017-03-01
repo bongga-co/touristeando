@@ -34,6 +34,7 @@ public class Constants {
     public static final int REQUEST_COARSE_LOCATION_PERMISSION = 2;
     public static final int REQUEST_FINE_LOCATION_PERMISSION = 3;
     public static final int REQUEST_CHECK_SETTINGS = 4;
+    public static final int REQUEST_CALL_PHONE_PERMISSION = 5;
 
     //Things to do
     public static final String WIFI_THING = "conseguir wifi gratis";

@@ -73,13 +73,13 @@
     <string name="skip">Omitir</string>
     <string name="start">Empezar</string>
 
-    <string name="slide_1_title">Preg\u00fantale a Toury</string>
-    <string name="slide_1_desc">Toury es tu asistente y te ayudar\u00e1 a descubrir tu ciudad de otra manera.</string>
+    <string name="slide_1_title">S\u00e9 un Turista</string>
+    <string name="slide_1_desc">Convi\u00e9rtete en un turista en tu ciudad y comienza a descubrir cosas asombrosas.</string>
 
     <string name="slide_2_title">Cosas para hacer</string>
-    <string name="slide_2_desc">Encuentra lugares donde puedes: tener asistencia odontológica, motilarte, tomarte un caf\u00e9, ir a comer, volar en parapente y m\u00e1s.</string>
+    <string name="slide_2_desc">Encuentra lugares donde puedes: tomarte un caf\u00e9, ir a comer, hacer ejercicio y m\u00e1s.</string>
 
-    <string name="slide_3_title">Comparte con amigos</string>
+    <string name="slide_3_title">Comparte</string>
     <string name="slide_3_desc">Saca tiempo para hacer eso que m\u00e1s te gusta con nuevas personas o con aquellos que ya conoces.</string>
 
     <!-- Preferences / Settings -->
@@ -107,6 +107,10 @@
     <string name="invite_friend">Invitar Amigo</string>
     <string name="free_label">Gratis</string>
     <string name="undefined_price">Precio No Definido</string>
+    <string name="show_route_title">¿C\u00f3mo Llegar?</string>
+    <string name="show_route_msg">Sigue las instrucciones para llegar al lugar</string>
+    <string name="take_me">C\u00f3mo LLegar</string>
+    <string name="call_phone_error">No se ha definido n\u00famero de tel\u00e9fono</string>
 
     <!-- Feedback -->
     <string name="feedback_empty_name">Ingresa tu nombre</string>
