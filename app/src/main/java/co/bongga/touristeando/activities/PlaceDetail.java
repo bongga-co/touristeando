@@ -25,11 +25,16 @@ import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Currency;
+import java.util.List;
 import java.util.Locale;
+
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.adapters.ServicesAdapter;
 import co.bongga.touristeando.models.Coordinate;
@@ -54,7 +59,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     private Button btnToggleDescription;
     private View descriptionSeparator;
     private TextView placeCity;
-    private  TextView placeCityPlace;
+    private TextView placeCityPlace;
     private TextView placeAddress;
     private TextView placeDistance;
     private TextView placePhone;
@@ -144,7 +149,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.btn_toggle_description:
                 toggleDescription();
                 break;
@@ -162,41 +167,35 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             switch (requestCode) {
                 case Constants.REQUEST_CALL_PHONE_PERMISSION:
-                    Intent intent = callToPlace();
-                    if(intent != null){
-                        startActivity(intent);
-                    }
+                    callToPlace();
                     break;
             }
-        }
-        else {
+        } else {
             UtilityManager.showMessage(btnCallToPlace, getString(R.string.permission_denied));
         }
     }
 
-    private void setupUI(){
+    private void setupUI() {
         Glide.with(this).load(place.getThumbnail())
-            .crossFade()
-            .placeholder(R.drawable.placeholder_img)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .into(headerImg);
+                .crossFade()
+                .placeholder(R.drawable.placeholder_img)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(headerImg);
 
         placeName.setText(place.getName());
         placeCategory.setText(place.getCategory());
         placeRating.setRating(place.getRating());
 
-        if(place.getPrice() == null || place.getPrice().getAmount() == 0){
+        if (place.getPrice() == null || place.getPrice().getAmount() == 0) {
             placePrice.setText(getString(R.string.free_label));
-        }
-        else if(place.getPrice().getAmount() < 0){
+        } else if (place.getPrice().getAmount() < 0) {
             placePrice.setText(getString(R.string.undefined_price));
-        }
-        else{
+        } else {
             placePrice.setText(getString(R.string.dt_place_price, setCurrencySymbol(place.getPrice().getCurrency()), setCurrencyFormat(place.getPrice())));
         }
 
         String staticMapImageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" +
-                place.getCoordinates().getLatitude()+"," +place.getCoordinates().getLongitude() +
+                place.getCoordinates().getLatitude() + "," + place.getCoordinates().getLongitude() +
                 "&zoom=19&size=1200x450&scale=2";
 
         Glide.with(this).load(staticMapImageUrl)
@@ -209,27 +208,24 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         placeCity.setText(place.getCity() + ", " + place.getCountry());
         placeAddress.setText(place.getAddress());
 
-        if(place.getPlace() != null && !place.getPlace().isEmpty()){
+        if (place.getPlace() != null && !place.getPlace().isEmpty()) {
             placeCityPlace.setVisibility(View.VISIBLE);
             placeCityPlace.setText(place.getPlace());
-        }
-        else{
+        } else {
             placeCityPlace.setVisibility(View.GONE);
         }
 
         Coordinate userLocation = preferencesManager.getCurrentLocation();
-        if(userLocation != null){
+        if (userLocation != null) {
             Coordinate placeLocation = place.getCoordinates();
             double distance = UtilityManager.calculateDistance(userLocation, placeLocation);
 
-            if(distance < 1){
-                placeDistance.setText(String.format(Locale.getDefault(), "%.2f m", distance*1000));
-            }
-            else{
+            if (distance < 1) {
+                placeDistance.setText(String.format(Locale.getDefault(), "%.2f m", distance * 1000));
+            } else {
                 placeDistance.setText(String.format(Locale.getDefault(), "%.2f kms", distance));
             }
-        }
-        else{
+        } else {
             locationWrapper.setVisibility(View.GONE);
             placeDistance.setVisibility(View.GONE);
         }
@@ -237,25 +233,22 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         long cell = place.getPhone().getCell();
         String phone = place.getPhone().getPhone();
 
-        if(cell == 0 && phone.equals("0")){
+        if (cell == 0 && phone.equals("0")) {
             phoneWrapper.setVisibility(View.GONE);
             placePhone.setVisibility(View.GONE);
-        }
-        else if(cell == 0 && !phone.equals("0")){
+        } else if (cell == 0 && !phone.equals("0")) {
             placePhone.setText(String.format(Locale.getDefault(), "%s", phone));
-        }
-        else if(cell != 0 && phone.equals("0")){
+        } else if (cell != 0 && phone.equals("0")) {
             placePhone.setText(String.format(Locale.getDefault(), "%s", cell));
-        }
-        else{
+        } else {
             placePhone.setText(String.format(Locale.getDefault(), "%s - %s", cell, phone));
         }
 
-        if(place.getServices() != null && place.getServices().size() > 0){
+        if (place.getServices() != null && place.getServices().size() > 0) {
             servicesLabelWrapper.setVisibility(View.VISIBLE);
             servicesWrapper.setVisibility(View.VISIBLE);
 
-            for(Service service : place.getServices()){
+            for (Service service : place.getServices()) {
                 serviceItems.add(service);
             }
 
@@ -263,12 +256,12 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    private void takeMeToThePlace(){
+    private void takeMeToThePlace() {
         final double lat = place.getCoordinates().getLatitude();
         final double lng = place.getCoordinates().getLongitude();
         Coordinate cLocation = preferencesManager.getCurrentLocation();
 
-        if(cLocation != null){
+        if (cLocation != null) {
             final double currentLat = cLocation.getLatitude();
             final double currentLng = cLocation.getLongitude();
 
@@ -297,37 +290,64 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    private void requestPhoneCallPermission(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+    private void requestPhoneCallPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{
                         android.Manifest.permission.CALL_PHONE
                 }, Constants.REQUEST_CALL_PHONE_PERMISSION);
             }
             else {
-                Intent intent = callToPlace();
-                if(intent != null){
-                    startActivity(intent);
-                }
+                callToPlace();
             }
         }
-        else{
-            Intent intent = callToPlace();
-            if(intent != null){
-                startActivity(intent);
-            }
+        else {
+            callToPlace();
         }
     }
 
-    private Intent callToPlace(){
-        String phone = place.getPhone().getPhone();
-        if(!phone.equals("0")){
-            Intent intent = new Intent(Intent.ACTION_CALL);
-            intent.setData(Uri.parse("tel:" + phone));
+    private void callToPlace() {
+        List<Object> phones = new ArrayList<>();
 
-            return intent;
+        String phone = place.getPhone().getPhone();
+        long cell = place.getPhone().getCell();
+
+        if (!phone.equals("0")) {
+            phones.add(phone);
         }
-        return null;
+
+        if (cell != 0) {
+            phones.add(String.valueOf(cell));
+        }
+
+        final CharSequence[] phoneItems = phones.toArray(new CharSequence[phones.size()]);
+        if (phoneItems.length > 0) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setTitle(String.format(Locale.getDefault(), "%s %s", getString(R.string.call_phone_msg), place.getName()))
+                    .setItems(phoneItems, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent intent = new Intent(Intent.ACTION_CALL);
+                            intent.setData(Uri.parse("tel:" + phoneItems[i]));
+
+                            if (ActivityCompat.checkSelfPermission(PlaceDetail.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                return;
+                            }
+                            startActivity(intent);
+
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.btn_cancel), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+
+            final AlertDialog dialog = builder.create();
+            dialog.show();
+        }
     }
 
     private String setCurrencyFormat(Price price){

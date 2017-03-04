@@ -66,6 +66,7 @@
     <string name="generic_agent_no_content">Lo siento, no pude encontrar informaci\u00f3n cerca de ti. Intenta buscar por ciudad.</string>
     <string name="location_canceled_by_user">Necesito tu ubicaci\u00f3n para mostrarte los mejores lugares cerca de ti.</string>
     <string name="no_chat_msg">No hay mensajes</string>
+    <string name="example_hint">Ej:</string>
 
     <!-- Welcome -->
     <!-- Intro Slider -->
@@ -111,6 +112,7 @@
     <string name="show_route_msg">Sigue las instrucciones para llegar al lugar</string>
     <string name="take_me">C\u00f3mo LLegar</string>
     <string name="call_phone_error">No se ha definido n\u00famero de tel\u00e9fono</string>
+    <string name="call_phone_msg">Llamar a </string>
 
     <!-- Feedback -->
     <string name="feedback_empty_name">Ingresa tu nombre</string>

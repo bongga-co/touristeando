@@ -2,7 +2,10 @@ package co.bongga.touristeando.interfaces;
 
 import com.google.gson.JsonElement;
 
+import java.util.List;
+
 import co.bongga.touristeando.models.CollectionPlace;
+import co.bongga.touristeando.models.Help;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -13,6 +16,9 @@ import retrofit2.http.Query;
  */
 
 public interface APIEndpoints {
+    @GET("help")
+    Call<List<Help>> willShowHelp();
+
     @GET("places")
     Call<CollectionPlace> willGetAllPlaces(
         @Header("city") String city,

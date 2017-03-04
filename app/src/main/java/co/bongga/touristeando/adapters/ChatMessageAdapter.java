@@ -12,14 +12,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.List;
+
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.activities.PlaceDetail;
 import co.bongga.touristeando.interfaces.RecyclerClickListener;
 import co.bongga.touristeando.models.ChatMessage;
 import co.bongga.touristeando.models.Place;
-import co.bongga.touristeando.models.PublicWiFi;
+import co.bongga.touristeando.utils.Constants;
 import co.bongga.touristeando.utils.Globals;
 import co.bongga.touristeando.utils.RecyclerItemClickListener;
+import co.bongga.touristeando.utils.UtilityManager;
 import io.realm.RealmList;
 
 /**
@@ -44,8 +47,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         else if(msg.getLayout_type() == ChatMessage.MAP_TYPE){
             type = ChatMessage.MAP_TYPE;
         }
-        else if(msg.getLayout_type() == ChatMessage.EVENT_TYPE){
-            type = ChatMessage.EVENT_TYPE;
+        else if(msg.getLayout_type() == ChatMessage.GENERIC_TYPE){
+            type = ChatMessage.GENERIC_TYPE;
         }
         else if(msg.getLayout_type() == ChatMessage.PLACES_TYPE){
             type = ChatMessage.PLACES_TYPE;
@@ -74,11 +77,11 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             holder = new MapMessageHolder(rootView);
         }
-        else if(viewType == ChatMessage.EVENT_TYPE){
+        else if(viewType == ChatMessage.GENERIC_TYPE){
             rootView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_chat_event_type, parent, false);
 
-            holder = new ListWiFiMessageHolder(rootView);
+            holder = new GenericMessageHolder(rootView);
         }
         else if(viewType == ChatMessage.PLACES_TYPE){
             rootView = LayoutInflater.from(parent.getContext())
@@ -106,13 +109,20 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         else if(genHolder instanceof MapMessageHolder){
             MapMessageHolder holder = (MapMessageHolder) genHolder;
         }
-        else if(genHolder instanceof ListWiFiMessageHolder){
-            ListWiFiMessageHolder holder = (ListWiFiMessageHolder) genHolder;
+        else if(genHolder instanceof GenericMessageHolder){
+            GenericMessageHolder holder = (GenericMessageHolder) genHolder;
+            List<Object> events;
 
-            RealmList<PublicWiFi> events = chatList.get(position).getEvent();
+            if(chatList.get(position).getFlag() == Constants.WIFI_FLAG){
+                events = UtilityManager.objectFilter(chatList.get(position).getEvent(), Object.class);
+                holder.genericAdapter.setData(events, Constants.WIFI_FLAG);
+            }
+            else {
+                events = UtilityManager.objectFilter(chatList.get(position).getHelp(), Object.class);
+                holder.genericAdapter.setData(events, Constants.HELP_FLAG);
+            }
 
-            holder.publicWiFiAdapter.setData(events);
-            holder.publicWiFiAdapter.setRowIndex(position);
+            holder.genericAdapter.setRowIndex(position);
         }
         else if(genHolder instanceof ListPlacesMessageHolder){
             ListPlacesMessageHolder holder = (ListPlacesMessageHolder) genHolder;
@@ -186,10 +196,10 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    public static class ListWiFiMessageHolder extends RecyclerView.ViewHolder {
-        private PublicWiFiAdapter publicWiFiAdapter;
+    public static class GenericMessageHolder extends RecyclerView.ViewHolder {
+        private GenericAdapter genericAdapter;
 
-        ListWiFiMessageHolder(View view){
+        GenericMessageHolder(View view){
             super(view);
 
             final Context context = itemView.getContext();
@@ -197,8 +207,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             RecyclerView eventList = (RecyclerView) itemView.findViewById(R.id.eventList);
             eventList.setHasFixedSize(true);
             eventList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-            publicWiFiAdapter = new PublicWiFiAdapter(context);
-            eventList.setAdapter(publicWiFiAdapter);
+            genericAdapter = new GenericAdapter(context);
+            eventList.setAdapter(genericAdapter);
         }
     }
 

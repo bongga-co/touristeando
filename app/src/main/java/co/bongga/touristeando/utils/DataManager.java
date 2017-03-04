@@ -6,6 +6,7 @@ import java.util.List;
 import co.bongga.touristeando.interfaces.APIEndpoints;
 import co.bongga.touristeando.interfaces.DataCallback;
 import co.bongga.touristeando.models.CollectionPlace;
+import co.bongga.touristeando.models.Help;
 import co.bongga.touristeando.models.PublicWiFi;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,12 +28,13 @@ public class DataManager {
                 String body = response.body().toString();
                 List<PublicWiFi> objects = UtilityManager.doubleBuilder().fromJson(body, new TypeToken<List<PublicWiFi>>(){}.getType());
 
-                callback.didReceivePoints(objects);
+                List<Object> data = UtilityManager.objectFilter(objects, Object.class);
+                callback.didReceiveData(data);
             }
 
             @Override
             public void onFailure(Call<JsonElement>call, Throwable t) {
-                callback.didReceivePoints(null);
+                callback.didReceiveData(null);
             }
         });
         return null;
@@ -45,13 +47,32 @@ public class DataManager {
             public void onResponse(Call<CollectionPlace>call, Response<CollectionPlace> response) {
                 CollectionPlace places = response.body();
                 if(places.getListPlace() != null){
-                    callback.didReceivePlace(places.getListPlace());
+                    List<Object> data = UtilityManager.objectFilter(places.getListPlace(), Object.class);
+                    callback.didReceiveData(data);
                 }
             }
 
             @Override
             public void onFailure(Call<CollectionPlace>call, Throwable t) {
-                callback.didReceivePlace(null);
+                callback.didReceiveData(null);
+            }
+        });
+        return null;
+    }
+
+    public static List<Help> willShowHelp(final DataCallback callback){
+        Call<List<Help>> call = apiService.willShowHelp();
+        call.enqueue(new Callback<List<Help>>() {
+            @Override
+            public void onResponse(Call<List<Help>>call, Response<List<Help>> response) {
+                List<Help> helpList = response.body();
+                List<Object> data = UtilityManager.objectFilter(helpList, Object.class);
+                callback.didReceiveData(data);
+            }
+
+            @Override
+            public void onFailure(Call<List<Help>>call, Throwable t) {
+                callback.didReceiveData(null);
             }
         });
         return null;

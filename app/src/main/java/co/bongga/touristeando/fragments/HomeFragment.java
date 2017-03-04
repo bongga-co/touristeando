@@ -56,7 +56,7 @@ import co.bongga.touristeando.adapters.ChatMessageAdapter;
 import co.bongga.touristeando.interfaces.DataCallback;
 import co.bongga.touristeando.models.ChatMessage;
 import co.bongga.touristeando.models.Coordinate;
-import co.bongga.touristeando.models.Event;
+import co.bongga.touristeando.models.Help;
 import co.bongga.touristeando.models.Place;
 import co.bongga.touristeando.models.PublicWiFi;
 import co.bongga.touristeando.models.Query;
@@ -391,43 +391,41 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
             notifyChange();
 
-            if (result.getParameters() != null && !result.getParameters().isEmpty()) {
+            if(result.getAction().equals(Constants.PLACES_ACTION)){
                 agentParams = result.getParameters();
 
-                if(result.getAction().equals(Constants.PLACES_ACTION)){
-                    String city;
-                    String thing;
-                    String sort = (agentParams.get("sorting") != null) ?
-                            UtilityManager.removeAccents(agentParams.get("sorting").getAsString()) : null;
+                String city;
+                String thing;
+                String sort = (agentParams.get("sorting") != null) ?
+                        UtilityManager.removeAccents(agentParams.get("sorting").getAsString()) : null;
 
-                    if(agentParams.get("thing") != null){
-                        thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
+                if(agentParams.get("thing") != null){
+                    thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
 
-                        if(agentParams.get("city") != null){
-                            double lat = 0;
-                            double lng = 0;
+                    if(agentParams.get("city") != null){
+                        double lat = 0;
+                        double lng = 0;
 
-                            Coordinate location = preferencesManager.getCurrentLocation();
+                        Coordinate location = preferencesManager.getCurrentLocation();
 
-                            if(location != null){
-                                lat = location.getLatitude();
-                                lng = location.getLongitude();
-                            }
-
-                            city = UtilityManager.removeAccents(agentParams.get("city").getAsString());
-                            didRetrieveAgentQuery(city, lat, lng, thing, sort);
+                        if(location != null){
+                            lat = location.getLatitude();
+                            lng = location.getLongitude();
                         }
-                        else{
-                            requestForLocationPermission();
-                        }
+
+                        city = UtilityManager.removeAccents(agentParams.get("city").getAsString());
+                        didRetrieveAgentQuery(city, lat, lng, thing, sort);
                     }
-                    else {
-                        didShowAgentError();
+                    else{
+                        requestForLocationPermission();
                     }
                 }
-                else{
-                    didToggleLoader(true);
+                else {
+                    didShowAgentError();
                 }
+            }
+            else if(result.getAction().equals(Constants.HELP_ACTION)){
+                didRetrieveHelpList();
             }
             else{
                 didToggleLoader(true);
@@ -466,14 +464,15 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
         DataManager.willGetPublicWifiPoints(params, new DataCallback() {
             @Override
-            public void didReceivePoints(List<PublicWiFi> data) {
-                if(data != null){
+            public void didReceiveData(List<Object> response) {
+                if(response != null){
+                    List<PublicWiFi> data = UtilityManager.objectFilter(response, PublicWiFi.class);
                     if(data.size() > 0){
                         for(PublicWiFi point : data){
                             points.add(point);
                         }
 
-                        ChatMessage msg = new ChatMessage(points, false, ChatMessage.EVENT_TYPE, false);
+                        ChatMessage msg = new ChatMessage(points, false, ChatMessage.GENERIC_TYPE, Constants.WIFI_FLAG, false);
                         Globals.chatItems.add(msg);
                         didStoreMessage(msg);
 
@@ -487,11 +486,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                 else{
                     didShowAgentError();
                 }
-            }
-
-            @Override
-            public void didReceivePlace(List<Place> data) {
-
             }
         });
     }
@@ -509,19 +503,50 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
         DataManager.willGetAllPlaces(city, latitude, longitude, thing, distance, sort, new DataCallback() {
             @Override
-            public void didReceivePoints(List<PublicWiFi> data) {
+            public void didReceiveData(List<Object> response) {
+                if(response != null){
+                    List<Place> data = UtilityManager.objectFilter(response, Place.class);
 
-            }
-
-            @Override
-            public void didReceivePlace(List<Place> data) {
-                if(data != null){
                     if(data.size() > 0){
                         for(Place place : data){
                             listPlaces.add(place);
                         }
 
                         ChatMessage msg = new ChatMessage(listPlaces, false, ChatMessage.PLACES_TYPE);
+                        Globals.chatItems.add(msg);
+                        didStoreMessage(msg);
+
+                        notifyChange();
+                        didToggleLoader(true);
+                    }
+                    else{
+                        showDefaultMessage();
+                    }
+                }
+                else{
+                    didShowAgentError();
+                }
+            }
+        });
+    }
+
+    /*
+     * Getting help list
+     */
+    private void didRetrieveHelpList(){
+        final RealmList<Help> helpList = new RealmList<>();
+
+        DataManager.willShowHelp(new DataCallback() {
+            @Override
+            public void didReceiveData(List<Object> response) {
+                if(response != null){
+                    List<Help> data = UtilityManager.objectFilter(response, Help.class);
+                    if(data.size() > 0){
+                        for(Help help : data){
+                            helpList.add(help);
+                        }
+
+                        ChatMessage msg = new ChatMessage(helpList, false, ChatMessage.GENERIC_TYPE, Constants.HELP_FLAG, false, false);
                         Globals.chatItems.add(msg);
                         didStoreMessage(msg);
 

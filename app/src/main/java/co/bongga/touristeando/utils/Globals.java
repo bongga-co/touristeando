@@ -14,6 +14,4 @@ public class Globals {
     public static Event currentEvent;
     public static Place currentPlace;
     public static ArrayList<ChatMessage> chatItems = new ArrayList<>();
-    public static boolean canSaveNotification = false;
-    public static boolean isMainUI = false;
 }

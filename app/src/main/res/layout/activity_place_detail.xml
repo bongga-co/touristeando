@@ -172,7 +172,7 @@
                         android:text="@string/take_me"
                         android:contentDescription="@string/take_me"
                         android:src="@drawable/ic_directions_car"
-                        android:background="@null" />
+                        android:background="@drawable/container_shadow" />
                 </LinearLayout>
             </LinearLayout>
         </RelativeLayout>

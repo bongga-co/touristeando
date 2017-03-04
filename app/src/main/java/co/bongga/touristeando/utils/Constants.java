@@ -39,4 +39,8 @@ public class Constants {
     //Things to do
     public static final String WIFI_THING = "conseguir wifi gratis";
     public static final int WIFI_POINTS_LIMIT = 1000;
+
+    //Generic Object
+    public static final int WIFI_FLAG = 1;
+    public static final int HELP_FLAG = 2;
 }

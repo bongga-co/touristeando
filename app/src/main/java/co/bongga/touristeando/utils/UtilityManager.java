@@ -30,6 +30,7 @@ import java.lang.reflect.Type;
 import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -246,5 +247,14 @@ public class UtilityManager {
             })
             .create();
         return gson;
+    }
+
+    public static <E> List<E> objectFilter(List<?> lst, Class<E> cls) {
+        List<E> result = new ArrayList<>();
+        for (Object obj : lst) {
+            if (cls.isInstance(obj))
+                result.add(cls.cast(obj));
+        }
+        return result;
     }
 }
