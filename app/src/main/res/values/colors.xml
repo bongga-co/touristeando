@@ -3,6 +3,7 @@
     <color name="standar_primary">#FF6501</color>
     <color name="standar_second">#69a578</color>
     <color name="standar_third">#e1a227</color>
+    <color name="standar_fourth">#00ccff</color>
 
     <color name="colorPrimary">@color/standar_primary</color>
     <color name="colorPrimaryDark">#e75b00</color>

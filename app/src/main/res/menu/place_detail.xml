@@ -6,4 +6,9 @@
         android:icon="@mipmap/ic_menu_assistant"
         android:title="@string/invite_friend"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/ic_action_share"
+        android:icon="@mipmap/ic_menu_share"
+        android:title="@string/share_place"
+        app:showAsAction="never" />
 </menu>

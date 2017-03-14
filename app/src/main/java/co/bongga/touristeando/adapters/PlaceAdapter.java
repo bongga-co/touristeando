@@ -9,8 +9,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
+import java.util.Locale;
+
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.models.Place;
+import co.bongga.touristeando.utils.UtilityManager;
 import io.realm.RealmList;
 
 /**
@@ -60,6 +64,34 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceHolder>
 
         holder.name.setText(place.getName());
         holder.category.setText(place.getCategory());
+
+        if (place.getPrice() == null || place.getPrice().getAmount() == 0) {
+            holder.priceLbl.setText(context.getString(R.string.price_lbl));
+            holder.price.setText(context.getString(R.string.free_label));
+        }
+        else if (place.getPrice().getAmount() < 0) {
+            //holder.price.setVisibility(View.GONE);
+            //holder.priceLbl.setVisibility(View.GONE);
+            holder.priceLbl.setText(context.getString(R.string.price_lbl));
+            holder.price.setText("--");
+        }
+        else {
+            holder.priceLbl.setText(context.getString(R.string.dt_price_lbl));
+            holder.price.setText(context.getString(R.string.dt_place_price, UtilityManager.setCurrencySymbol(place.getPrice().getCurrency()), UtilityManager.setCurrencyFormat(place.getPrice())));
+        }
+
+        if(place.getDistance() != 0){
+            double distance = place.getDistance();
+            if (distance < 1) {
+                holder.distance.setText(String.format(Locale.getDefault(), "%.0f mts", distance * 1000));
+            }
+            else {
+                holder.distance.setText(String.format(Locale.getDefault(), "%.2f kms", distance));
+            }
+        }
+        else {
+            holder.distance.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -68,7 +100,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceHolder>
     }
 
     public static class PlaceHolder extends RecyclerView.ViewHolder {
-        public TextView name, category;
+        public TextView name, category, price, distance, priceLbl;
         public ImageView thumbnail;
 
         public PlaceHolder(View view){
@@ -77,6 +109,9 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceHolder>
             thumbnail = (ImageView) view.findViewById(R.id.event_icon);
             name = (TextView)view.findViewById(R.id.event_name);
             category = (TextView)view.findViewById(R.id.event_category);
+            price = (TextView)view.findViewById(R.id.event_price);
+            priceLbl = (TextView)view.findViewById(R.id.event_price_label);
+            distance = (TextView)view.findViewById(R.id.event_distance);
         }
     }
 }

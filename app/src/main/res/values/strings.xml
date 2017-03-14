@@ -107,12 +107,15 @@
     <string name="btn_toggle_place_description_minus">Ver Menos</string>
     <string name="invite_friend">Invitar Amigo</string>
     <string name="free_label">Gratis</string>
+    <string name="price_lbl">Precio</string>
     <string name="undefined_price">Precio No Definido</string>
     <string name="show_route_title">¿C\u00f3mo Llegar?</string>
     <string name="show_route_msg">Sigue las instrucciones para llegar al lugar</string>
     <string name="take_me">C\u00f3mo LLegar</string>
     <string name="call_phone_error">No se ha definido n\u00famero de tel\u00e9fono</string>
     <string name="call_phone_msg">Llamar a </string>
+    <string name="dt_request_uber">Perdir Uber</string>
+    <string name="share_place">Compartir</string>
 
     <!-- Feedback -->
     <string name="feedback_empty_name">Ingresa tu nombre</string>

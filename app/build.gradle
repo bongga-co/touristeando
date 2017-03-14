@@ -8,8 +8,8 @@ android {
         applicationId "co.bongga.touristeando"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 11
-        versionName "0.0.10"
+        versionCode 12
+        versionName "0.1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -25,6 +25,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    configurations.all {
+        resolutionStrategy {
+            force 'com.google.code.findbugs:jsr305:1.3.9', 'com.google.code.findbugs:jsr305:2.0.1'
         }
     }
 }
@@ -51,7 +56,7 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.google.firebase:firebase-database:10.2.0'
     compile 'com.google.firebase:firebase-messaging:10.2.0'
-    //compile 'com.uber.sdk:rides-android:0.5.3'
+    compile 'com.uber.sdk:rides-android:0.6.0'
     testCompile 'junit:junit:4.12'
 }
 

@@ -10,6 +10,10 @@ public class Constants {
     public static final String API_AI_KEY = "416855e204a74ea4813328dab1cae292";
     public static final int DESCRIPTION_LENGHT = 150;
 
+    public static final String UBER_CLIENT_ID = "6XOg9WX55mzBwzfdmdo_Ro1MsREFeXD2";
+    public static final String UBER_SERVER_TOKEN = "o94BCI3ixfgPrK9rLX0ROtnln1RiPRyypdFtbbrg";
+    public static final String UBER_REDIRECT_URL = "http://touristeando.bongga.co";
+
     public static final String API_BASE_URL = "https://touristeando.herokuapp.com/api/";
     public static final String API_SODA_URL = "https://www.datos.gov.co/resource/";
     public static final String DEFAULT_HEADER_IMAGE = "http://bongga.co/global_res/images/nav_menu_header_bg.jpg";

@@ -22,33 +22,29 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Currency;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.adapters.ServicesAdapter;
 import co.bongga.touristeando.models.Coordinate;
 import co.bongga.touristeando.models.Place;
-import co.bongga.touristeando.models.Price;
 import co.bongga.touristeando.models.Service;
 import co.bongga.touristeando.utils.Constants;
 import co.bongga.touristeando.utils.Globals;
 import co.bongga.touristeando.utils.PreferencesManager;
 import co.bongga.touristeando.utils.UtilityManager;
 import io.realm.RealmList;
+import com.uber.sdk.android.core.UberSdk;
+import com.uber.sdk.core.auth.Scope;
+import com.uber.sdk.rides.client.SessionConfiguration;
 
 public class PlaceDetail extends AppCompatActivity implements View.OnClickListener {
-    private ScrollView scrollView;
     private ImageView headerImg;
     private TextView placeName;
     private TextView placeCategory;
@@ -80,6 +76,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     private RealmList<Service> serviceItems = new RealmList<>();
 
     private Place place;
+    private SessionConfiguration configUber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +88,6 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         place = Globals.currentPlace;
         setTitle(place.getName());
 
-        scrollView = (ScrollView) findViewById(R.id.scrollView);
         headerImg = (ImageView) findViewById(R.id.dt_header_img);
         placeName = (TextView) findViewById(R.id.dt_place_name);
         placeCategory = (TextView) findViewById(R.id.dt_place_category);
@@ -128,6 +124,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         serviceList.setAdapter(servicesAdapter);
 
         setupUI();
+        setupUber();
     }
 
     @Override
@@ -141,6 +138,9 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         int id = item.getItemId();
 
         if (id == R.id.ic_action_invite_friend) {
+            return false;
+        }
+        else if (id == R.id.ic_action_share) {
             return false;
         }
 
@@ -188,10 +188,12 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
 
         if (place.getPrice() == null || place.getPrice().getAmount() == 0) {
             placePrice.setText(getString(R.string.free_label));
-        } else if (place.getPrice().getAmount() < 0) {
+        }
+        else if (place.getPrice().getAmount() < 0) {
             placePrice.setText(getString(R.string.undefined_price));
-        } else {
-            placePrice.setText(getString(R.string.dt_place_price, setCurrencySymbol(place.getPrice().getCurrency()), setCurrencyFormat(place.getPrice())));
+        }
+        else {
+            placePrice.setText(getString(R.string.dt_place_price, UtilityManager.setCurrencySymbol(place.getPrice().getCurrency()), UtilityManager.setCurrencyFormat(place.getPrice())));
         }
 
         String staticMapImageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" +
@@ -211,21 +213,22 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         if (place.getPlace() != null && !place.getPlace().isEmpty()) {
             placeCityPlace.setVisibility(View.VISIBLE);
             placeCityPlace.setText(place.getPlace());
-        } else {
+        }
+        else {
             placeCityPlace.setVisibility(View.GONE);
         }
 
-        Coordinate userLocation = preferencesManager.getCurrentLocation();
-        if (userLocation != null) {
-            Coordinate placeLocation = place.getCoordinates();
-            double distance = UtilityManager.calculateDistance(userLocation, placeLocation);
-
+        //Show distance
+        if(place.getDistance() != 0){
+            double distance = place.getDistance();
             if (distance < 1) {
-                placeDistance.setText(String.format(Locale.getDefault(), "%.2f m", distance * 1000));
-            } else {
+                placeDistance.setText(String.format(Locale.getDefault(), "%.0f mts", distance * 1000));
+            }
+            else {
                 placeDistance.setText(String.format(Locale.getDefault(), "%.2f kms", distance));
             }
-        } else {
+        }
+        else {
             locationWrapper.setVisibility(View.GONE);
             placeDistance.setVisibility(View.GONE);
         }
@@ -236,22 +239,23 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         if (cell == 0 && phone.equals("0")) {
             phoneWrapper.setVisibility(View.GONE);
             placePhone.setVisibility(View.GONE);
-        } else if (cell == 0 && !phone.equals("0")) {
+        }
+        else if (cell == 0 && !phone.equals("0")) {
             placePhone.setText(String.format(Locale.getDefault(), "%s", phone));
-        } else if (cell != 0 && phone.equals("0")) {
+        }
+        else if (cell != 0 && phone.equals("0")) {
             placePhone.setText(String.format(Locale.getDefault(), "%s", cell));
-        } else {
+        }
+        else {
             placePhone.setText(String.format(Locale.getDefault(), "%s - %s", cell, phone));
         }
 
         if (place.getServices() != null && place.getServices().size() > 0) {
             servicesLabelWrapper.setVisibility(View.VISIBLE);
             servicesWrapper.setVisibility(View.VISIBLE);
-
             for (Service service : place.getServices()) {
                 serviceItems.add(service);
             }
-
             servicesAdapter.notifyDataSetChanged();
         }
     }
@@ -265,7 +269,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
             final double currentLat = cLocation.getLatitude();
             final double currentLng = cLocation.getLongitude();
 
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
             dialog.setTitle(getResources().getString(R.string.show_route_title));
             dialog.setMessage(getResources().getString(R.string.show_route_msg));
             dialog.setPositiveButton(getResources().getString(R.string.take_me), new DialogInterface.OnClickListener() {
@@ -278,14 +282,19 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                     startActivity(intent);
                 }
             });
-
+            /*dialog.setNeutralButton(getResources().getString(R.string.dt_request_uber), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    showUberView();
+                }
+            });*/
             dialog.setNegativeButton(getResources().getString(R.string.btn_cancel), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     dialog.dismiss();
                 }
             });
 
-            AlertDialog alertDialog = dialog.create();
+            final AlertDialog alertDialog = dialog.create();
             alertDialog.show();
         }
     }
@@ -309,8 +318,8 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     private void callToPlace() {
         List<Object> phones = new ArrayList<>();
 
-        String phone = place.getPhone().getPhone();
-        long cell = place.getPhone().getCell();
+        final String phone = place.getPhone().getPhone();
+        final long cell = place.getPhone().getCell();
 
         if (!phone.equals("0")) {
             phones.add(phone);
@@ -350,39 +359,8 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    private String setCurrencyFormat(Price price){
-        NumberFormat format = NumberFormat.getInstance();
-        format.setMaximumFractionDigits(0);
-        Currency currency = Currency.getInstance(price.getCurrency());
-        format.setCurrency(currency);
-
-        String amountFormatted = format.format(price.getAmount());
-
-        return amountFormatted;
-    }
-
-    private String setCurrencySymbol(String currencySymbol){
-        String symbol = "";
-
-        switch (currencySymbol){
-            case "COP":
-                symbol = "$";
-                break;
-
-            case "USD":
-                symbol = "U$";
-                break;
-
-            case "EUR":
-                symbol = "€";
-                break;
-        }
-
-        return symbol;
-    }
-
     private String checkDescriptionLength(String desc){
-        String finalText = null;
+        String finalText;
 
         if(desc.length() > Constants.DESCRIPTION_LENGHT){
             finalText = desc.substring(0, Constants.DESCRIPTION_LENGHT) + "...";
@@ -390,9 +368,6 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
 
             descriptionSeparator.setVisibility(View.VISIBLE);
             btnToggleDescription.setVisibility(View.VISIBLE);
-
-            //TODO: check
-            //scrollView.scrollTo(0, scrollView.getBottom());
         }
         else{
             finalText = desc;
@@ -418,5 +393,20 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                 isExpanded=0;
                 break;
         }
+    }
+
+    private void setupUber(){
+        configUber = new SessionConfiguration.Builder()
+                .setClientId(Constants.UBER_CLIENT_ID)
+                .setRedirectUri(Constants.UBER_REDIRECT_URL)
+                .setScopes(Arrays.asList(Scope.PROFILE, Scope.RIDE_WIDGETS))
+                .setEnvironment(SessionConfiguration.Environment.SANDBOX)
+                .build();
+
+        UberSdk.initialize(configUber);
+    }
+
+    private void showUberView(){
+
     }
 }

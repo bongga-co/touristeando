@@ -28,9 +28,11 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.text.Normalizer;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -39,6 +41,7 @@ import java.util.regex.Pattern;
 
 import co.bongga.touristeando.interfaces.SnackCallback;
 import co.bongga.touristeando.models.Coordinate;
+import co.bongga.touristeando.models.Price;
 import co.bongga.touristeando.models.RealmDouble;
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -256,5 +259,36 @@ public class UtilityManager {
                 result.add(cls.cast(obj));
         }
         return result;
+    }
+
+    public static String setCurrencyFormat(Price price){
+        NumberFormat format = NumberFormat.getInstance();
+        format.setMaximumFractionDigits(0);
+        Currency currency = Currency.getInstance(price.getCurrency());
+        format.setCurrency(currency);
+
+        String amountFormatted = format.format(price.getAmount());
+
+        return amountFormatted;
+    }
+
+    public static String setCurrencySymbol(String currencySymbol){
+        String symbol = "";
+
+        switch (currencySymbol){
+            case "COP":
+                symbol = "$";
+                break;
+
+            case "USD":
+                symbol = "U$";
+                break;
+
+            case "EUR":
+                symbol = "€";
+                break;
+        }
+
+        return symbol;
     }
 }

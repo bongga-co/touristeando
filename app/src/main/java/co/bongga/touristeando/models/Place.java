@@ -21,6 +21,7 @@ public class Place extends RealmObject {
     private String place;
     private Phone phone;
     private boolean outstanding;
+    private double distance;
     private RealmList<Service> services;
 
     public Place(){
@@ -28,7 +29,7 @@ public class Place extends RealmObject {
     }
 
     public Place(String name, String category, String thumbnail, float rating, Price price,
-                 Coordinate coordinates, String description, String city, String country,
+                 Coordinate coordinates, double distance, String description, String city, String country,
                  String address, String place, Phone phone, boolean outstanding, RealmList<Service> services) {
         this.name = name;
         this.category = category;
@@ -44,6 +45,7 @@ public class Place extends RealmObject {
         this.phone = phone;
         this.outstanding = outstanding;
         this.services = services;
+        this.distance = distance;
     }
 
     public String getName() {
@@ -156,5 +158,13 @@ public class Place extends RealmObject {
 
     public void setServices(RealmList<Service> services) {
         this.services = services;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
     }
 }
