@@ -176,6 +176,7 @@
                 </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
+        <!-- Description -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -223,6 +224,47 @@
                 android:textColor="@android:color/darker_gray"
                 android:padding="5dp" />
         </LinearLayout>
+        <!-- Gallery -->
+        <LinearLayout
+            android:id="@+id/dt_place_gallery_label_wrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="20dp">
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/ic_add_photo_gallery"
+                android:background="@null" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/dt_place_gallery_wrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:background="@drawable/container_shadow">
+            <co.bongga.touristeando.ui.TouryTextViewPier
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="@string/dt_place_gallery"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/standar_primary" />
+            <co.bongga.touristeando.ui.TouryTextViewPier
+                android:id="@+id/dt_place_gallery_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dt_place_gallery_empty"
+                android:textAlignment="center" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/dt_gallery_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <!-- Services -->
         <LinearLayout
             android:id="@+id/dt_place_services_label_wrapper"
             android:layout_width="match_parent"

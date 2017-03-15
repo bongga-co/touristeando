@@ -70,8 +70,6 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceHolder>
             holder.price.setText(context.getString(R.string.free_label));
         }
         else if (place.getPrice().getAmount() < 0) {
-            //holder.price.setVisibility(View.GONE);
-            //holder.priceLbl.setVisibility(View.GONE);
             holder.priceLbl.setText(context.getString(R.string.price_lbl));
             holder.price.setText("--");
         }

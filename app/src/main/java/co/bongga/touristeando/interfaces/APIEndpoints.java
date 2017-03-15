@@ -5,10 +5,12 @@ import com.google.gson.JsonElement;
 import java.util.List;
 
 import co.bongga.touristeando.models.CollectionPlace;
+import co.bongga.touristeando.models.Gallery;
 import co.bongga.touristeando.models.Help;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
@@ -32,5 +34,10 @@ public interface APIEndpoints {
     @GET("4ai7-uijz.json")
     Call<JsonElement> willGetPublicWifiPoints(
         @Query("$where") String params
+    );
+
+    @GET("places/{id}/gallery")
+    Call<List<Gallery>> willGetPlaceGallery(
+        @Path("id") String id
     );
 }

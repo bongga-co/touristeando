@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -22,7 +23,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -31,11 +31,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import co.bongga.touristeando.R;
+import co.bongga.touristeando.adapters.GalleryAdapter;
 import co.bongga.touristeando.adapters.ServicesAdapter;
+import co.bongga.touristeando.interfaces.DataCallback;
 import co.bongga.touristeando.models.Coordinate;
+import co.bongga.touristeando.models.Gallery;
 import co.bongga.touristeando.models.Place;
 import co.bongga.touristeando.models.Service;
 import co.bongga.touristeando.utils.Constants;
+import co.bongga.touristeando.utils.DataManager;
 import co.bongga.touristeando.utils.Globals;
 import co.bongga.touristeando.utils.PreferencesManager;
 import co.bongga.touristeando.utils.UtilityManager;
@@ -68,6 +72,11 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     private LinearLayout locationWrapper;
 
     private RecyclerView serviceList;
+
+    private ArrayList<Gallery> imageList;
+    private GalleryAdapter galleryAdapter;
+    private RecyclerView galleryRecycler;
+    private TextView emptyGallery;
 
     private static int isExpanded = 0;
     private static String shortenDescription;
@@ -120,6 +129,20 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         serviceList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         serviceList.setItemAnimator(new DefaultItemAnimator());
 
+        //Gallery Section
+        galleryRecycler = (RecyclerView) findViewById(R.id.dt_gallery_list);
+
+        imageList = new ArrayList<>();
+        galleryAdapter = new GalleryAdapter(getApplicationContext(), imageList);
+
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+        galleryRecycler.setLayoutManager(mLayoutManager);
+        galleryRecycler.setItemAnimator(new DefaultItemAnimator());
+        galleryRecycler.setAdapter(galleryAdapter);
+
+        emptyGallery = (TextView) findViewById(R.id.dt_place_gallery_empty);
+
+        //Services Section
         servicesAdapter = new ServicesAdapter(this, serviceItems);
         serviceList.setAdapter(servicesAdapter);
 
@@ -176,6 +199,8 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     }
 
     private void setupUI() {
+        System.out.println(place.getId());
+
         Glide.with(this).load(place.getThumbnail())
                 .crossFade()
                 .placeholder(R.drawable.placeholder_img)
@@ -258,6 +283,8 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
             }
             servicesAdapter.notifyDataSetChanged();
         }
+
+        fetchGalleryImages();
     }
 
     private void takeMeToThePlace() {
@@ -393,6 +420,36 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                 isExpanded=0;
                 break;
         }
+    }
+
+    private void fetchGalleryImages(){
+        String id = place.getId();
+        DataManager.willGetPlaceGallery(id, new DataCallback() {
+            @Override
+            public void didReceiveData(List<Object> response) {
+            if(response != null){
+                List<Gallery> data = UtilityManager.objectFilter(response, Gallery.class);
+                if(data.size() > 0){
+                    emptyGallery.setVisibility(View.GONE);
+                    galleryRecycler.setVisibility(View.VISIBLE);
+
+                    for(Gallery galleryItem : data){
+                        imageList.add(galleryItem);
+                    }
+
+                    galleryAdapter.notifyDataSetChanged();
+                }
+                else{
+                    emptyGallery.setVisibility(View.VISIBLE);
+                    galleryRecycler.setVisibility(View.GONE);
+                }
+            }
+            else{
+                emptyGallery.setVisibility(View.VISIBLE);
+                galleryRecycler.setVisibility(View.GONE);
+            }
+            }
+        });
     }
 
     private void setupUber(){

@@ -116,6 +116,8 @@
     <string name="call_phone_msg">Llamar a </string>
     <string name="dt_request_uber">Perdir Uber</string>
     <string name="share_place">Compartir</string>
+    <string name="dt_place_gallery">Galer\u00eda</string>
+    <string name="dt_place_gallery_empty">No hay im\u00e1genes disponibles.\nS\u00e9 el primero en agregar la mejor panor\u00e1mica de este lugar.</string>
 
     <!-- Feedback -->
     <string name="feedback_empty_name">Ingresa tu nombre</string>

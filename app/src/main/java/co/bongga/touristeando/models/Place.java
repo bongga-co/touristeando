@@ -8,6 +8,7 @@ import io.realm.RealmObject;
  */
 
 public class Place extends RealmObject {
+    private String id;
     private String name;
     private String category;
     private String thumbnail;
@@ -28,9 +29,10 @@ public class Place extends RealmObject {
 
     }
 
-    public Place(String name, String category, String thumbnail, float rating, Price price,
+    public Place(String id, String name, String category, String thumbnail, float rating, Price price,
                  Coordinate coordinates, double distance, String description, String city, String country,
                  String address, String place, Phone phone, boolean outstanding, RealmList<Service> services) {
+        this.id = id;
         this.name = name;
         this.category = category;
         this.thumbnail = thumbnail;
@@ -46,6 +48,14 @@ public class Place extends RealmObject {
         this.outstanding = outstanding;
         this.services = services;
         this.distance = distance;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
