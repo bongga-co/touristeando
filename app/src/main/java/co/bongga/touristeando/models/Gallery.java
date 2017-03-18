@@ -1,5 +1,7 @@
 package co.bongga.touristeando.models;
 
+import android.graphics.Bitmap;
+
 import io.realm.RealmObject;
 
 /**
@@ -10,6 +12,7 @@ public class Gallery {
     private String urlSmall;
     private String urlLarge;
     private long publishedDate;
+    private Bitmap bitmap;
 
     public Gallery() {
     }
@@ -42,5 +45,13 @@ public class Gallery {
 
     public void setPublishedDate(long publishedDate) {
         this.publishedDate = publishedDate;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
     }
 }

@@ -18,6 +18,7 @@ public class Constants {
     public static final String API_SODA_URL = "https://www.datos.gov.co/resource/";
     public static final String DEFAULT_HEADER_IMAGE = "http://bongga.co/global_res/images/nav_menu_header_bg.jpg";
     public static final String DEFAULT_PROFILE_IMAGE = "http://bongga.co/global_res/images/logo.png";
+    public static final String FB_STORAGE_URL = "gs://touristeando-881da.appspot.com/";
 
     //Actions
     public static final String ATTRACTIONS_ACTION = "attractions";
@@ -39,6 +40,8 @@ public class Constants {
     public static final int REQUEST_FINE_LOCATION_PERMISSION = 3;
     public static final int REQUEST_CHECK_SETTINGS = 4;
     public static final int REQUEST_CALL_PHONE_PERMISSION = 5;
+    public static final int REQUEST_PICK_IMAGE_GALLERY = 6;
+    public static final int REQUEST_PICK_IMAGE_CAMERA = 7;
 
     //Things to do
     public static final String WIFI_THING = "conseguir wifi gratis";

@@ -40,4 +40,11 @@ public interface APIEndpoints {
     Call<List<Gallery>> willGetPlaceGallery(
         @Path("id") String id
     );
+
+    @GET("places/{id}/gallery/start/{start}/size/{size}")
+    Call<List<Gallery>> willGetPlaceGalleryWithLimit(
+            @Path("id") String id,
+            @Path("start") int start,
+            @Path("size") int size
+    );
 }

@@ -96,4 +96,22 @@ public class DataManager {
         });
         return null;
     }
+
+    public static List<Gallery> willGetPlaceGalleryWithLimit(String id, int start, int size, final DataCallback callback){
+        Call<List<Gallery>> call = apiService.willGetPlaceGalleryWithLimit(id, start, size);
+        call.enqueue(new Callback<List<Gallery>>() {
+            @Override
+            public void onResponse(Call<List<Gallery>>call, Response<List<Gallery>> response) {
+                List<Gallery> gallery = response.body();
+                List<Object> data = UtilityManager.objectFilter(gallery, Object.class);
+                callback.didReceiveData(data);
+            }
+
+            @Override
+            public void onFailure(Call<List<Gallery>>call, Throwable t) {
+                callback.didReceiveData(null);
+            }
+        });
+        return null;
+    }
 }

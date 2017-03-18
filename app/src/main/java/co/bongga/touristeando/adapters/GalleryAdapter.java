@@ -41,11 +41,16 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryH
     public void onBindViewHolder(GalleryAdapter.GalleryHolder holder, int position) {
         Gallery image = imageList.get(position);
 
-        Glide.with(context).load(image.getUrlSmall())
+        if(image.getUrlLarge() != null){
+            Glide.with(context).load(image.getUrlLarge())
                 .thumbnail(0.5f)
                 .crossFade()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.thumb);
+        }
+        else if(image.getBitmap() != null){
+            holder.thumb.setImageBitmap(image.getBitmap());
+        }
     }
 
     @Override

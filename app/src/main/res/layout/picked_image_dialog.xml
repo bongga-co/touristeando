@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/picked_image"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:layout_gravity="center"
+        android:layout_marginBottom="5dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="5dp"
+        android:padding="@dimen/generic_margin">
+        <Button
+            android:id="@+id/btn_cancel_picked_image"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:layout_marginRight="2dp"
+            android:layout_marginEnd="2dp"
+            android:backgroundTint="@color/light_gray"
+            android:textColor="@android:color/black"
+            android:background="@drawable/component_bordered_with_shadow"
+            android:text="@string/btn_cancel_picked_image"/>
+        <Button
+            android:id="@+id/btn_submit_picked_image"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:layout_marginLeft="2dp"
+            android:layout_marginStart="2dp"
+            android:backgroundTint="@color/standar_primary"
+            android:textColor="@android:color/white"
+            android:background="@drawable/component_bordered_with_shadow"
+            android:text="@string/btn_submit_picked_image"/>
+    </LinearLayout>
+</LinearLayout>

@@ -1,12 +1,18 @@
 package co.bongga.touristeando.activities;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +21,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,14 +33,23 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
+
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.adapters.GalleryAdapter;
 import co.bongga.touristeando.adapters.ServicesAdapter;
+import co.bongga.touristeando.fragments.GalleryFragment;
 import co.bongga.touristeando.interfaces.DataCallback;
+import co.bongga.touristeando.interfaces.RecyclerClickListener;
 import co.bongga.touristeando.models.Coordinate;
 import co.bongga.touristeando.models.Gallery;
 import co.bongga.touristeando.models.Place;
@@ -42,8 +58,17 @@ import co.bongga.touristeando.utils.Constants;
 import co.bongga.touristeando.utils.DataManager;
 import co.bongga.touristeando.utils.Globals;
 import co.bongga.touristeando.utils.PreferencesManager;
+import co.bongga.touristeando.utils.RecyclerItemClickListener;
 import co.bongga.touristeando.utils.UtilityManager;
 import io.realm.RealmList;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.uber.sdk.android.core.UberSdk;
 import com.uber.sdk.core.auth.Scope;
 import com.uber.sdk.rides.client.SessionConfiguration;
@@ -78,6 +103,9 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     private RecyclerView galleryRecycler;
     private TextView emptyGallery;
 
+    private Button btnSeeAll;
+    private Button btnAddPicture;
+
     private static int isExpanded = 0;
     private static String shortenDescription;
     private PreferencesManager preferencesManager;
@@ -86,6 +114,12 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
 
     private Place place;
     private SessionConfiguration configUber;
+    private String id;
+
+    private ProgressDialog loader;
+
+    private DatabaseReference firebaseDB;
+    private FirebaseStorage storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +127,10 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         setContentView(R.layout.activity_place_detail);
 
         preferencesManager = new PreferencesManager(this);
+        loader = UtilityManager.showLoader(this, getString(R.string.loader_message));
+
+        firebaseDB = FirebaseDatabase.getInstance().getReference();
+        storage = FirebaseStorage.getInstance();
 
         place = Globals.currentPlace;
         setTitle(place.getName());
@@ -135,12 +173,32 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         imageList = new ArrayList<>();
         galleryAdapter = new GalleryAdapter(getApplicationContext(), imageList);
 
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+        //RecyclerView.LayoutManager mLayoutManager = new StaggeredGridLayoutManager(3, 1);
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         galleryRecycler.setLayoutManager(mLayoutManager);
+        galleryRecycler.setHasFixedSize(true);
         galleryRecycler.setItemAnimator(new DefaultItemAnimator());
         galleryRecycler.setAdapter(galleryAdapter);
 
+        galleryRecycler.addOnItemTouchListener(new RecyclerItemClickListener(this, galleryRecycler, new RecyclerClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                showGalleryView(true, position);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
+
         emptyGallery = (TextView) findViewById(R.id.dt_place_gallery_empty);
+
+        btnSeeAll = (Button) findViewById(R.id.btn_see_all_images);
+        btnSeeAll.setOnClickListener(this);
+
+        btnAddPicture = (Button) findViewById(R.id.btn_add_picture);
+        btnAddPicture.setOnClickListener(this);
 
         //Services Section
         servicesAdapter = new ServicesAdapter(this, serviceItems);
@@ -182,6 +240,12 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
             case R.id.btn_call_to_place:
                 requestPhoneCallPermission();
                 break;
+            case R.id.btn_see_all_images:
+                openGalleryGrid();
+                break;
+            case R.id.btn_add_picture:
+                chooseGetImageOption();
+                break;
         }
     }
 
@@ -192,15 +256,35 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                 case Constants.REQUEST_CALL_PHONE_PERMISSION:
                     callToPlace();
                     break;
+                case Constants.REQUEST_PICK_IMAGE_GALLERY:
+                    chooseFromGallery();
+                    break;
             }
         } else {
             UtilityManager.showMessage(btnCallToPlace, getString(R.string.permission_denied));
         }
     }
 
-    private void setupUI() {
-        System.out.println(place.getId());
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == Constants.REQUEST_PICK_IMAGE_GALLERY && resultCode == RESULT_OK){
+            if(data != null){
+                requestResult(data);
+            }
+        }
+        else if(requestCode == Constants.REQUEST_PICK_IMAGE_CAMERA && resultCode == RESULT_OK){
+            Bundle extras = data.getExtras();
+            Bitmap capturedPicture = (Bitmap) extras.get("data");
 
+            if(capturedPicture != null){
+                showPickedImage(resizeImage(capturedPicture));
+            }
+        }
+        else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void setupUI() {
         Glide.with(this).load(place.getThumbnail())
                 .crossFade()
                 .placeholder(R.drawable.placeholder_img)
@@ -423,35 +507,221 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     }
 
     private void fetchGalleryImages(){
-        String id = place.getId();
-        DataManager.willGetPlaceGallery(id, new DataCallback() {
+        loader.show();
+
+        id = place.getId();
+        DataManager.willGetPlaceGalleryWithLimit(id, 0, 4, new DataCallback() {
             @Override
             public void didReceiveData(List<Object> response) {
-            if(response != null){
-                List<Gallery> data = UtilityManager.objectFilter(response, Gallery.class);
-                if(data.size() > 0){
-                    emptyGallery.setVisibility(View.GONE);
-                    galleryRecycler.setVisibility(View.VISIBLE);
+                loader.dismiss();
 
-                    for(Gallery galleryItem : data){
-                        imageList.add(galleryItem);
+                if(response != null){
+                    List<Gallery> data = UtilityManager.objectFilter(response, Gallery.class);
+                    if(data.size() > 0){
+                        toggleGallery(true);
+
+                        for(Gallery galleryItem : data){
+                            imageList.add(galleryItem);
+                        }
+
+                        galleryAdapter.notifyDataSetChanged();
                     }
-
-                    galleryAdapter.notifyDataSetChanged();
+                    else{
+                        toggleGallery(false);
+                    }
                 }
                 else{
-                    emptyGallery.setVisibility(View.VISIBLE);
-                    galleryRecycler.setVisibility(View.GONE);
+                    toggleGallery(false);
                 }
-            }
-            else{
-                emptyGallery.setVisibility(View.VISIBLE);
-                galleryRecycler.setVisibility(View.GONE);
-            }
             }
         });
     }
 
+    private void toggleGallery(boolean flag){
+        if(!flag){
+            emptyGallery.setVisibility(View.VISIBLE);
+            galleryRecycler.setVisibility(View.GONE);
+            btnSeeAll.setVisibility(View.GONE);
+        }
+        else{
+            emptyGallery.setVisibility(View.GONE);
+            galleryRecycler.setVisibility(View.VISIBLE);
+            btnSeeAll.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void showGalleryView(boolean flag, int position){
+        Bundle bundle = null;
+
+        if(flag){
+            bundle = new Bundle();
+            bundle.putSerializable("images", imageList);
+            bundle.putInt("position", position);
+        }
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        GalleryFragment newFragment = GalleryFragment.newInstance();
+        newFragment.setArguments(bundle);
+        newFragment.show(ft, "slideshow");
+    }
+
+    private void openGalleryGrid(){
+        Intent i = new Intent(PlaceDetail.this, co.bongga.touristeando.activities.Gallery.class);
+        i.putExtra("placeId", id);
+        startActivity(i);
+    }
+
+    private void chooseGetImageOption(){
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.choose_image_lbl))
+                .setIcon(R.mipmap.ic_launcher)
+                .setItems(new CharSequence[]{getString(R.string.choose_from_camera),
+                        getString(R.string.choose_from_library)}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(which == 0){
+                            requestCameraPermission();
+                        }
+                        else{
+                            chooseFromGallery();
+                        }
+                    }
+                });
+
+        dialog.show();
+    }
+
+    private void chooseFromGallery(){
+        Intent pickerImage = new Intent(Intent.ACTION_GET_CONTENT);
+        pickerImage.setType("image/*");
+        startActivityForResult(pickerImage, Constants.REQUEST_PICK_IMAGE_GALLERY);
+    }
+
+    private void chooseFromCamera(){
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if(intent.resolveActivity(getPackageManager()) != null){
+            startActivityForResult(intent, Constants.REQUEST_PICK_IMAGE_CAMERA);
+        }
+    }
+
+    private void requestResult(Intent data){
+        try {
+            final Uri imageUri = data.getData();
+            final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+            final Bitmap selectedImage = resizeImage(BitmapFactory.decodeStream(imageStream));
+
+            if(selectedImage != null){
+                showPickedImage(resizeImage(selectedImage));
+            }
+            else{
+                UtilityManager.showMessage(btnAddPicture, getString(R.string.not_file_found));
+            }
+        }
+        catch (FileNotFoundException e) {
+            UtilityManager.showMessage(btnAddPicture, getString(R.string.not_file_found));
+        }
+    }
+
+    private Bitmap resizeImage(Bitmap originalImage){
+        Bitmap newImage = originalImage; //Bitmap.createScaledBitmap(originalImage, 800, 600, true);
+        return newImage;
+    }
+
+    private void requestCameraPermission(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA }, 0);
+            }
+            else {
+                chooseFromCamera();
+            }
+        }
+        else{
+            chooseFromCamera();
+        }
+    }
+
+    private void showPickedImage(final Bitmap bitmap){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+
+        final View dialogView = inflater.inflate(R.layout.picked_image_dialog, null);
+
+        builder.setView(dialogView);
+        builder.setCancelable(false);
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+        final ImageView imageView = (ImageView) dialogView.findViewById(R.id.picked_image);
+        final Button btnOk = (Button) dialogView.findViewById(R.id.btn_submit_picked_image);
+        final Button btnCancel = (Button) dialogView.findViewById(R.id.btn_cancel_picked_image);
+
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+
+                Gallery gallery = new Gallery(null, null, new Date().getTime());
+                gallery.setBitmap(bitmap);
+
+                toggleGallery(true);
+
+                imageList.add(gallery);
+                if(imageList.size() <= 4){
+                    galleryAdapter.notifyDataSetChanged();
+                }
+
+                uploadPicture(bitmap);
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        imageView.setImageBitmap(bitmap);
+    }
+
+    private void uploadPicture(Bitmap original){
+        if(!UtilityManager.isConnected(this)){
+            UtilityManager.showMessage(btnAddPicture, getString(R.string.no_network_connection));
+            return;
+        }
+
+        loader.show();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        original.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        StorageReference storageRef = storage.getReferenceFromUrl(Constants.FB_STORAGE_URL);
+        StorageReference imageRef = storageRef.child("places/"+place.getId()+"/gallery/" + UUID.randomUUID()+".jpg");
+
+        UploadTask uploadTask = imageRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                loader.dismiss();
+                UtilityManager.showMessage(btnAddPicture, getString(R.string.image_upload_error));
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
+                Gallery gallery = new Gallery(downloadUrl.toString(), downloadUrl.toString(), new Date().getTime());
+                firebaseDB.child("places").child(place.getId()).child("gallery").push().setValue(gallery);
+
+                loader.dismiss();
+            }
+        });
+    }
+
+    //Uber Intergration
     private void setupUber(){
         configUber = new SessionConfiguration.Builder()
                 .setClientId(Constants.UBER_CLIENT_ID)

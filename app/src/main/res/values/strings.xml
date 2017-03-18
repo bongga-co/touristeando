@@ -63,7 +63,7 @@
     <string name="txt_placeholder_chat_input">¿Qu\u00e9 quieres descubrir? ...</string>
     <string name="txt_placeholder_chat_listening">Escuchando...</string>
     <string name="generic_agent_error">No pude procesar lo que me pediste, intenta de nuevo.</string>
-    <string name="generic_agent_no_content">Lo siento, no pude encontrar informaci\u00f3n cerca de ti. Intenta buscar por ciudad.</string>
+    <string name="generic_agent_no_content">Lo siento, no pude encontrar informaci\u00f3n. Intenta buscar por ciudad.</string>
     <string name="location_canceled_by_user">Necesito tu ubicaci\u00f3n para mostrarte los mejores lugares cerca de ti.</string>
     <string name="no_chat_msg">No hay mensajes</string>
     <string name="example_hint">Ej:</string>
@@ -118,6 +118,15 @@
     <string name="share_place">Compartir</string>
     <string name="dt_place_gallery">Galer\u00eda</string>
     <string name="dt_place_gallery_empty">No hay im\u00e1genes disponibles.\nS\u00e9 el primero en agregar la mejor panor\u00e1mica de este lugar.</string>
+    <string name="btn_see_all_images">Ver Todas</string>
+    <string name="btn_add_picture">Agregar Foto</string>
+    <string name="choose_image_lbl">Elegir imagen desde...</string>
+    <string name="choose_from_camera">C\u00e1mara</string>
+    <string name="choose_from_library">Galer\u00eda</string>
+    <string name="not_file_found">Archivo no encontrado</string>
+    <string name="btn_submit_picked_image">@string/btn_ok</string>
+    <string name="btn_cancel_picked_image">@string/btn_cancel</string>
+    <string name="image_upload_error">No se pudo subir la imagen, intenta de nuevo.</string>
 
     <!-- Feedback -->
     <string name="feedback_empty_name">Ingresa tu nombre</string>
@@ -130,4 +139,7 @@
 
     <!-- Notifications -->
     <string name="no_notification_msg">No hay notificaciones disponibles</string>
+
+    <!-- Galeria -->
+    <string name="title_activity_gallery">Galer\u00eda</string>
 </resources>
