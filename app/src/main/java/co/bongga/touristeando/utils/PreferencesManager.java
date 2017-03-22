@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 
 import co.bongga.touristeando.models.Coordinate;
+import co.bongga.touristeando.models.User;
 
 /**
  * Created by bongga on 12/13/16.
@@ -26,6 +27,7 @@ public class PreferencesManager {
     private static final String CURRENT_LOCATION = "currentLocation";
     private static final String DEFAULT_DISTANCE = "defaultDistance";
     private static final String HELP_MESSAGE = "helpMessage";
+    private static final String LOGGED_USER = "userData";
 
     private Gson gson;
 
@@ -71,5 +73,15 @@ public class PreferencesManager {
 
     public boolean isShownHelpMessage(){
         return pref.getBoolean(HELP_MESSAGE, true);
+    }
+
+    public void setLoggedUser(User user){
+        editor.putString(LOGGED_USER, gson.toJson(user));
+        editor.commit();
+    }
+
+    public User getLoggedUser(){
+        String user = pref.getString(LOGGED_USER, null);
+        return gson.fromJson(user, User.class);
     }
 }

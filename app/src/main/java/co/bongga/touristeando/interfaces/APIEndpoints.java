@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import java.util.List;
 
 import co.bongga.touristeando.models.CollectionPlace;
-import co.bongga.touristeando.models.Gallery;
+import co.bongga.touristeando.models.GalleryItem;
 import co.bongga.touristeando.models.Help;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -37,12 +37,12 @@ public interface APIEndpoints {
     );
 
     @GET("places/{id}/gallery")
-    Call<List<Gallery>> willGetPlaceGallery(
+    Call<List<GalleryItem>> willGetPlaceGallery(
         @Path("id") String id
     );
 
     @GET("places/{id}/gallery/start/{start}/size/{size}")
-    Call<List<Gallery>> willGetPlaceGalleryWithLimit(
+    Call<List<GalleryItem>> willGetPlaceGalleryWithLimit(
             @Path("id") String id,
             @Path("start") int start,
             @Path("size") int size

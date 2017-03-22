@@ -1,7 +1,6 @@
 package co.bongga.touristeando.adapters;
 
 import android.content.Context;
-import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,17 +13,17 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import java.util.List;
 
 import co.bongga.touristeando.R;
-import co.bongga.touristeando.models.Gallery;
+import co.bongga.touristeando.models.GalleryItem;
 
 /**
  * Created by bongga on 3/15/17.
  */
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryHolder> {
-    private List<Gallery> imageList;
+    private List<GalleryItem> imageList;
     private Context context;
 
-    public GalleryAdapter(Context context, List<Gallery> imageList){
+    public GalleryAdapter(Context context, List<GalleryItem> imageList){
         this.context = context;
         this.imageList = imageList;
     }
@@ -39,7 +38,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryH
 
     @Override
     public void onBindViewHolder(GalleryAdapter.GalleryHolder holder, int position) {
-        Gallery image = imageList.get(position);
+        GalleryItem image = imageList.get(position);
 
         if(image.getUrlLarge() != null){
             Glide.with(context).load(image.getUrlLarge())

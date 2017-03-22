@@ -10,7 +10,7 @@
     <color name="colorAccent">@color/standar_second</color>
 
     <color name="light_gray">#EEEEEE</color>
-
+    <color name="dark_gray">#333333</color>
 
     <color name="bg_msg_from">#e5e7eb</color>
 

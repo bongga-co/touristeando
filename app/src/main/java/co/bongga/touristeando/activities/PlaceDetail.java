@@ -21,7 +21,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,7 +52,7 @@ import co.bongga.touristeando.fragments.GalleryFragment;
 import co.bongga.touristeando.interfaces.DataCallback;
 import co.bongga.touristeando.interfaces.RecyclerClickListener;
 import co.bongga.touristeando.models.Coordinate;
-import co.bongga.touristeando.models.Gallery;
+import co.bongga.touristeando.models.GalleryItem;
 import co.bongga.touristeando.models.Place;
 import co.bongga.touristeando.models.Service;
 import co.bongga.touristeando.utils.Constants;
@@ -66,7 +65,6 @@ import io.realm.RealmList;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -98,10 +96,11 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     private LinearLayout servicesWrapper;
     private LinearLayout phoneWrapper;
     private LinearLayout locationWrapper;
+    private LinearLayout priceWrapper;
 
     private RecyclerView serviceList;
 
-    private ArrayList<Gallery> imageList;
+    private ArrayList<GalleryItem> imageList;
     private GalleryAdapter galleryAdapter;
     private RecyclerView galleryRecycler;
     private TextView emptyGallery;
@@ -166,18 +165,18 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
 
         phoneWrapper = (LinearLayout) findViewById(R.id.phoneWrapper);
         locationWrapper = (LinearLayout) findViewById(R.id.locationWrapper);
+        priceWrapper = (LinearLayout) findViewById(R.id.priceWrapper);
 
         serviceList = (RecyclerView) findViewById(R.id.dt_services_list);
         serviceList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         serviceList.setItemAnimator(new DefaultItemAnimator());
 
-        //Gallery Section
+        //GalleryItem Section
         galleryRecycler = (RecyclerView) findViewById(R.id.dt_gallery_list);
 
         imageList = new ArrayList<>();
         galleryAdapter = new GalleryAdapter(getApplicationContext(), imageList);
 
-        //RecyclerView.LayoutManager mLayoutManager = new StaggeredGridLayoutManager(3, 1);
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         galleryRecycler.setLayoutManager(mLayoutManager);
         galleryRecycler.setHasFixedSize(true);
@@ -249,7 +248,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                 openGalleryGrid();
                 break;
             case R.id.btn_add_picture:
-                if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                if(Globals.loggedUser != null){
                     chooseGetImageOption();
                 }
                 else{
@@ -312,6 +311,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
             placePrice.setText(getString(R.string.free_label));
         }
         else if (place.getPrice().getAmount() < 0) {
+            priceWrapper.setVisibility(View.GONE);
             placePrice.setText(getString(R.string.undefined_price));
         }
         else {
@@ -530,9 +530,9 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                 galleryProgress.setVisibility(View.GONE);
 
                 if(response != null){
-                    List<Gallery> data = UtilityManager.objectFilter(response, Gallery.class);
+                    List<GalleryItem> data = UtilityManager.objectFilter(response, GalleryItem.class);
                     if(data.size() > 0){
-                        for(Gallery galleryItem : data){
+                        for(GalleryItem galleryItem : data){
                             imageList.add(galleryItem);
                         }
 
@@ -675,7 +675,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
             public void onClick(View view) {
                 dialog.dismiss();
 
-                Gallery gallery = new Gallery(null, null, new Date().getTime());
+                GalleryItem gallery = new GalleryItem(null, null, new Date().getTime());
                 gallery.setBitmap(bitmap);
 
                 toggleGallery(true);
@@ -726,8 +726,20 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
 
-                Gallery gallery = new Gallery(downloadUrl.toString(), downloadUrl.toString(), new Date().getTime());
-                firebaseDB.child("places").child(place.getId()).child("gallery").push().setValue(gallery);
+                String url;
+
+                if(downloadUrl != null){
+                    url = downloadUrl.toString();
+
+                    GalleryItem gallery = new GalleryItem(url, url, new Date().getTime());
+                    gallery.setUser(String.format(Locale.getDefault(), "%s %s", Globals.loggedUser.getFirstName(),
+                                Globals.loggedUser.getLastName()));
+
+                    firebaseDB.child("places").child(place.getId()).child("gallery").push().setValue(gallery);
+                }
+                else{
+                    UtilityManager.showMessage(btnAddPicture, getString(R.string.generic_unexpected_error));
+                }
 
                 loader.dismiss();
             }

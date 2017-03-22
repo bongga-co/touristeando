@@ -1,10 +1,13 @@
 package co.bongga.touristeando.models;
 
+import io.realm.RealmObject;
+
 /**
  * Created by bongga on 12/15/16.
  */
 
 public class User {
+    private String id;
     private String firstName;
     private String lastName;
     private String email;
@@ -29,6 +32,14 @@ public class User {
         this.lastName = lastName;
         this.email = email;
         this.photoUrl = photoUrl;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getFirstName() {

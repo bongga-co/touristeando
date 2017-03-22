@@ -6,11 +6,6 @@
             android:icon="@drawable/ic_menu_assistant"
             android:title="@string/nav_home" />
         <item
-            android:id="@+id/nav_profile"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/nav_profile"
-            android:visible="false" />
-        <item
             android:id="@+id/nav_offer"
             android:icon="@drawable/ic_menu_offer"
             android:title="@string/nav_offers"
@@ -29,6 +24,10 @@
 
     <item android:title="@string/nav_section_others">
         <menu>
+            <item
+                android:id="@+id/nav_profile"
+                android:icon="@drawable/ic_menu_profile"
+                android:title="@string/nav_profile" />
             <item
                 android:id="@+id/nav_setting"
                 android:icon="@drawable/ic_menu_settings"

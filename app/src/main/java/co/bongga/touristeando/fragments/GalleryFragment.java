@@ -19,13 +19,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import java.util.ArrayList;
 
 import co.bongga.touristeando.R;
-import co.bongga.touristeando.models.Gallery;
+import co.bongga.touristeando.models.GalleryItem;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class GalleryFragment extends DialogFragment {
-    private ArrayList<Gallery> imageList;
+    private ArrayList<GalleryItem> imageList;
     private ViewPager viewPager;
     private TextView lblCount;
     private GalleryPagerAdapter myViewPagerAdapter;
@@ -54,7 +54,7 @@ public class GalleryFragment extends DialogFragment {
         viewPager = (ViewPager) v.findViewById(R.id.viewpager);
         lblCount = (TextView) v.findViewById(R.id.lbl_count);
 
-        imageList = (ArrayList<Gallery>) getArguments().getSerializable("images");
+        imageList = (ArrayList<GalleryItem>) getArguments().getSerializable("images");
         selectedPosition = getArguments().getInt("position");
 
         myViewPagerAdapter = new GalleryPagerAdapter();
@@ -91,7 +91,7 @@ public class GalleryFragment extends DialogFragment {
 
     private void displayMetaInfo(int position) {
         lblCount.setText((position + 1) + " de " + imageList.size());
-        Gallery image = imageList.get(position);
+        GalleryItem image = imageList.get(position);
     }
 
     public class GalleryPagerAdapter extends PagerAdapter {
@@ -109,7 +109,7 @@ public class GalleryFragment extends DialogFragment {
 
             ImageView imageViewPreview = (ImageView) view.findViewById(R.id.image_preview);
 
-            Gallery image = imageList.get(position);
+            GalleryItem image = imageList.get(position);
 
             if(image.getUrlLarge() != null){
                 Glide.with(getActivity()).load(image.getUrlLarge())

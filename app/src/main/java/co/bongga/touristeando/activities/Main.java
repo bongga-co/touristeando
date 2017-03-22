@@ -15,17 +15,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
+import java.util.Locale;
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.controllers.NotificationsPresenter;
 import co.bongga.touristeando.fragments.HomeFragment;
 import co.bongga.touristeando.fragments.NotificationFragment;
-import co.bongga.touristeando.fragments.ProfileFragment;
 import co.bongga.touristeando.utils.CircleTransform;
 import co.bongga.touristeando.utils.Constants;
+import co.bongga.touristeando.utils.Globals;
 import co.bongga.touristeando.utils.PreferencesManager;
 import co.bongga.touristeando.utils.UtilityManager;
 
@@ -37,7 +39,6 @@ public class Main extends AppCompatActivity {
 
     private static int navItemIndex = 0;
     private static final String TAG_HOME = "home";
-    private static final String TAG_PROFILE = "profile";
     private static final String TAG_OFFER = "offer";
     private static String CURRENT_TAG = TAG_HOME;
 
@@ -45,19 +46,20 @@ public class Main extends AppCompatActivity {
 
     private View navHeader;
     private ImageView imgNavHeaderBg, imgProfile;
-    private PreferencesManager preferencesManager;
+    private TextView profileName, profileEmail;
 
-    NotificationsPresenter notificationsPresenter;
+    private NotificationsPresenter notificationsPresenter;
+    private PreferencesManager preferencesManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        preferencesManager = new PreferencesManager(this);
+
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        preferencesManager = new PreferencesManager(this);
 
         activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
 
@@ -71,9 +73,12 @@ public class Main extends AppCompatActivity {
         navHeader = navigationView.getHeaderView(0);
         imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
         imgProfile = (ImageView) navHeader.findViewById(R.id.img_header_profile);
+        profileEmail = (TextView) navHeader.findViewById(R.id.lbl_header_email);
+        profileName = (TextView) navHeader.findViewById(R.id.lbl_header_name);
 
         handler = new Handler();
 
+        checkUserStatus();
         loadNavHeader();
 
         // initializing navigation menu
@@ -135,7 +140,14 @@ public class Main extends AppCompatActivity {
 
         if (id == R.id.action_share) {
             shareApp();
-            return true;
+        }
+        else if(id == R.id.action_add_place){
+            if(Globals.loggedUser != null){
+                recommendPlace();
+            }
+            else{
+                startActivityForResult(new Intent(Main.this, Login.class), Constants.REQUEST_USER_LOGIN);
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -146,6 +158,9 @@ public class Main extends AppCompatActivity {
         if(requestCode == Constants.REQUEST_CHECK_SETTINGS){
             HomeFragment fragment = getHomeFragment();
             fragment.onActivityResult(requestCode, resultCode, data);
+        }
+        else if(requestCode == Constants.REQUEST_USER_LOGIN && resultCode == RESULT_OK){
+            recommendPlace();
         }
         else{
             super.onActivityResult(requestCode, resultCode, data);
@@ -172,7 +187,27 @@ public class Main extends AppCompatActivity {
 
     private void loadNavHeader(){
         String urlNavHeaderBg = Constants.DEFAULT_HEADER_IMAGE;
-        String urlProfileImg = Constants.DEFAULT_PROFILE_IMAGE;
+        if(Globals.loggedUser != null) {
+            profileEmail.setText(Globals.loggedUser.getEmail());
+            profileName.setText(String.format(Locale.getDefault(), "%s %s", Globals.loggedUser.getFirstName(),
+                                                                            Globals.loggedUser.getLastName()));
+            // Loading profile image
+            Glide.with(this).load(Globals.loggedUser.getPhotoUrl())
+                .crossFade()
+                .thumbnail(0.5f)
+                .bitmapTransform(new CircleTransform(this))
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.drawable.nav_placeholder_profile)
+                .into(imgProfile);
+
+            imgProfile.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(Main.this, Profile.class));
+                    setCloseDrawer();
+                }
+            });
+        }
 
         // loading header background image
         Glide.with(this).load(urlNavHeaderBg)
@@ -180,15 +215,6 @@ public class Main extends AppCompatActivity {
             .placeholder(R.drawable.nav_menu_header_bg)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(imgNavHeaderBg);
-
-        // Loading profile image
-        Glide.with(this).load(urlProfileImg)
-            .crossFade()
-            .thumbnail(0.5f)
-            .bitmapTransform(new CircleTransform(this))
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .placeholder(R.drawable.nav_placeholder_profile)
-            .into(imgProfile);
     }
 
     private void setUpNavigationView() {
@@ -208,14 +234,11 @@ public class Main extends AppCompatActivity {
                     loadHomeFragment();
                     break;
                 case R.id.nav_profile:
-                    navItemIndex = 1;
-                    CURRENT_TAG = TAG_PROFILE;
-
-                    setCheckMenuItem(menuItem);
-                    loadHomeFragment();
+                    startActivity(new Intent(Main.this, Profile.class));
+                    setCloseDrawer();
                     break;
                 case R.id.nav_offer:
-                    navItemIndex = 2;
+                    navItemIndex = 1;
                     CURRENT_TAG = TAG_OFFER;
 
                     setCheckMenuItem(menuItem);
@@ -313,9 +336,6 @@ public class Main extends AppCompatActivity {
             handler.post(mPendingRunnable);
         }
 
-        // show or hide the fab button
-        //toggleFab();
-
         //Closing drawer on item click
         drawer.closeDrawers();
 
@@ -334,12 +354,8 @@ public class Main extends AppCompatActivity {
     private Fragment setCurrentFragment(){
         switch (navItemIndex) {
             case 0:
-                HomeFragment homeFragment = new HomeFragment();
-                return homeFragment;
+                return new HomeFragment();
             case 1:
-                ProfileFragment profileFragment = new ProfileFragment();
-                return profileFragment;
-            case 2:
                 NotificationFragment notificationFragment = new NotificationFragment();
                 notificationsPresenter = new NotificationsPresenter(
                         notificationFragment, FirebaseMessaging.getInstance());
@@ -355,5 +371,18 @@ public class Main extends AppCompatActivity {
         send.setType("text/plain");
 
         startActivity(Intent.createChooser(send, getResources().getString(R.string.share_chooser_title)));
+    }
+
+    private void recommendPlace(){
+        startActivity(new Intent(Main.this, Recommend.class));
+    }
+
+    private void checkUserStatus(){
+        if(preferencesManager.getLoggedUser() != null){
+            Globals.loggedUser = preferencesManager.getLoggedUser();
+        }
+        else{
+            Globals.loggedUser = null;
+        }
     }
 }

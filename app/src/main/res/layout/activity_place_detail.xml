@@ -53,6 +53,7 @@
                 android:visibility="gone"/>
         </LinearLayout>
         <LinearLayout
+            android:id="@+id/priceWrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="20dp"
@@ -224,7 +225,7 @@
                 android:textColor="@android:color/darker_gray"
                 android:padding="5dp" />
         </LinearLayout>
-        <!-- Gallery -->
+        <!-- GalleryItem -->
         <LinearLayout
             android:id="@+id/dt_place_gallery_label_wrapper"
             android:layout_width="match_parent"

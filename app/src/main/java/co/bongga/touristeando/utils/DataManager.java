@@ -6,7 +6,7 @@ import java.util.List;
 import co.bongga.touristeando.interfaces.APIEndpoints;
 import co.bongga.touristeando.interfaces.DataCallback;
 import co.bongga.touristeando.models.CollectionPlace;
-import co.bongga.touristeando.models.Gallery;
+import co.bongga.touristeando.models.GalleryItem;
 import co.bongga.touristeando.models.Help;
 import co.bongga.touristeando.models.PublicWiFi;
 import retrofit2.Call;
@@ -79,36 +79,36 @@ public class DataManager {
         return null;
     }
 
-    public static List<Gallery> willGetPlaceGallery(String id, final DataCallback callback){
-        Call<List<Gallery>> call = apiService.willGetPlaceGallery(id);
-        call.enqueue(new Callback<List<Gallery>>() {
+    public static List<GalleryItem> willGetPlaceGallery(String id, final DataCallback callback){
+        Call<List<GalleryItem>> call = apiService.willGetPlaceGallery(id);
+        call.enqueue(new Callback<List<GalleryItem>>() {
             @Override
-            public void onResponse(Call<List<Gallery>>call, Response<List<Gallery>> response) {
-                List<Gallery> gallery = response.body();
+            public void onResponse(Call<List<GalleryItem>>call, Response<List<GalleryItem>> response) {
+                List<GalleryItem> gallery = response.body();
                 List<Object> data = UtilityManager.objectFilter(gallery, Object.class);
                 callback.didReceiveData(data);
             }
 
             @Override
-            public void onFailure(Call<List<Gallery>>call, Throwable t) {
+            public void onFailure(Call<List<GalleryItem>>call, Throwable t) {
                 callback.didReceiveData(null);
             }
         });
         return null;
     }
 
-    public static List<Gallery> willGetPlaceGalleryWithLimit(String id, int start, int size, final DataCallback callback){
-        Call<List<Gallery>> call = apiService.willGetPlaceGalleryWithLimit(id, start, size);
-        call.enqueue(new Callback<List<Gallery>>() {
+    public static List<GalleryItem> willGetPlaceGalleryWithLimit(String id, int start, int size, final DataCallback callback){
+        Call<List<GalleryItem>> call = apiService.willGetPlaceGalleryWithLimit(id, start, size);
+        call.enqueue(new Callback<List<GalleryItem>>() {
             @Override
-            public void onResponse(Call<List<Gallery>>call, Response<List<Gallery>> response) {
-                List<Gallery> gallery = response.body();
+            public void onResponse(Call<List<GalleryItem>>call, Response<List<GalleryItem>> response) {
+                List<GalleryItem> gallery = response.body();
                 List<Object> data = UtilityManager.objectFilter(gallery, Object.class);
                 callback.didReceiveData(data);
             }
 
             @Override
-            public void onFailure(Call<List<Gallery>>call, Throwable t) {
+            public void onFailure(Call<List<GalleryItem>>call, Throwable t) {
                 callback.didReceiveData(null);
             }
         });

@@ -50,7 +50,8 @@ import co.bongga.touristeando.utils.UtilityManager;
 
 public class Login extends AppCompatActivity implements View.OnClickListener {
     private FirebaseAuth firebaseAuth;
-    private FirebaseDatabase database;
+    private FirebaseDatabase firebaseDB;
+    private DatabaseReference database;
 
     private CallbackManager callbackManager;
     private LoginManager loginManager;
@@ -62,17 +63,21 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private Button btnSkip;
 
     private ProgressDialog loader;
+    private PreferencesManager preferencesManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         loader = UtilityManager.showLoader(this, getString(R.string.loader_message));
+        preferencesManager = new PreferencesManager(this);
 
         setContentView(R.layout.activity_login);
 
         firebaseAuth = FirebaseAuth.getInstance();
-        database = FirebaseDatabase.getInstance();
+
+        firebaseDB = FirebaseDatabase.getInstance();
+        database = firebaseDB.getReference();
 
         btnTwitter = (ImageButton) findViewById(R.id.btn_twitter_login);
         btnTwitter.setOnClickListener(this);
@@ -168,22 +173,17 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         callbackManager = CallbackManager.Factory.create();
         loginManager = LoginManager.getInstance();
 
-        //loader.show();
-
         loginManager.logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
         loginManager.registerCallback(callbackManager,
             new FacebookCallback<LoginResult>() {
                 @Override
                 public void onSuccess(LoginResult loginResult) {
-                    //loader.dismiss();
-
                     AuthCredential credential = FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken());
                     didRequestToken(credential, Constants.FACEBOOK_PROVIDER);
                 }
 
                 @Override
                 public void onCancel() {
-                    //loader.dismiss();
                     UtilityManager.showMessage(btnFacebook, getResources().getString(R.string.login_cancel_msg));
                 }
 
@@ -216,17 +216,27 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 }
                 else{
                     FirebaseUser firebaseUser = task.getResult().getUser();
+                    String firstname = null;
+                    String lastname = null;
 
-                    String splitName[] = firebaseUser.getDisplayName().split(" ");
-                    String firstname = splitName[0];
-                    String lastname = splitName[1];
+                    try{
+                        String splitName[] = firebaseUser.getDisplayName().split(" ");
+                        firstname = splitName[0];
+                        lastname = splitName[1];
+                    }
+                    catch (NullPointerException e){
+                        firstname = firebaseUser.getDisplayName();
+                        lastname = firebaseUser.getDisplayName();
+                    }
 
-                    User user = new User(firstname, lastname, firebaseUser.getEmail());
+                    final User user = new User(firstname, lastname, firebaseUser.getEmail(),
+                            firebaseUser.getPhotoUrl().toString());
 
-                    Globals.loggedUser = user;
-
-                    DatabaseReference userRef = database.getReference("users");
+                    DatabaseReference userRef = database.child("users");
                     userRef.child(firebaseUser.getUid()).setValue(user);
+
+                    preferencesManager.setLoggedUser(user);
+                    Globals.loggedUser = user;
 
                     setResult(RESULT_OK);
                     closeView();
@@ -244,6 +254,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
     private void didOpenHomeView(){
         setResult(RESULT_CANCELED);
+        Globals.loggedUser = null;
         closeView();
     }
 

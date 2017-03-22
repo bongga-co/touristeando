@@ -8,16 +8,17 @@ import io.realm.RealmObject;
  * Created by bongga on 3/15/17.
  */
 
-public class Gallery {
+public class GalleryItem {
     private String urlSmall;
     private String urlLarge;
     private long publishedDate;
     private Bitmap bitmap;
+    private String user;
 
-    public Gallery() {
+    public GalleryItem() {
     }
 
-    public Gallery(String urlSmall, String urlLarge, long publishedDate) {
+    public GalleryItem(String urlSmall, String urlLarge, long publishedDate) {
         this.urlSmall = urlSmall;
         this.urlLarge = urlLarge;
         this.publishedDate = publishedDate;
@@ -53,5 +54,13 @@ public class Gallery {
 
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 }
