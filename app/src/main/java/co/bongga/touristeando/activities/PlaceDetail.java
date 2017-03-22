@@ -21,6 +21,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +30,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
@@ -64,6 +66,7 @@ import io.realm.RealmList;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -102,6 +105,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     private GalleryAdapter galleryAdapter;
     private RecyclerView galleryRecycler;
     private TextView emptyGallery;
+    private ProgressBar galleryProgress;
 
     private Button btnSeeAll;
     private Button btnAddPicture;
@@ -193,6 +197,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         }));
 
         emptyGallery = (TextView) findViewById(R.id.dt_place_gallery_empty);
+        galleryProgress = (ProgressBar) findViewById(R.id.gallery_progress);
 
         btnSeeAll = (Button) findViewById(R.id.btn_see_all_images);
         btnSeeAll.setOnClickListener(this);
@@ -244,7 +249,12 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                 openGalleryGrid();
                 break;
             case R.id.btn_add_picture:
-                chooseGetImageOption();
+                if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                    chooseGetImageOption();
+                }
+                else{
+                    startActivityForResult(new Intent(PlaceDetail.this, Login.class), Constants.REQUEST_USER_LOGIN);
+                }
                 break;
         }
     }
@@ -278,6 +288,9 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
             if(capturedPicture != null){
                 showPickedImage(resizeImage(capturedPicture));
             }
+        }
+        else if(requestCode == Constants.REQUEST_USER_LOGIN && resultCode == RESULT_OK){
+            chooseGetImageOption();
         }
         else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -507,24 +520,24 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     }
 
     private void fetchGalleryImages(){
-        loader.show();
+        galleryProgress.setVisibility(View.VISIBLE);
+        emptyGallery.setVisibility(View.GONE);
 
         id = place.getId();
         DataManager.willGetPlaceGalleryWithLimit(id, 0, 4, new DataCallback() {
             @Override
             public void didReceiveData(List<Object> response) {
-                loader.dismiss();
+                galleryProgress.setVisibility(View.GONE);
 
                 if(response != null){
                     List<Gallery> data = UtilityManager.objectFilter(response, Gallery.class);
                     if(data.size() > 0){
-                        toggleGallery(true);
-
                         for(Gallery galleryItem : data){
                             imageList.add(galleryItem);
                         }
 
                         galleryAdapter.notifyDataSetChanged();
+                        toggleGallery(true);
                     }
                     else{
                         toggleGallery(false);

@@ -10,6 +10,10 @@ public class Constants {
     public static final String API_AI_KEY = "416855e204a74ea4813328dab1cae292";
     public static final int DESCRIPTION_LENGHT = 150;
 
+    //Twitter API
+    public static final String TWITTER_KEY = "FS012mbtLsPYA0v0weqYvBYXe";
+    public static final String TWITTER_SECRET = "UnnrP1Ron60U8WHmPP5LsWhAZqlg9Ce9iPf14sf8jlvrhw1BGe";
+
     public static final String UBER_CLIENT_ID = "6XOg9WX55mzBwzfdmdo_Ro1MsREFeXD2";
     public static final String UBER_SERVER_TOKEN = "o94BCI3ixfgPrK9rLX0ROtnln1RiPRyypdFtbbrg";
     public static final String UBER_REDIRECT_URL = "http://touristeando.bongga.co";
@@ -42,6 +46,8 @@ public class Constants {
     public static final int REQUEST_CALL_PHONE_PERMISSION = 5;
     public static final int REQUEST_PICK_IMAGE_GALLERY = 6;
     public static final int REQUEST_PICK_IMAGE_CAMERA = 7;
+    public static final int REQUEST_GOOGLE_SIGN_IN = 8;
+    public static final int REQUEST_USER_LOGIN = 9;
 
     //Things to do
     public static final String WIFI_THING = "conseguir wifi gratis";
@@ -50,4 +56,8 @@ public class Constants {
     //Generic Object
     public static final int WIFI_FLAG = 1;
     public static final int HELP_FLAG = 2;
+
+    public static final String TWITTER_PROVIDER = "twitter";
+    public static final String FACEBOOK_PROVIDER = "facebook";
+    public static final String GOOGLE_PROVIDER = "google";
 }

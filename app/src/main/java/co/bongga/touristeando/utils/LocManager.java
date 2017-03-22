@@ -167,12 +167,12 @@ public class LocManager implements GoogleApiClient.ConnectionCallbacks,
     }
 
     private void saveCurrentLocation(){
-        coordinate.setLatitude(lastLocation.getLatitude());
-        coordinate.setLongitude(lastLocation.getLongitude());
-
-        preferencesManager.setCurrentLocation(coordinate);
-
         if(counter >= 4){
+            coordinate.setLatitude(lastLocation.getLatitude());
+            coordinate.setLongitude(lastLocation.getLongitude());
+
+            preferencesManager.setCurrentLocation(coordinate);
+
             stopLocationUpdates();
         }
 

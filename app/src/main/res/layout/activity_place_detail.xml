@@ -253,6 +253,14 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/standar_primary" />
+            <ProgressBar
+                android:id="@+id/gallery_progress"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:indeterminate="true"
+                android:elevation="5dp"
+                android:layout_gravity="center"
+                android:visibility="gone"/>
             <co.bongga.touristeando.ui.TouryTextViewPier
                 android:id="@+id/dt_place_gallery_empty"
                 android:layout_width="wrap_content"

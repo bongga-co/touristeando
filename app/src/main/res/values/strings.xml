@@ -1,17 +1,17 @@
 <resources>
     <string name="app_name">Touristeando</string>
-    <string name="slogan">Descubre tu ciudad</string>
     <string name="title_activity_welcome">Welcome</string>
     <string name="share_app">Compartir Touristeando</string>
     <string name="share_text">Prueba Touristeando!!\n\nDescubre lo que tu ciudad tiene para ofrecerte.\n\nhttps://goo.gl/HQR3eQ \n\n</string>
     <string name="share_chooser_title">@string/share_app</string>
     <string name="generic_unexpected_error">Error inesperado</string>
+    <string name="facebook_app_id">1151764564902117</string>
+    <string name="fb_login_protocol_scheme">fb1151764564902117</string>
 
     <!-- Misc Messages -->
     <string name="permission_denied">Permiso denegado</string>
     <string name="loader_message">Cargando...</string>
     <string name="no_network_connection">No tienes conexi\u00f3n a internet</string>
-    <string name="no_location_provided">Debes proveer tu ubicaci\u00f3n</string>
     <string name="no_location_found">No pude obtener tu ubicaci\u00f3n, intenta de nuevo</string>
     <string name="btn_ok">Aceptar</string>
     <string name="btn_cancel">Cancelar</string>
@@ -27,7 +27,7 @@
                 * Jugar Paintball
                 * Tener Asistencia Odontológica y más.
             </p>\n
-            <p>En cualquier momento escribe ayuda para que conozcas que otras cosas puedo hacer por ti.</p>
+            <p>En cualquier momento escribe la palabra ayuda o presiona el bot\u00f3n verde ubicado abajo a la izquierda del campo de texto para que conozcas que otras cosas puedo hacer por ti.</p>
         ]]>
     </string>
 
@@ -65,7 +65,6 @@
     <string name="generic_agent_error">No pude procesar lo que me pediste, intenta de nuevo.</string>
     <string name="generic_agent_no_content">Lo siento, no pude encontrar informaci\u00f3n. Intenta buscar por ciudad.</string>
     <string name="location_canceled_by_user">Necesito tu ubicaci\u00f3n para mostrarte los mejores lugares cerca de ti.</string>
-    <string name="no_chat_msg">No hay mensajes</string>
     <string name="example_hint">Ej:</string>
 
     <!-- Welcome -->
@@ -74,8 +73,8 @@
     <string name="skip">Omitir</string>
     <string name="start">Empezar</string>
 
-    <string name="slide_1_title">S\u00e9 un Turista</string>
-    <string name="slide_1_desc">Convi\u00e9rtete en un turista en tu ciudad y comienza a descubrir cosas asombrosas.</string>
+    <string name="slide_1_title">Modo Tourister!</string>
+    <string name="slide_1_desc">Convi\u00e9rtete en un turista en tu ciudad y comienza a descubrir y compartir lugares maravillosos.</string>
 
     <string name="slide_2_title">Cosas para hacer</string>
     <string name="slide_2_desc">Encuentra lugares donde puedes: tomarte un caf\u00e9, ir a comer, hacer ejercicio y m\u00e1s.</string>
@@ -112,9 +111,7 @@
     <string name="show_route_title">¿C\u00f3mo Llegar?</string>
     <string name="show_route_msg">Sigue las instrucciones para llegar al lugar</string>
     <string name="take_me">C\u00f3mo LLegar</string>
-    <string name="call_phone_error">No se ha definido n\u00famero de tel\u00e9fono</string>
     <string name="call_phone_msg">Llamar a </string>
-    <string name="dt_request_uber">Perdir Uber</string>
     <string name="share_place">Compartir</string>
     <string name="dt_place_gallery">Galer\u00eda</string>
     <string name="dt_place_gallery_empty">No hay im\u00e1genes disponibles.\nS\u00e9 el primero en agregar la mejor panor\u00e1mica de este lugar.</string>
@@ -142,4 +139,12 @@
 
     <!-- Galeria -->
     <string name="title_activity_gallery">Galer\u00eda</string>
+
+    <!-- Login -->
+    <string name="btn_twitter">Twitter</string>
+    <string name="btn_facebook">Facebook</string>
+    <string name="btn_google">Google</string>
+    <string name="login_error_msg">No se pudo efectuar el inicio de sesi\u00f3n, intenta nuevamente.</string>
+    <string name="login_cancel_msg">Inicio de sesi\u00f3n cancelado</string>
+    <string name="auth_error">Fallo la autenticaci\u00f3n</string>
 </resources>
