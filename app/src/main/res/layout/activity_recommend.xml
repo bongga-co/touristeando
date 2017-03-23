@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/rc_intro"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="20dp" />
         <android.support.design.widget.TextInputLayout
@@ -40,6 +40,7 @@
             android:id="@+id/rc_place_category"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:prompt="@string/default_category"
             android:layout_marginBottom="10dp" />
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"

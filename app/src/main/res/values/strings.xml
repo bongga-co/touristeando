@@ -158,5 +158,6 @@
     <string name="rc_place_name">Nombre del Lugar/Negocio</string>
     <string name="rc_place_description">Descripci\u00f3n</string>
     <string name="rc_place_category">Categor\u00eda</string>
+    <string name="default_category">Seleccione Categor\u00eda</string>
 
 </resources>
