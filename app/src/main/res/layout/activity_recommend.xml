@@ -10,6 +10,8 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/generic_margin"
         android:orientation="vertical">
+
+        <!-- Intro Message -->
         <co.bongga.touristeando.ui.TouryTextViewPier
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -17,41 +19,226 @@
             android:textSize="16sp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="20dp" />
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <EditText
-                android:id="@+id/rc_place_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="@string/rc_place_name"
-                android:inputType="text"
-                android:lines="1"/>
-        </android.support.design.widget.TextInputLayout>
+
+        <!-- Basic Information -->
         <co.bongga.touristeando.ui.TouryTextViewPier
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/rc_place_category"
+            android:text="@string/basic_header"
             android:textSize="16sp"
-            android:textColor="@color/standar_second" />
-        <Spinner
-            android:id="@+id/rc_place_category"
+            android:textColor="@color/standar_primary"
+            android:layout_marginTop="10dp" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/standar_second"/>
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:prompt="@string/default_category"
-            android:layout_marginBottom="10dp" />
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <EditText
-                android:id="@+id/rc_place_description"
+            android:orientation="vertical">
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/rc_place_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/rc_place_name"
+                    android:inputType="text"
+                    android:lines="1"/>
+            </android.support.design.widget.TextInputLayout>
+            <co.bongga.touristeando.ui.TouryTextViewPier
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/rc_place_category"
+                android:textSize="16sp"
+                android:textColor="@color/standar_second" />
+            <Spinner
+                android:id="@+id/rc_place_category"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="@string/rc_place_description"
-                android:inputType="text" />
-        </android.support.design.widget.TextInputLayout>
+                android:prompt="@string/default_category"
+                android:layout_marginBottom="10dp" />
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/rc_place_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/rc_place_description"
+                    android:inputType="text" />
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+        <!-- Location Information -->
+        <co.bongga.touristeando.ui.TouryTextViewPier
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/location_header"
+            android:textSize="16sp"
+            android:textColor="@color/standar_primary"
+            android:layout_marginTop="20dp" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/standar_second"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/rc_place_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/rc_place_address"
+                    android:inputType="textPostalAddress"
+                    android:lines="1"/>
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/rc_place_landmark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/rc_place_landmark"
+                    android:inputType="text" />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/rc_place_city"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/rc_place_city"
+                    android:inputType="text" />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/rc_place_country"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/rc_place_country"
+                    android:inputType="text" />
+            </android.support.design.widget.TextInputLayout>
+            <!--<fragment
+                android:id="@+id/rc_place_map"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                tools:context=".activities.Recommend"
+                android:name="com.google.android.gms.maps.SupportMapFragment"/>-->
+        </LinearLayout>
+
+        <!-- Contact Information -->
+        <co.bongga.touristeando.ui.TouryTextViewPier
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/contact_header"
+            android:textSize="16sp"
+            android:textColor="@color/standar_primary"
+            android:layout_marginTop="20dp" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/standar_second"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/rc_place_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/rc_place_phone"
+                    android:inputType="phone"
+                    android:lines="1"/>
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/rc_place_cell"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/rc_place_cell"
+                    android:inputType="phone" />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/rc_place_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/rc_place_email"
+                    android:inputType="textEmailAddress" />
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+        <!-- Pricing Information -->
+        <co.bongga.touristeando.ui.TouryTextViewPier
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/pricing_header"
+            android:textSize="16sp"
+            android:textColor="@color/standar_primary"
+            android:layout_marginTop="20dp" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/standar_second"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <co.bongga.touristeando.ui.TouryTextViewPier
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/rc_place_lbl_currency"
+                android:textSize="16sp"
+                android:textColor="@color/standar_second" />
+            <Spinner
+                android:id="@+id/rc_place_currency"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:prompt="@string/default_category"
+                android:layout_marginBottom="10dp" />
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/rc_place_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/rc_place_price"
+                    android:inputType="phone" />
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

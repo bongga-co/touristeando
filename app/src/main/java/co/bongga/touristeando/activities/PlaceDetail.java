@@ -97,6 +97,8 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     private LinearLayout phoneWrapper;
     private LinearLayout locationWrapper;
     private LinearLayout priceWrapper;
+    private LinearLayout descriptionWrapperHeader;
+    private LinearLayout descriptionWrapper;
 
     private RecyclerView serviceList;
 
@@ -166,6 +168,8 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         phoneWrapper = (LinearLayout) findViewById(R.id.phoneWrapper);
         locationWrapper = (LinearLayout) findViewById(R.id.locationWrapper);
         priceWrapper = (LinearLayout) findViewById(R.id.priceWrapper);
+        descriptionWrapper = (LinearLayout) findViewById(R.id.descriptionWrapper);
+        descriptionWrapperHeader = (LinearLayout) findViewById(R.id.descriptionWrapperHeader);
 
         serviceList = (RecyclerView) findViewById(R.id.dt_services_list);
         serviceList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -328,7 +332,17 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(placeLocationBg);
 
-        placeDescription.setText(checkDescriptionLength(place.getDescription()));
+        if(place.getDescription() != null && !place.getDescription().isEmpty()){
+            descriptionWrapper.setVisibility(View.VISIBLE);
+            descriptionWrapperHeader.setVisibility(View.VISIBLE);
+
+            placeDescription.setText(checkDescriptionLength(place.getDescription()));
+        }
+        else{
+            descriptionWrapper.setVisibility(View.GONE);
+            descriptionWrapperHeader.setVisibility(View.GONE);
+        }
+
         placeCity.setText(place.getCity() + ", " + place.getCountry());
         placeAddress.setText(place.getAddress());
 
@@ -528,6 +542,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
             @Override
             public void didReceiveData(List<Object> response) {
                 galleryProgress.setVisibility(View.GONE);
+                btnAddPicture.setVisibility(View.VISIBLE);
 
                 if(response != null){
                     List<GalleryItem> data = UtilityManager.objectFilter(response, GalleryItem.class);

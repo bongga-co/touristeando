@@ -18,7 +18,7 @@
         <LinearLayout
             android:id="@+id/chat_bottom_container"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_alignParentBottom="true"
             android:padding="5dp"
@@ -53,6 +53,8 @@
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:hint="@string/txt_placeholder_chat_input"
+                android:maxLines="3"
+                android:scrollbars="vertical"
                 android:layout_weight="0.9"
                 android:padding="7dp"
                 android:layout_marginLeft="5dp"
@@ -64,6 +66,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:src="@android:drawable/ic_btn_speak_now"
+                android:layout_gravity="center_vertical"
                 android:background="@null"/>
             <ImageButton
                 android:id="@+id/btnText"
@@ -71,6 +74,7 @@
                 android:layout_height="48dp"
                 android:src="@drawable/ic_query_send"
                 android:background="@null"
+                android:layout_gravity="center_vertical"
                 android:visibility="gone" />
         </LinearLayout>
     </RelativeLayout>
