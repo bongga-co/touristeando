@@ -5,5 +5,6 @@
     <item
         android:id="@+id/ic_action_save_place"
         android:title="@string/rc_save_place"
+        android:icon="@drawable/ic_save_place"
         app:showAsAction="always" />
 </menu>

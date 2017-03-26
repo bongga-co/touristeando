@@ -166,11 +166,27 @@
     <string name="rc_place_cell">N\u00famero Celular</string>
     <string name="rc_place_email">Correo Electr\u00f3nico</string>
     <string name="rc_place_lbl_currency">Moneda</string>
+    <string name="rc_place_link_thumb">Url de la Imagen</string>
     <string name="rc_place_price">Precio</string>
     <string name="default_category">Seleccione Categor\u00eda</string>
     <string name="basic_header">Informaci\u00f3n B\u00e1sica</string>
     <string name="location_header">Informaci\u00f3n de Ubicaci\u00f3n</string>
     <string name="contact_header">Informaci\u00f3n de Contacto</string>
     <string name="pricing_header">Informaci\u00f3n de Precio</string>
+    <string name="rc_place_lbl_thumb">Agregar Imagen</string>
     <string name="rc_save_place">Guardar</string>
+    <string name="no_categories_data">No se pudo obtener los datos de las categor\u00edas</string>
+    <string name="place_not_saved">No se pudo enviar la informaci\u00f3n, intenta nuevamente</string>
+    <string name="place_saved">Felicitaciones!! Has agregado un nuevo lugar.</string>
+    <string name="missing_info">Ingrese informaci\u00f3n</string>
+    <string name="remove_image">Eliminar Imagen</string>
+    <string name="choose_img_header">Elija una imagen</string>
+    <string name="default_currency">Seleccione Moneda</string>
+    <string-array name="array_currency">
+        <item>COP</item>
+        <item>USD</item>
+        <item>EUR</item>
+        <item>INR</item>
+        <item>MXN</item>
+    </string-array>
 </resources>

@@ -22,6 +22,7 @@ import java.net.URL;
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.activities.Main;
 import co.bongga.touristeando.models.Notification;
+import co.bongga.touristeando.utils.UtilityManager;
 import io.realm.Realm;
 
 /**
@@ -89,7 +90,7 @@ public class FCMService extends FirebaseMessagingService {
 
         String imageUrl = notification.getImage();
         if(imageUrl != null && imageUrl.length() > 4 && Patterns.WEB_URL.matcher(imageUrl).matches()){
-            Bitmap bitmap = getBitmapFromURL(imageUrl);
+            Bitmap bitmap = UtilityManager.getBitmapFromURL(imageUrl);
 
             NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
             bigPictureStyle.setBigContentTitle(notification.getTitle());
@@ -109,21 +110,6 @@ public class FCMService extends FirebaseMessagingService {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(0, notificationBuilder.build());
-    }
-
-    private Bitmap getBitmapFromURL(String strURL) {
-        try {
-            URL url = new URL(strURL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return myBitmap;
-        }
-        catch (IOException e) {
-            return null;
-        }
     }
 
     private void didStoreNotification(Notification notification){

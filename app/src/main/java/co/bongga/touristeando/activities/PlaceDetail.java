@@ -273,7 +273,8 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                     chooseFromGallery();
                     break;
             }
-        } else {
+        }
+        else {
             UtilityManager.showMessage(btnCallToPlace, getString(R.string.permission_denied));
         }
     }
@@ -289,7 +290,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
             Bitmap capturedPicture = (Bitmap) extras.get("data");
 
             if(capturedPicture != null){
-                showPickedImage(resizeImage(capturedPicture));
+                showPickedImage(UtilityManager.resizeImage(capturedPicture));
             }
         }
         else if(requestCode == Constants.REQUEST_USER_LOGIN && resultCode == RESULT_OK){
@@ -636,10 +637,10 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         try {
             final Uri imageUri = data.getData();
             final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-            final Bitmap selectedImage = resizeImage(BitmapFactory.decodeStream(imageStream));
+            final Bitmap selectedImage = UtilityManager.resizeImage(BitmapFactory.decodeStream(imageStream));
 
             if(selectedImage != null){
-                showPickedImage(resizeImage(selectedImage));
+                showPickedImage(UtilityManager.resizeImage(selectedImage));
             }
             else{
                 UtilityManager.showMessage(btnAddPicture, getString(R.string.not_file_found));
@@ -648,11 +649,6 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         catch (FileNotFoundException e) {
             UtilityManager.showMessage(btnAddPicture, getString(R.string.not_file_found));
         }
-    }
-
-    private Bitmap resizeImage(Bitmap originalImage){
-        Bitmap newImage = originalImage; //Bitmap.createScaledBitmap(originalImage, 800, 600, true);
-        return newImage;
     }
 
     private void requestCameraPermission(){
@@ -723,7 +719,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         loader.show();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        original.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        original.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
 
         StorageReference storageRef = storage.getReferenceFromUrl(Constants.FB_STORAGE_URL);
@@ -747,8 +743,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                     url = downloadUrl.toString();
 
                     GalleryItem gallery = new GalleryItem(url, url, new Date().getTime());
-                    gallery.setUser(String.format(Locale.getDefault(), "%s %s", Globals.loggedUser.getFirstName(),
-                                Globals.loggedUser.getLastName()));
+                    gallery.setUser(Globals.loggedUser.getId());
 
                     firebaseDB.child("places").child(place.getId()).child("gallery").push().setValue(gallery);
                 }

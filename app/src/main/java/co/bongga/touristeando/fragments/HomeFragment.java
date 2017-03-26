@@ -509,7 +509,9 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
                     if(data.size() > 0){
                         for(Place place : data){
-                            listPlaces.add(place);
+                            if(place.isOutstanding()){
+                                listPlaces.add(place);
+                            }
                         }
 
                         ChatMessage msg = new ChatMessage(listPlaces, false, ChatMessage.PLACES_TYPE);

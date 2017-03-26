@@ -9,6 +9,10 @@ import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -16,6 +20,7 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
@@ -26,7 +31,10 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.Normalizer;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -290,5 +298,83 @@ public class UtilityManager {
         }
 
         return symbol;
+    }
+
+    public static Address getLocationFromAddress(Context context, String strAddress) {
+        Geocoder coder = new Geocoder(context);
+        List<Address> address;
+        Address currentAddress = null;
+
+        try {
+            // May throw an IOException
+            address = coder.getFromLocationName(strAddress, 5);
+            if (address == null) {
+                return null;
+            }
+
+            Address location = address.get(0);
+            currentAddress = location;
+        }
+        catch (IOException ex) {
+            return null;
+        }
+
+        return currentAddress;
+    }
+
+    public static Address getAddressFromLocation(Context context, double latitude, double longitude){
+        Geocoder coder = new Geocoder(context);
+        List<Address> address;
+        Address currentAddress;
+
+        try {
+            // May throw an IOException
+            address = coder.getFromLocation(latitude, longitude, 5);
+
+            if (address == null) {
+                return null;
+            }
+
+            Address location = address.get(0);
+            currentAddress = location;
+        }
+        catch (IOException ex) {
+            return null;
+        }
+
+        return currentAddress;
+    }
+
+    public static Bitmap resizeImage(Bitmap originalImage){
+        final int maxSize = 960;
+        int outWidth;
+        int outHeight;
+        int inWidth = originalImage.getWidth();
+        int inHeight = originalImage.getHeight();
+        if(inWidth > inHeight){
+            outWidth = maxSize;
+            outHeight = (inHeight * maxSize) / inWidth;
+        } else {
+            outHeight = maxSize;
+            outWidth = (inWidth * maxSize) / inHeight;
+        }
+
+        Bitmap newImage = Bitmap.createScaledBitmap(originalImage, outWidth, outHeight, false);
+        return newImage;
+    }
+
+    public static Bitmap getBitmapFromURL(String strURL) {
+        try {
+            URL url = new URL(strURL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        }
+        catch (IOException e) {
+            return null;
+        }
     }
 }

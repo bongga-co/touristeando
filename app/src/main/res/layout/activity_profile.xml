@@ -12,7 +12,7 @@
         android:orientation="vertical">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="210dp"
             android:background="@color/standar_second">
             <ImageView
                 android:id="@+id/profile_image"
@@ -20,7 +20,9 @@
                 android:layout_height="128dp"
                 android:scaleType="fitCenter"
                 android:adjustViewBounds="true"
-                android:layout_centerInParent="true" />
+                android:layout_centerInParent="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="10dp" />
             <co.bongga.touristeando.ui.TouryTextViewPier
                 android:id="@+id/profile_name"
                 android:layout_width="wrap_content"

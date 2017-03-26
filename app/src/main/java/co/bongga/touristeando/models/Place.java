@@ -8,6 +8,10 @@ import io.realm.RealmObject;
  */
 
 public class Place extends RealmObject {
+    public String getId() {
+        return id;
+    }
+
     private String id;
     private String name;
     private String category;
@@ -17,41 +21,41 @@ public class Place extends RealmObject {
     private Coordinate coordinates;
     private String description;
     private String city;
+    private String email;
     private String country;
     private String address;
     private String place;
+    private String thing_to_do;
     private Phone phone;
     private boolean outstanding;
     private double distance;
     private RealmList<Service> services;
+    private String user;
 
     public Place(){
 
     }
 
-    public Place(String id, String name, String category, String thumbnail, float rating, Price price,
-                 Coordinate coordinates, double distance, String description, String city, String country,
-                 String address, String place, Phone phone, boolean outstanding, RealmList<Service> services) {
+    public Place(String id, String name, String category, String thumbnail, String email, float rating, Price price,
+                 Coordinate coordinates, double distance, String description, String city, String country, String thing,
+                 String address, String place, Phone phone, boolean outstanding) {
         this.id = id;
         this.name = name;
         this.category = category;
         this.thumbnail = thumbnail;
         this.rating = rating;
         this.price = price;
+        this.email = email;
         this.coordinates = coordinates;
         this.description = description;
         this.city = city;
         this.country = country;
         this.address = address;
+        this.thing_to_do = thing;
         this.place = place;
         this.phone = phone;
         this.outstanding = outstanding;
-        this.services = services;
         this.distance = distance;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public void setId(String id) {
@@ -176,5 +180,29 @@ public class Place extends RealmObject {
 
     public void setDistance(double distance) {
         this.distance = distance;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getThing() {
+        return thing_to_do;
+    }
+
+    public void setThing(String thing) {
+        this.thing_to_do = thing;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 }

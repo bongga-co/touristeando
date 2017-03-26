@@ -229,7 +229,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         lastname = firebaseUser.getDisplayName();
                     }
 
-                    final User user = new User(firstname, lastname, firebaseUser.getEmail(),
+                    final User user = new User(firebaseUser.getUid(), firstname, lastname, firebaseUser.getEmail(),
                             firebaseUser.getPhotoUrl().toString());
 
                     DatabaseReference userRef = database.child("users");

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
+    android:id="@+id/rc_scroll"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,7 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/generic_margin"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true">
 
         <!-- Intro Message -->
         <co.bongga.touristeando.ui.TouryTextViewPier
@@ -46,8 +49,9 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/rc_place_name"
-                    android:inputType="text"
-                    android:lines="1"/>
+                    android:inputType="textCapWords"
+                    android:maxLength="100"
+                    android:lines="1" />
             </android.support.design.widget.TextInputLayout>
             <co.bongga.touristeando.ui.TouryTextViewPier
                 android:layout_width="wrap_content"
@@ -70,9 +74,52 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
+                    android:maxLines="3"
+                    android:maxLength="2000"
                     android:hint="@string/rc_place_description"
-                    android:inputType="text" />
+                    android:inputType="textMultiLine" />
             </android.support.design.widget.TextInputLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+                <co.bongga.touristeando.ui.TouryTextViewPier
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.7"
+                    android:text="@string/rc_place_lbl_thumb"
+                    android:textSize="16sp"
+                    android:textColor="@color/standar_second" />
+                <Switch
+                    android:id="@+id/rc_check_thumb"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.3"
+                    android:layout_gravity="end" />
+            </LinearLayout>
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/rc_place_link_thumb_wrapper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+                <EditText
+                    android:id="@+id/rc_place_link_thumb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/rc_place_link_thumb"
+                    android:inputType="textUri"
+                    android:lines="1" />
+            </android.support.design.widget.TextInputLayout>
+            <ImageView
+                android:id="@+id/rc_place_thumb"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:src="@drawable/placeholder_img"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true" />
         </LinearLayout>
 
         <!-- Location Information -->
@@ -92,18 +139,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <android.support.design.widget.TextInputLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/rc_place_address"
-                    android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="@string/rc_place_address"
-                    android:inputType="textPostalAddress"
-                    android:lines="1"/>
-            </android.support.design.widget.TextInputLayout>
+                    android:layout_weight="0.8">
+                    <EditText
+                        android:id="@+id/rc_place_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:hint="@string/rc_place_address"
+                        android:inputType="textCapWords"
+                        android:lines="1"/>
+                </android.support.design.widget.TextInputLayout>
+                <ImageButton
+                    android:id="@+id/rc_place_toggle_location"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.2"
+                    android:layout_gravity="center_vertical|end"
+                    android:src="@drawable/ic_toggle_location"
+                    android:background="@null"/>
+            </LinearLayout>
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -113,7 +174,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/rc_place_landmark"
-                    android:inputType="text" />
+                    android:inputType="textCapSentences" />
             </android.support.design.widget.TextInputLayout>
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -124,7 +185,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/rc_place_city"
-                    android:inputType="text" />
+                    android:inputType="textCapWords" />
             </android.support.design.widget.TextInputLayout>
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -135,14 +196,14 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/rc_place_country"
-                    android:inputType="text" />
+                    android:inputType="textCapWords" />
             </android.support.design.widget.TextInputLayout>
-            <!--<fragment
+            <fragment
                 android:id="@+id/rc_place_map"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                tools:context=".activities.Recommend"
-                android:name="com.google.android.gms.maps.SupportMapFragment"/>-->
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                tools:context=".activities.Recommend" />
         </LinearLayout>
 
         <!-- Contact Information -->
@@ -171,7 +232,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/rc_place_phone"
-                    android:inputType="phone"
+                    android:inputType="number"
                     android:lines="1"/>
             </android.support.design.widget.TextInputLayout>
             <android.support.design.widget.TextInputLayout
@@ -183,7 +244,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/rc_place_cell"
-                    android:inputType="phone" />
+                    android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -226,19 +287,57 @@
                 android:id="@+id/rc_place_currency"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:prompt="@string/default_category"
-                android:layout_marginBottom="10dp" />
-            <android.support.design.widget.TextInputLayout
+                android:prompt="@string/default_currency"
+                android:layout_marginBottom="10dp"
+                android:drawSelectorOnTop="true"
+                android:entries="@array/array_currency" />
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/rc_place_price"
-                    android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+                <co.bongga.touristeando.ui.TouryTextViewPier
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="@string/rc_place_price"
-                    android:inputType="phone" />
-            </android.support.design.widget.TextInputLayout>
+                    android:layout_weight="0.7"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/price_lbl"
+                    android:textSize="16sp"
+                    android:textColor="@color/standar_second" />
+                <Switch
+                    android:id="@+id/rc_check_price"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.3"
+                    android:layout_gravity="end" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="3dp">
+                <SeekBar
+                    android:id="@+id/rc_place_price_range"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.7"
+                    android:max="500000"
+                    android:progress="0"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_gravity="center_vertical" />
+                <co.bongga.touristeando.ui.TouryTextViewPier
+                    android:id="@+id/rc_place_price"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.3"
+                    android:text="@string/free_label"
+                    android:textSize="18sp"
+                    android:textColor="@color/standar_second"
+                    android:layout_gravity="center_vertical|end" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
