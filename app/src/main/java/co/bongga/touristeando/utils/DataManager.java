@@ -2,12 +2,15 @@ package co.bongga.touristeando.utils;
 
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
+import com.squareup.moshi.Json;
+
 import java.util.List;
 import co.bongga.touristeando.interfaces.APIEndpoints;
 import co.bongga.touristeando.interfaces.DataCallback;
 import co.bongga.touristeando.models.CollectionPlace;
 import co.bongga.touristeando.models.GalleryItem;
 import co.bongga.touristeando.models.Help;
+import co.bongga.touristeando.models.HelpFeedback;
 import co.bongga.touristeando.models.PublicWiFi;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -109,6 +112,29 @@ public class DataManager {
 
             @Override
             public void onFailure(Call<List<GalleryItem>>call, Throwable t) {
+                callback.didReceiveData(null);
+            }
+        });
+        return null;
+    }
+
+    public static List<HelpFeedback> saveFeedback(HelpFeedback feedback, final DataCallback callback){
+        Call<List<HelpFeedback>> call = apiService.saveFeedback(feedback);
+        call.enqueue(new Callback<List<HelpFeedback>>() {
+            @Override
+            public void onResponse(Call<List<HelpFeedback>>call, Response<List<HelpFeedback>> response) {
+                List<HelpFeedback> feedback = response.body();
+                List<Object> data = null;
+
+                if(feedback != null){
+                    data = UtilityManager.objectFilter(feedback, Object.class);
+                }
+
+                callback.didReceiveData(data);
+            }
+
+            @Override
+            public void onFailure(Call<List<HelpFeedback>>call, Throwable t) {
                 callback.didReceiveData(null);
             }
         });

@@ -7,9 +7,12 @@ import java.util.List;
 import co.bongga.touristeando.models.CollectionPlace;
 import co.bongga.touristeando.models.GalleryItem;
 import co.bongga.touristeando.models.Help;
+import co.bongga.touristeando.models.HelpFeedback;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -47,4 +50,7 @@ public interface APIEndpoints {
             @Path("start") int start,
             @Path("size") int size
     );
+
+    @POST("feedback")
+    Call<List<HelpFeedback>> saveFeedback(@Body HelpFeedback feedback);
 }

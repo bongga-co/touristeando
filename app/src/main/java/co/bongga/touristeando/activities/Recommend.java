@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Address;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -71,6 +72,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 import co.bongga.touristeando.R;
+import co.bongga.touristeando.interfaces.LocationManagerCallback;
 import co.bongga.touristeando.models.Coordinate;
 import co.bongga.touristeando.models.PlaceCategory;
 import co.bongga.touristeando.models.TouryCoordinate;
@@ -81,10 +83,9 @@ import co.bongga.touristeando.utils.Constants;
 import co.bongga.touristeando.utils.Globals;
 import co.bongga.touristeando.utils.InputFilterForEditText;
 import co.bongga.touristeando.utils.LocManager;
-import co.bongga.touristeando.utils.PreferencesManager;
 import co.bongga.touristeando.utils.UtilityManager;
 
-public class Recommend extends AppCompatActivity implements OnMapReadyCallback, View.OnFocusChangeListener {
+public class Recommend extends AppCompatActivity implements OnMapReadyCallback, View.OnFocusChangeListener, LocationManagerCallback {
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private FirebaseStorage storage;
@@ -110,7 +111,6 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
     private static long price = 0;
 
     private LocManager locManager;
-    private PreferencesManager preferencesManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,8 +120,9 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
         setupMap();
 
         loader = UtilityManager.showLoader(this, getString(R.string.loader_message));
+
         locManager = new LocManager(this);
-        preferencesManager = new PreferencesManager(this);
+        locManager.setLocationManagerCallback(this);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
@@ -369,6 +370,33 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
         }
     }
 
+    @Override
+    public void didRetrieveLocation(Location location) {
+        if(location != null){
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            placeCoordinate = latLng;
+
+            Address address = UtilityManager.getAddressFromLocation(this, location.getLatitude(), location.getLongitude());
+
+            if(address != null){
+                etCity.setText(address.getLocality());
+                etCountry.setText(address.getCountryName());
+
+                if(address.getMaxAddressLineIndex() > 0){
+                    etAddress.setText(address.getAddressLine(0));
+                }
+
+                map.clear();
+
+                map.addMarker(new MarkerOptions().position(latLng));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+            }
+        }
+        else {
+            didShowLocationError();
+        }
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == Constants.REQUEST_PICK_IMAGE_GALLERY && resultCode == RESULT_OK){
             if(data != null){
@@ -404,7 +432,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
 
             switch (resultCode) {
                 case Activity.RESULT_OK:
-                    waitingForLocation();
+                    loader.dismiss();
                     break;
                 case Activity.RESULT_CANCELED:
                     loader.dismiss();
@@ -793,7 +821,6 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
 
                     switch (status.getStatusCode()) {
                         case LocationSettingsStatusCodes.SUCCESS:
-                            getUserLocation();
                             break;
                         case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                             try {
@@ -809,43 +836,6 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
                     }
                 }
             });
-        }
-    }
-
-    private void waitingForLocation(){
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loader.dismiss();
-                getUserLocation();
-            }
-        }, 3000);
-    }
-
-    private void getUserLocation(){
-        final Coordinate location = preferencesManager.getCurrentLocation();
-        if(location != null){
-            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-            placeCoordinate = latLng;
-
-            Address address = UtilityManager.getAddressFromLocation(this, location.getLatitude(), location.getLongitude());
-
-            if(address != null){
-                etCity.setText(address.getLocality());
-                etCountry.setText(address.getCountryName());
-
-                if(address.getMaxAddressLineIndex() > 0){
-                    etAddress.setText(address.getAddressLine(0));
-                }
-
-                map.clear();
-
-                map.addMarker(new MarkerOptions().position(latLng));
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-            }
-        }
-        else {
-            didShowLocationError();
         }
     }
 

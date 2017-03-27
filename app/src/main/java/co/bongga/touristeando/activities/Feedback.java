@@ -7,12 +7,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import java.util.List;
 
 import co.bongga.touristeando.R;
+import co.bongga.touristeando.interfaces.DataCallback;
 import co.bongga.touristeando.models.HelpFeedback;
+import co.bongga.touristeando.utils.DataManager;
 import co.bongga.touristeando.utils.UtilityManager;
 
 public class Feedback extends AppCompatActivity {
@@ -21,8 +21,6 @@ public class Feedback extends AppCompatActivity {
     private EditText fbMsg;
     private Button btnFbSubmit;
 
-    private FirebaseDatabase db;
-    private DatabaseReference feedbackRef;
     private ProgressDialog loader;
 
     @Override
@@ -31,9 +29,6 @@ public class Feedback extends AppCompatActivity {
         setContentView(R.layout.activity_feedback);
 
         loader = UtilityManager.showLoader(this, getString(R.string.loader_message));
-
-        db = FirebaseDatabase.getInstance();
-        feedbackRef = db.getReference("feedback");
 
         fbName = (EditText) findViewById(R.id.feedback_name);
         fbEmail = (EditText) findViewById(R.id.feedback_email);
@@ -70,17 +65,15 @@ public class Feedback extends AppCompatActivity {
 
                 loader.show();
 
-                HelpFeedback helpFeedback = new HelpFeedback(name, email, msg);
-                feedbackRef.push().setValue(helpFeedback, new DatabaseReference.CompletionListener() {
+                HelpFeedback helpFeedback = new HelpFeedback(name, email, msg, getString(R.string.app_name));
+
+                DataManager.saveFeedback(helpFeedback, new DataCallback() {
                     @Override
-                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    public void didReceiveData(List<Object> data) {
                         loader.dismiss();
 
-                        if(databaseError == null){
-                            fbName.setText(null);
-                            fbEmail.setText(null);
-                            fbMsg.setText(null);
-
+                        if(data != null){
+                            clearFields();
                             UtilityManager.showMessage(btnFbSubmit, getString(R.string.feedback_sent_successfully));
                         }
                         else{
@@ -90,5 +83,11 @@ public class Feedback extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private void clearFields(){
+        fbName.setText(null);
+        fbEmail.setText(null);
+        fbMsg.setText(null);
     }
 }

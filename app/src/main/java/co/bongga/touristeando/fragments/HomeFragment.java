@@ -7,6 +7,7 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -54,6 +55,7 @@ import ai.api.model.Result;
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.adapters.ChatMessageAdapter;
 import co.bongga.touristeando.interfaces.DataCallback;
+import co.bongga.touristeando.interfaces.LocationManagerCallback;
 import co.bongga.touristeando.models.ChatMessage;
 import co.bongga.touristeando.models.Coordinate;
 import co.bongga.touristeando.models.Help;
@@ -73,7 +75,7 @@ import io.realm.RealmResults;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment implements AIListener, View.OnClickListener {
+public class HomeFragment extends Fragment implements AIListener, View.OnClickListener, LocationManagerCallback {
     private RecyclerView chatList;
     private ChatMessageAdapter chatMessageAdapter;
 
@@ -105,7 +107,9 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
         db = Realm.getDefaultInstance();
         preferencesManager = new PreferencesManager(getActivity());
+
         locManager = new LocManager(getActivity());
+        locManager.setLocationManagerCallback(this);
 
         firebaseDb = FirebaseDatabase.getInstance();
         databaseReference = firebaseDb.getReference("queries");
@@ -296,7 +300,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
                     switch (status.getStatusCode()) {
                         case LocationSettingsStatusCodes.SUCCESS:
-                            prepareDataRetrievement();
                             break;
                         case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                             try {
@@ -638,28 +641,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         }
     }
 
-    private void prepareDataRetrievement(){
-        final String thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
-        final String city = (agentParams.get("city") != null) ?
-                UtilityManager.removeAccents(agentParams.get("city").getAsString()) : null;
-        final String sort = (agentParams.get("sorting") != null) ?
-                UtilityManager.removeAccents(agentParams.get("sorting").getAsString()) : null;
-        final Coordinate location = preferencesManager.getCurrentLocation();
-
-        if(location != null){
-            if(thing.equals(Constants.WIFI_THING)){
-                didRetrieveWifiPoint(location.getLatitude(), location.getLongitude());
-            }
-            else{
-                didRetrieveAgentQuery(city, location.getLatitude(), location.getLongitude(), thing, sort);
-                preferencesManager.setCurrentLocation(null);
-            }
-        }
-        else{
-            didShowLocationError();
-        }
-    }
-
     private void showDefaultMessage(){
         ChatMessage msg = new ChatMessage(getString(R.string.generic_agent_no_content), false, ChatMessage.TEXT_TYPE);
         Globals.chatItems.add(msg);
@@ -728,12 +709,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             case Constants.REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                prepareDataRetrievement();
-                            }
-                        }, 3000);
                         break;
                     case Activity.RESULT_CANCELED:
                         didCancelLocation();
@@ -817,5 +792,27 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                 didShowAgentError();
             }
         });
+    }
+
+    @Override
+    public void didRetrieveLocation(Location location) {
+        final String thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
+        final String city = (agentParams.get("city") != null) ?
+                UtilityManager.removeAccents(agentParams.get("city").getAsString()) : null;
+        final String sort = (agentParams.get("sorting") != null) ?
+                UtilityManager.removeAccents(agentParams.get("sorting").getAsString()) : null;
+
+        if(location != null){
+            if(thing.equals(Constants.WIFI_THING)){
+                didRetrieveWifiPoint(location.getLatitude(), location.getLongitude());
+            }
+            else{
+                didRetrieveAgentQuery(city, location.getLatitude(), location.getLongitude(), thing, sort);
+                preferencesManager.setCurrentLocation(null);
+            }
+        }
+        else{
+            didShowLocationError();
+        }
     }
 }

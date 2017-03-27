@@ -51,6 +51,7 @@
                 android:id="@+id/feedback_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textCapSentences"
                 android:hint="@string/feedback_msg" />
         </android.support.design.widget.TextInputLayout>
         <Button

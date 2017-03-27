@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -17,6 +18,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
+
+import co.bongga.touristeando.interfaces.LocationManagerCallback;
 import co.bongga.touristeando.models.Coordinate;
 
 /**
@@ -39,16 +42,23 @@ public class LocManager implements GoogleApiClient.ConnectionCallbacks,
     private int counter = 0;
     private static final int TWO_MINUTES = 1000 * 60 * 2;
 
-    public LocManager(Activity context){
+    private LocationManagerCallback locationManagerCallback;
+
+    public LocManager(Activity context) {
         this.context = context;
 
         this.preferencesManager = new PreferencesManager(context);
-        preferencesManager.setCurrentLocation(null);
+        //preferencesManager.setCurrentLocation(null);
     }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        //lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         startLocationUpdates();
     }
 
@@ -65,14 +75,11 @@ public class LocManager implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void onLocationChanged(Location location) {
-        lastLocation = location;
-
-        /*if(isBetterLocation(location, lastLocation)){
-
-        }*/
-
-        if(lastLocation != null){
-            saveCurrentLocation();
+        if(isBetterLocation(location, lastLocation)){
+            saveCurrentLocation(location);
+        }
+        else{
+            saveCurrentLocation(lastLocation);
         }
     }
 
@@ -168,17 +175,22 @@ public class LocManager implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    private void saveCurrentLocation(){
-        if(counter >= 7){
-            Coordinate coordinate = new Coordinate();
-            coordinate.setLatitude(lastLocation.getLatitude());
-            coordinate.setLongitude(lastLocation.getLongitude());
+    private void saveCurrentLocation(Location location){
+        if(location != null){
+            /*if(counter >= 7){
+                Coordinate coordinate = new Coordinate();
+                coordinate.setLatitude(location.getLatitude());
+                coordinate.setLongitude(location.getLongitude());
 
-            preferencesManager.setCurrentLocation(coordinate);
+                preferencesManager.setCurrentLocation(coordinate);
+                stopLocationUpdates();
+            }
+
+            counter++;*/
+
+            locationManagerCallback.didRetrieveLocation(location);
             stopLocationUpdates();
         }
-
-        counter++;
     }
 
     private boolean isBetterLocation(Location location, Location currentBestLocation) {
@@ -221,5 +233,9 @@ public class LocManager implements GoogleApiClient.ConnectionCallbacks,
             return true;
         }
         return false;
+    }
+
+    public void setLocationManagerCallback(LocationManagerCallback locationManagerCallback){
+        this.locationManagerCallback = locationManagerCallback;
     }
 }
