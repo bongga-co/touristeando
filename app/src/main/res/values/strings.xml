@@ -118,7 +118,7 @@
     <string name="dt_place_gallery">Galer\u00eda</string>
     <string name="dt_place_gallery_empty">No hay im\u00e1genes disponibles.\nS\u00e9 el primero en agregar la mejor panor\u00e1mica de este lugar.</string>
     <string name="btn_see_all_images">Ver Todas</string>
-    <string name="btn_add_picture">Agregar Foto</string>
+    <string name="btn_add_picture">Subir Imagen</string>
     <string name="choose_image_lbl">Elegir imagen desde...</string>
     <string name="choose_from_camera">C\u00e1mara</string>
     <string name="choose_from_library">Galer\u00eda</string>
@@ -149,19 +149,19 @@
     <string name="login_error_msg">No se pudo efectuar el inicio de sesi\u00f3n, intenta nuevamente.</string>
     <string name="login_cancel_msg">Inicio de sesi\u00f3n cancelado</string>
     <string name="auth_error">Fallo la autenticaci\u00f3n</string>
-    <string name="title_activity_profile">Profile</string>
+    <string name="title_activity_profile">Perfil</string>
     <string name="skip_login">Cerrar</string>
     <string name="lbl_logout">Cerrar Sesi\u00f3n</string>
 
     <!-- Recommend Place -->
     <string name="rc_intro">Recomienda lugares maravillosos, para que t\u00fa y otros Touristers puedan disfrutar.</string>
-    <string name="rc_place_name">Nombre del Lugar/Negocio</string>
+    <string name="rc_place_name">Nombre del Lugar/Negocio*</string>
     <string name="rc_place_description">Descripci\u00f3n</string>
     <string name="rc_place_category">Categor\u00eda</string>
-    <string name="rc_place_address">Direcci\u00f3n</string>
+    <string name="rc_place_address">Direcci\u00f3n*</string>
     <string name="rc_place_landmark">Punto de Referencia</string>
-    <string name="rc_place_city">Ciudad</string>
-    <string name="rc_place_country">Pa\u00eds</string>
+    <string name="rc_place_city">Ciudad*</string>
+    <string name="rc_place_country">Pa\u00eds*</string>
     <string name="rc_place_phone">Tel\u00e9fono</string>
     <string name="rc_place_cell">N\u00famero Celular</string>
     <string name="rc_place_email">Correo Electr\u00f3nico</string>
@@ -173,7 +173,7 @@
     <string name="location_header">Informaci\u00f3n de Ubicaci\u00f3n</string>
     <string name="contact_header">Informaci\u00f3n de Contacto</string>
     <string name="pricing_header">Informaci\u00f3n de Precio</string>
-    <string name="rc_place_lbl_thumb">Agregar Imagen</string>
+    <string name="rc_place_lbl_thumb">Agregar Imagen*</string>
     <string name="rc_save_place">Guardar</string>
     <string name="no_categories_data">No se pudo obtener los datos de las categor\u00edas</string>
     <string name="place_not_saved">No se pudo enviar la informaci\u00f3n, intenta nuevamente</string>
@@ -182,6 +182,7 @@
     <string name="remove_image">Eliminar Imagen</string>
     <string name="choose_img_header">Elija una imagen</string>
     <string name="default_currency">Seleccione Moneda</string>
+    <string name="rc_place_price_free">0</string>
     <string-array name="array_currency">
         <item>COP</item>
         <item>USD</item>

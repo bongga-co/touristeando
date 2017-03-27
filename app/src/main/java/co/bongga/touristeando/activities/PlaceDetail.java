@@ -41,8 +41,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import co.bongga.touristeando.R;
@@ -65,8 +67,11 @@ import io.realm.RealmList;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -214,6 +219,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
 
         setupUI();
         setupUber();
+        setVisitCount();
     }
 
     @Override
@@ -770,5 +776,29 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
 
     private void showUberView(){
 
+    }
+
+    private void setVisitCount(){
+        final Map<String, Object> data = new HashMap<>();
+
+        firebaseDB.child("places").child(place.getId()).child("count").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    long currentCount = (long) dataSnapshot.getValue();
+                    data.put("count", ++currentCount);
+                    firebaseDB.child("places").child(place.getId()).updateChildren(data);
+                }
+                else{
+                    data.put("count", 1);
+                    firebaseDB.child("places").child(place.getId()).updateChildren(data);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }

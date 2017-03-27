@@ -72,6 +72,9 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceHolder>
         else if (place.getPrice().getAmount() < 0) {
             holder.priceLbl.setText(context.getString(R.string.price_lbl));
             holder.price.setText("--");
+
+            holder.priceLbl.setVisibility(View.INVISIBLE);
+            holder.price.setVisibility(View.INVISIBLE);
         }
         else {
             holder.priceLbl.setText(context.getString(R.string.dt_price_lbl));

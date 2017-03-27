@@ -24,8 +24,8 @@ android {
         applicationId "co.bongga.touristeando"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 13
-        versionName "0.2.0"
+        versionCode 14
+        versionName "0.3.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

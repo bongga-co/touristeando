@@ -22,6 +22,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -76,6 +79,7 @@ import co.bongga.touristeando.models.TouryPlace;
 import co.bongga.touristeando.models.TouryPrice;
 import co.bongga.touristeando.utils.Constants;
 import co.bongga.touristeando.utils.Globals;
+import co.bongga.touristeando.utils.InputFilterForEditText;
 import co.bongga.touristeando.utils.LocManager;
 import co.bongga.touristeando.utils.PreferencesManager;
 import co.bongga.touristeando.utils.UtilityManager;
@@ -91,7 +95,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
 
     private Spinner spCategory, spCurrency;
     private EditText etName, etDescription, etAddress, etCity, etLandmark,
-            etCountry, etPhone, etCell, etEmail, etThumbLink;
+            etCountry, etPhone, etCell, etEmail, etThumbLink, etPrice;
     private Switch checkThumb, checkPrice;
     private ImageView imThumb;
     private TextInputLayout linkWrapper;
@@ -148,25 +152,33 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    skPrice.setEnabled(false);
+                    etPrice.setEnabled(false);
                     tvPrice.setText(getString(R.string.undefined_price));
                     price = -1;
                 }
                 else{
-                    skPrice.setEnabled(true);
-                    price = skPrice.getProgress();
+                    etPrice.setEnabled(true);
+                    if(!etPrice.getText().toString().isEmpty()){
+                        price = Integer.parseInt(etPrice.getText().toString());
 
-                    if(price == 0){
-                        tvPrice.setText(getString(R.string.free_label));
+                        if(price == 0){
+                            tvPrice.setText(getString(R.string.free_label));
+                        }
+                        else{
+                            tvPrice.setText(String.format(Locale.getDefault(), "$ %s", price));
+                        }
                     }
                     else{
-                        tvPrice.setText(String.format(Locale.getDefault(), "$ %s", price));
+                        price = 0;
+                        tvPrice.setText(getString(R.string.free_label));
                     }
                 }
             }
         });
 
         tvPrice = (TextView) findViewById(R.id.rc_place_price);
+
+        //TODO: Hidden
         skPrice = (SeekBar) findViewById(R.id.rc_place_price_range);
         skPrice.incrementProgressBy(50);
         skPrice.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -192,6 +204,38 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        etPrice = (EditText) findViewById(R.id.rc_place_price_box);
+        etPrice.setFilters(new InputFilter[]{ new InputFilterForEditText("0", "1500000")});
+        etPrice.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(!etPrice.getText().toString().isEmpty()){
+                    int price = Integer.parseInt(etPrice.getText().toString());
+
+                    if(price == 0){
+                        tvPrice.setText(getString(R.string.free_label));
+                    }
+                    else{
+                        tvPrice.setText(String.format(Locale.getDefault(), "$ %s", price));
+                    }
+                }
+                else{
+                    price = 0;
+                    tvPrice.setText(getString(R.string.free_label));
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
 
             }
         });
@@ -360,13 +404,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
 
             switch (resultCode) {
                 case Activity.RESULT_OK:
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            loader.dismiss();
-                            getUserLocation();
-                        }
-                    }, 3000);
+                    waitingForLocation();
                     break;
                 case Activity.RESULT_CANCELED:
                     loader.dismiss();
@@ -400,7 +438,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
                     categoryName.add(category.getName());
                 }
 
-                ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(getApplicationContext(),
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(Recommend.this,
                         android.R.layout.simple_spinner_item, categoryName);
 
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -425,19 +463,21 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
             String address = etAddress.getText().toString();
 
             if(!address.isEmpty() && !city.isEmpty()){
-                Address currentAddress = UtilityManager.getLocationFromAddress(getApplicationContext(),
-                        String.format(Locale.getDefault(), "%s, %s", address, city));
+                if(address != null){
+                    Address currentAddress = UtilityManager.getLocationFromAddress(getApplicationContext(),
+                            String.format(Locale.getDefault(), "%s, %s", address, city));
 
-                LatLng location = new LatLng(currentAddress.getLatitude(), currentAddress.getLongitude());
+                    LatLng location = new LatLng(currentAddress.getLatitude(), currentAddress.getLongitude());
 
-                if(map != null){
-                    map.clear();
+                    if(map != null){
+                        map.clear();
 
-                    map.addMarker(new MarkerOptions().position(location));
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+                        map.addMarker(new MarkerOptions().position(location));
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
 
-                    placeCoordinate = location;
-                    etCountry.setText(currentAddress.getCountryName());
+                        placeCoordinate = location;
+                        etCountry.setText(currentAddress.getCountryName());
+                    }
                 }
             }
 
@@ -446,13 +486,24 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
     }
 
     private void chooseGetImageOption(){
+        CharSequence itemsDialog[];
+
+        if(headerImage != null){
+            itemsDialog = new CharSequence[]{
+                    getString(R.string.choose_from_camera),
+                    getString(R.string.choose_from_library),
+                    getString(R.string.remove_image)};
+        }
+        else{
+            itemsDialog = new CharSequence[]{
+                    getString(R.string.choose_from_camera),
+                    getString(R.string.choose_from_library)};
+        }
+
         AlertDialog.Builder dialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.choose_image_lbl))
                 .setIcon(R.mipmap.ic_launcher)
-                .setItems(new CharSequence[]{
-                        getString(R.string.choose_from_camera),
-                        getString(R.string.choose_from_library),
-                        getString(R.string.remove_image)}, new DialogInterface.OnClickListener() {
+                .setItems(itemsDialog, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -572,7 +623,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
         String currency = spCurrency.getSelectedItem().toString();
 
         String thumb = null;
-        if(checkThumb.isChecked()){
+        if(checkThumb.isChecked() && !etThumbLink.getText().toString().isEmpty()){
             thumb = etThumbLink.getText().toString().trim();
         }
 
@@ -761,6 +812,16 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
         }
     }
 
+    private void waitingForLocation(){
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loader.dismiss();
+                getUserLocation();
+            }
+        }, 3000);
+    }
+
     private void getUserLocation(){
         final Coordinate location = preferencesManager.getCurrentLocation();
         if(location != null){
@@ -769,17 +830,19 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
 
             Address address = UtilityManager.getAddressFromLocation(this, location.getLatitude(), location.getLongitude());
 
-            etCity.setText(address.getLocality());
-            etCountry.setText(address.getCountryName());
+            if(address != null){
+                etCity.setText(address.getLocality());
+                etCountry.setText(address.getCountryName());
 
-            if(address.getMaxAddressLineIndex() > 0){
-                etAddress.setText(address.getAddressLine(0));
+                if(address.getMaxAddressLineIndex() > 0){
+                    etAddress.setText(address.getAddressLine(0));
+                }
+
+                map.clear();
+
+                map.addMarker(new MarkerOptions().position(latLng));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
             }
-
-            map.clear();
-
-            map.addMarker(new MarkerOptions().position(latLng));
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
         }
         else {
             didShowLocationError();

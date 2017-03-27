@@ -20,6 +20,7 @@ public class TouryPlace {
     private String thing_to_do;
     private TouryPhone phone;
     private boolean outstanding;
+    private long count;
     private String user;
 
     public TouryPlace(){
@@ -103,10 +104,6 @@ public class TouryPlace {
         this.email = email;
     }
 
-    public void setThing(String thing) {
-        this.thing_to_do = thing;
-    }
-
     public void setUser(String user) {
         this.user = user;
     }
@@ -163,6 +160,10 @@ public class TouryPlace {
         return thing_to_do;
     }
 
+    public void setThing_to_do(String thing_to_do) {
+        this.thing_to_do = thing_to_do;
+    }
+
     public TouryPhone getPhone() {
         return phone;
     }
@@ -173,5 +174,13 @@ public class TouryPlace {
 
     public String getUser() {
         return user;
+    }
+
+    public long getCount() {
+        return count;
+    }
+
+    public void setCount(long count) {
+        this.count = count;
     }
 }

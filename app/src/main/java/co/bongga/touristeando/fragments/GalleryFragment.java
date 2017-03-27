@@ -2,6 +2,7 @@ package co.bongga.touristeando.fragments;
 
 
 import android.content.Context;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.models.GalleryItem;
+import co.bongga.touristeando.utils.UtilityManager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,6 +33,7 @@ public class GalleryFragment extends DialogFragment {
     private TextView lblCount;
     private GalleryPagerAdapter myViewPagerAdapter;
     private int selectedPosition = 0;
+    private ImageButton btnClose;
 
     public GalleryFragment() {
 
@@ -53,6 +57,15 @@ public class GalleryFragment extends DialogFragment {
 
         viewPager = (ViewPager) v.findViewById(R.id.viewpager);
         lblCount = (TextView) v.findViewById(R.id.lbl_count);
+
+        btnClose = (ImageButton) v.findViewById(R.id.btn_close_image_fullscreen);
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UtilityManager.showMessage(btnClose, "Here...");
+                getDialog().dismiss();
+            }
+        });
 
         imageList = (ArrayList<GalleryItem>) getArguments().getSerializable("images");
         selectedPosition = getArguments().getInt("position");
