@@ -73,7 +73,6 @@ import java.util.UUID;
 
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.interfaces.LocationManagerCallback;
-import co.bongga.touristeando.models.Coordinate;
 import co.bongga.touristeando.models.PlaceCategory;
 import co.bongga.touristeando.models.TouryCoordinate;
 import co.bongga.touristeando.models.TouryPhone;
@@ -159,20 +158,9 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
                 }
                 else{
                     etPrice.setEnabled(true);
-                    if(!etPrice.getText().toString().isEmpty()){
-                        price = Integer.parseInt(etPrice.getText().toString());
-
-                        if(price == 0){
-                            tvPrice.setText(getString(R.string.free_label));
-                        }
-                        else{
-                            tvPrice.setText(String.format(Locale.getDefault(), "$ %s", price));
-                        }
-                    }
-                    else{
-                        price = 0;
-                        tvPrice.setText(getString(R.string.free_label));
-                    }
+                    etPrice.setText(null);
+                    tvPrice.setText(getString(R.string.free_label));
+                    price = 0;
                 }
             }
         });
@@ -220,7 +208,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(!etPrice.getText().toString().isEmpty()){
-                    int price = Integer.parseInt(etPrice.getText().toString());
+                    price = Integer.parseInt(etPrice.getText().toString());
 
                     if(price == 0){
                         tvPrice.setText(getString(R.string.free_label));
@@ -660,7 +648,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
             return;
         }
 
-        TouryPlace place = new TouryPlace(
+        final TouryPlace place = new TouryPlace(
             name,
             category,
             thumb,
@@ -691,7 +679,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
                         uploadPicture(headerImage, key);
                     }
                     else{
-                        UtilityManager.showMessage(imThumb, getString(R.string.place_saved));
+                        UtilityManager.showMessageWithDialog(Recommend.this, place.getName(), getString(R.string.place_saved));
                         clearFields();
                     }
                 }

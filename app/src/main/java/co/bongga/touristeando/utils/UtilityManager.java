@@ -9,6 +9,7 @@ import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Address;
@@ -17,6 +18,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -47,6 +49,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import co.bongga.touristeando.R;
 import co.bongga.touristeando.interfaces.SnackCallback;
 import co.bongga.touristeando.models.Coordinate;
 import co.bongga.touristeando.models.Price;
@@ -100,6 +103,21 @@ public class UtilityManager {
                 });
 
         snackbar.show();
+    }
+
+    public static void showMessageWithDialog(Context ctx, String title, String msg){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(ctx)
+                .setTitle(title)
+                .setMessage(msg)
+                .setCancelable(false)
+                .setPositiveButton(ctx.getString(R.string.btn_ok), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        final AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     public static ProgressDialog showLoader(Context context, String msg){
