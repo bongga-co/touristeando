@@ -330,8 +330,12 @@ public class UtilityManager {
                 return null;
             }
 
-            Address location = address.get(0);
-            currentAddress = location;
+            Address location;
+
+            if(address.size() > 0){
+                location = address.get(0);
+                currentAddress = location;
+            }
         }
         catch (IOException ex) {
             return null;

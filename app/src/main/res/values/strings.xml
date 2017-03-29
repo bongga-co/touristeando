@@ -65,7 +65,7 @@
     <string name="txt_placeholder_chat_input">¿Qu\u00e9 quieres descubrir? ...</string>
     <string name="txt_placeholder_chat_listening">Escuchando...</string>
     <string name="generic_agent_error">No pude procesar lo que me pediste, intenta de nuevo.</string>
-    <string name="generic_agent_no_content">Lo siento, no pude encontrar informaci\u00f3n. Intenta buscar por ciudad.</string>
+    <string name="generic_agent_no_content">Lo siento, no pude encontrar informaci\u00f3n.</string>
     <string name="location_canceled_by_user">Necesito tu ubicaci\u00f3n para mostrarte los mejores lugares cerca de ti.</string>
     <string name="example_hint">Ej:</string>
 

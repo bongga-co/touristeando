@@ -265,14 +265,6 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
             @Override
             public void onClick(View v) {
                 requestForLocationPermission();
-
-                toggleLocation.setEnabled(false);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                       toggleLocation.setEnabled(true);
-                    }
-                }, 3000);
             }
         });
 
@@ -360,6 +352,8 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
 
     @Override
     public void didRetrieveLocation(Location location) {
+        loader.dismiss();
+
         if(location != null){
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             placeCoordinate = latLng;
@@ -473,16 +467,16 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
 
     private void setPlaceLocation(boolean hasFocus){
         if(!hasFocus){
-            loader.show();
-
             String city = etCity.getText().toString();
             String address = etAddress.getText().toString();
 
             if(!address.isEmpty() && !city.isEmpty()){
-                if(address != null){
-                    Address currentAddress = UtilityManager.getLocationFromAddress(getApplicationContext(),
-                            String.format(Locale.getDefault(), "%s, %s", address, city));
+                loader.show();
 
+                Address currentAddress = UtilityManager.getLocationFromAddress(getApplicationContext(),
+                        String.format(Locale.getDefault(), "%s, %s", address, city));
+
+                if(currentAddress != null){
                     LatLng location = new LatLng(currentAddress.getLatitude(), currentAddress.getLongitude());
 
                     if(map != null){
@@ -494,10 +488,13 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
                         placeCoordinate = location;
                         etCountry.setText(currentAddress.getCountryName());
                     }
+
+                    loader.dismiss();
+                }
+                else{
+                    loader.dismiss();
                 }
             }
-
-            loader.dismiss();
         }
     }
 
@@ -663,7 +660,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
             address,
             landmark,
             new TouryPhone(cell, phone),
-            false,
+            true,
             Globals.loggedUser.getId()
         );
 
@@ -773,6 +770,8 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
         headerImage = null;
         price = 0;
         placeCoordinate = null;
+        etPrice.setText(null);
+        etThumbLink.setText(null);
 
         scrollView.smoothScrollTo(0, 0);
     }
@@ -809,6 +808,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
 
                     switch (status.getStatusCode()) {
                         case LocationSettingsStatusCodes.SUCCESS:
+                            loader.show();
                             break;
                         case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                             try {
