@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Touristeando</string>
+    <!--<string name="app_name">Touristeando</string>-->
     <string name="title_activity_welcome">Welcome</string>
     <string name="title_activity_recommend">Recomendar Lugar</string>
     <string name="share_app">Compartir Touristeando</string>
@@ -182,6 +182,7 @@
     <string name="remove_image">Eliminar Imagen</string>
     <string name="choose_img_header">Elija una imagen</string>
     <string name="default_currency">Seleccione Moneda</string>
+    <string name="place_location_error">No se pudo determinar las coordenadas del lugar</string>
     <string name="rc_place_price_free">0</string>
     <string-array name="array_currency">
         <item>COP</item>

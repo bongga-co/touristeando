@@ -645,6 +645,11 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
             return;
         }
 
+        if(placeCoordinate == null){
+            UtilityManager.showMessage(imThumb, getString(R.string.place_location_error));
+            return;
+        }
+
         final TouryPlace place = new TouryPlace(
             name,
             category,
@@ -673,7 +678,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
                 if(databaseError == null){
                     if(!checkThumb.isChecked()){
                         String key = databaseReference.getKey();
-                        uploadPicture(headerImage, key);
+                        uploadPicture(headerImage, key, place.getName());
                     }
                     else{
                         UtilityManager.showMessageWithDialog(Recommend.this, place.getName(), getString(R.string.place_saved));
@@ -687,7 +692,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
         });
     }
 
-    private void uploadPicture(Bitmap original, final String key){
+    private void uploadPicture(Bitmap original, final String key, final String name){
         if(!UtilityManager.isConnected(this)){
             UtilityManager.showMessage(imThumb, getString(R.string.no_network_connection));
             return;
@@ -723,7 +728,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
                                 UtilityManager.showMessage(imThumb, getString(R.string.place_not_saved));
                             }
                             else{
-                                UtilityManager.showMessage(imThumb, getString(R.string.place_saved));
+                                UtilityManager.showMessageWithDialog(Recommend.this, name, getString(R.string.place_saved));
                                 clearFields();
                             }
                         }

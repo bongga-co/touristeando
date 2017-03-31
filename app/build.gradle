@@ -39,14 +39,30 @@ android {
     }
     buildTypes {
         debug {
+            applicationIdSuffix ".debug"
             resValue "string", "google_maps_key",
                     (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
+            resValue "string", "app_name",
+                    (project.findProperty("APP_NAME_DEBUG") ?: "")
+            copy {
+                from 'src/debug/'
+                include '*.json'
+                into '.'
+            }
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             resValue "string", "google_maps_key",
                     (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
+            resValue "string", "app_name",
+                    (project.findProperty("APP_NAME") ?: "")
+            copy {
+                from 'src/release/'
+                include '*.json'
+                into '.'
+            }
         }
     }
     configurations.all {

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "461617228221",
+    "firebase_url": "https://touristeando-dev.firebaseio.com",
+    "project_id": "touristeando-dev",
+    "storage_bucket": "touristeando-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:461617228221:android:444de9ff66ff60f7",
+        "android_client_info": {
+          "package_name": "co.bongga.touristeando.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "461617228221-bll2o48e4pf59fbgqrbge2pb43impknf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFVM9cDiMhxh7F96-AifdymsdGmdrvbtc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
