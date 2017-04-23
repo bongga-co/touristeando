@@ -52,6 +52,7 @@ import ai.api.model.AIError;
 import ai.api.model.AIRequest;
 import ai.api.model.AIResponse;
 import ai.api.model.Result;
+import co.bongga.touristeando.BuildConfig;
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.adapters.ChatMessageAdapter;
 import co.bongga.touristeando.interfaces.DataCallback;
@@ -227,7 +228,16 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
      * API.AI Initial setup
      */
     private void setupAPIAI(){
-        final AIConfiguration config = new AIConfiguration(Constants.API_AI_KEY,
+        String apiKey;
+
+        if (BuildConfig.DEBUG) {
+            apiKey = Constants.API_AI_KEY_DEBUG;
+        }
+        else{
+            apiKey = Constants.API_AI_KEY;
+        }
+
+        final AIConfiguration config = new AIConfiguration(apiKey,
                 AIConfiguration.SupportedLanguages.Spanish,
                 AIConfiguration.RecognitionEngine.System);
 
@@ -345,7 +355,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             query = Constants.HELP_ACTION;
         }
         else{
-            query = rqText.getText().toString().trim();
+            query = rqText.getText().toString().trim().replaceAll("\\n", " ");
             addUserMessage(query);
             rqText.setText(null);
         }
@@ -409,7 +419,7 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                         double lat = 0;
                         double lng = 0;
 
-                        Coordinate location = preferencesManager.getCurrentLocation();
+                        Coordinate location = Globals.currentLocation;
 
                         if(location != null){
                             lat = location.getLatitude();
@@ -808,7 +818,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             }
             else{
                 didRetrieveAgentQuery(city, location.getLatitude(), location.getLongitude(), thing, sort);
-                preferencesManager.setCurrentLocation(null);
             }
         }
         else{

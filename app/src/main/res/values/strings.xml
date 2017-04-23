@@ -15,6 +15,7 @@
     <string name="loader_message">Cargando...</string>
     <string name="no_network_connection">No tienes conexi\u00f3n a internet</string>
     <string name="no_location_found">No pude obtener tu ubicaci\u00f3n, intenta de nuevo</string>
+    <string name="no_current_location">No pude determinar tu ubicaci\u00f3n</string>
     <string name="btn_ok">Aceptar</string>
     <string name="btn_cancel">Cancelar</string>
     <string name="no_location_services">Instala o actualiza Google Play Services para acceder a tu ubicaci\u00f3n.</string>

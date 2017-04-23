@@ -3,6 +3,7 @@ package co.bongga.touristeando.utils;
 import java.util.ArrayList;
 
 import co.bongga.touristeando.models.ChatMessage;
+import co.bongga.touristeando.models.Coordinate;
 import co.bongga.touristeando.models.Event;
 import co.bongga.touristeando.models.Place;
 import co.bongga.touristeando.models.User;
@@ -14,6 +15,7 @@ import co.bongga.touristeando.models.User;
 public class Globals {
     public static Event currentEvent;
     public static Place currentPlace;
+    public static Coordinate currentLocation = null;
     public static ArrayList<ChatMessage> chatItems = new ArrayList<>();
     public static User loggedUser = null;
 }

@@ -8,6 +8,7 @@ public class Constants {
     //Generals
     public static final String BASE_OS = "Android SDK";
     public static final String API_AI_KEY = "416855e204a74ea4813328dab1cae292";
+    public static final String API_AI_KEY_DEBUG = "c542edd091404db4bc8075bb7a3a2334";
     public static final int DESCRIPTION_LENGHT = 150;
 
     //Twitter API

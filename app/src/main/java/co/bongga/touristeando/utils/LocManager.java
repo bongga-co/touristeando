@@ -38,17 +38,12 @@ public class LocManager implements GoogleApiClient.ConnectionCallbacks,
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
-    private PreferencesManager preferencesManager;
-    private int counter = 0;
     private static final int TWO_MINUTES = 1000 * 60 * 2;
 
     private LocationManagerCallback locationManagerCallback;
 
     public LocManager(Activity context) {
         this.context = context;
-
-        this.preferencesManager = new PreferencesManager(context);
-        //preferencesManager.setCurrentLocation(null);
     }
 
     @Override
@@ -177,16 +172,9 @@ public class LocManager implements GoogleApiClient.ConnectionCallbacks,
 
     private void saveCurrentLocation(Location location){
         if(location != null){
-            /*if(counter >= 7){
-                Coordinate coordinate = new Coordinate();
-                coordinate.setLatitude(location.getLatitude());
-                coordinate.setLongitude(location.getLongitude());
-
-                preferencesManager.setCurrentLocation(coordinate);
-                stopLocationUpdates();
-            }
-
-            counter++;*/
+            Globals.currentLocation = new Coordinate();
+            Globals.currentLocation.setLatitude(location.getLatitude());
+            Globals.currentLocation.setLongitude(location.getLongitude());
 
             locationManagerCallback.didRetrieveLocation(location);
             stopLocationUpdates();

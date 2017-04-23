@@ -71,6 +71,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import co.bongga.touristeando.BuildConfig;
 import co.bongga.touristeando.R;
 import co.bongga.touristeando.interfaces.LocationManagerCallback;
 import co.bongga.touristeando.models.PlaceCategory;
@@ -665,7 +666,7 @@ public class Recommend extends AppCompatActivity implements OnMapReadyCallback, 
             address,
             landmark,
             new TouryPhone(cell, phone),
-            true,
+            BuildConfig.DEBUG,
             Globals.loggedUser.getId()
         );
 

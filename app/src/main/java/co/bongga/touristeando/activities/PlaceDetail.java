@@ -60,7 +60,6 @@ import co.bongga.touristeando.models.Service;
 import co.bongga.touristeando.utils.Constants;
 import co.bongga.touristeando.utils.DataManager;
 import co.bongga.touristeando.utils.Globals;
-import co.bongga.touristeando.utils.PreferencesManager;
 import co.bongga.touristeando.utils.RecyclerItemClickListener;
 import co.bongga.touristeando.utils.UtilityManager;
 import io.realm.RealmList;
@@ -118,7 +117,6 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
 
     private static int isExpanded = 0;
     private static String shortenDescription;
-    private PreferencesManager preferencesManager;
     private ServicesAdapter servicesAdapter;
     private RealmList<Service> serviceItems = new RealmList<>();
 
@@ -136,7 +134,6 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_detail);
 
-        preferencesManager = new PreferencesManager(this);
         loader = UtilityManager.showLoader(this, getString(R.string.loader_message));
 
         firebaseDB = FirebaseDatabase.getInstance().getReference();
@@ -408,7 +405,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
     private void takeMeToThePlace() {
         final double lat = place.getCoordinates().getLatitude();
         final double lng = place.getCoordinates().getLongitude();
-        Coordinate cLocation = preferencesManager.getCurrentLocation();
+        Coordinate cLocation = Globals.currentLocation;
 
         if (cLocation != null) {
             final double currentLat = cLocation.getLatitude();
@@ -427,12 +424,6 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
                     startActivity(intent);
                 }
             });
-            /*dialog.setNeutralButton(getResources().getString(R.string.dt_request_uber), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    showUberView();
-                }
-            });*/
             dialog.setNegativeButton(getResources().getString(R.string.btn_cancel), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     dialog.dismiss();
@@ -441,6 +432,9 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
 
             final AlertDialog alertDialog = dialog.create();
             alertDialog.show();
+        }
+        else{
+            UtilityManager.showMessage(btnTakeMe, getString(R.string.no_current_location));
         }
     }
 
