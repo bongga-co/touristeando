@@ -403,7 +403,6 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
             didStoreMessage(msg);
 
             notifyChange();
-
             if(result.getAction().equals(Constants.PLACES_ACTION)){
                 agentParams = result.getParameters();
 
@@ -437,7 +436,45 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
                     didShowAgentError();
                 }
             }
-            else if(result.getAction().equals(Constants.HELP_ACTION)){
+            else if(result.getAction().equals(Constants.SEARCH_PLACES_ACTION)) {
+                agentParams = result.getParameters();
+
+                String action;
+                String city;
+                Double budget;
+                String foodType;
+
+                if(agentParams.get("action") != null) {
+                    action = UtilityManager.removeAccents(agentParams.get("action").getAsString());
+                    if(agentParams.get("city") != null) {
+                        double lat = 0;
+                        double lng = 0;
+
+                        Coordinate location = Globals.currentLocation;
+
+                        if(location != null){
+                            lat = location.getLatitude();
+                            lng = location.getLongitude();
+                        }
+
+                        city = UtilityManager.removeAccents(agentParams.get("city").getAsString());
+                        if(agentParams.get("type") != null) {
+                            foodType = UtilityManager.removeAccents(agentParams.get("type").getAsString());
+                            if(agentParams.get("budget") != null) {
+                                budget = agentParams.get("budget").getAsDouble();
+                                didFetchPlaces(city, lat, lng, action, foodType, budget);
+                            }
+                        }
+                    }
+                    else{
+                        requestForLocationPermission();
+                    }
+                }
+                else {
+                    didShowAgentError();
+                }
+            }
+            else if(result.getAction().equals(Constants.RECOMMEND_ACTION)){
                 didRetrieveHelpList();
             }
             else{
@@ -515,6 +552,48 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
         }
 
         DataManager.willGetAllPlaces(city, latitude, longitude, thing, distance, sort, new DataCallback() {
+            @Override
+            public void didReceiveData(List<Object> response) {
+                if(response != null){
+                    List<Place> data = UtilityManager.objectFilter(response, Place.class);
+
+                    if(data.size() > 0){
+                        for(Place place : data){
+                            if(place.isOutstanding()){
+                                listPlaces.add(place);
+                            }
+                        }
+
+                        ChatMessage msg = new ChatMessage(listPlaces, false, ChatMessage.PLACES_TYPE);
+                        Globals.chatItems.add(msg);
+                        didStoreMessage(msg);
+
+                        notifyChange();
+                        didToggleLoader(true);
+                    }
+                    else{
+                        showDefaultMessage();
+                    }
+                }
+                else{
+                    didShowAgentError();
+                }
+            }
+        });
+    }
+
+    /*
+     * Fetching places information
+     */
+    private void didFetchPlaces(String city, double latitude, double longitude, String action, String foodType, Double budget){
+        final RealmList<Place> listPlaces = new RealmList<>();
+
+        int distance = preferencesManager.getDistance();
+        if(distance == 0){
+            distance = getResources().getInteger(R.integer.default_distance);
+        }
+
+        DataManager.willFetchPlaces(city, latitude, longitude, action, distance, foodType, budget, new DataCallback() {
             @Override
             public void didReceiveData(List<Object> response) {
                 if(response != null){
@@ -806,22 +885,41 @@ public class HomeFragment extends Fragment implements AIListener, View.OnClickLi
 
     @Override
     public void didRetrieveLocation(Location location) {
-        final String thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
-        final String city = (agentParams.get("city") != null) ?
-                UtilityManager.removeAccents(agentParams.get("city").getAsString()) : null;
-        final String sort = (agentParams.get("sorting") != null) ?
-                UtilityManager.removeAccents(agentParams.get("sorting").getAsString()) : null;
+        if(agentParams.get("thing") != null) {
+            final String thing = UtilityManager.removeAccents(agentParams.get("thing").getAsString());
+            final String city = (agentParams.get("city") != null) ?
+                    UtilityManager.removeAccents(agentParams.get("city").getAsString()) : null;
+            final String sort = (agentParams.get("sorting") != null) ?
+                    UtilityManager.removeAccents(agentParams.get("sorting").getAsString()) : null;
 
-        if(location != null){
-            if(thing.equals(Constants.WIFI_THING)){
-                didRetrieveWifiPoint(location.getLatitude(), location.getLongitude());
+            if(location != null){
+                if(thing.equals(Constants.WIFI_THING)){
+                    didRetrieveWifiPoint(location.getLatitude(), location.getLongitude());
+                }
+                else{
+                    didRetrieveAgentQuery(city, location.getLatitude(), location.getLongitude(), thing, sort);
+                }
             }
             else{
-                didRetrieveAgentQuery(city, location.getLatitude(), location.getLongitude(), thing, sort);
+                didShowLocationError();
             }
         }
-        else{
-            didShowLocationError();
+        else {
+            final String action = UtilityManager.removeAccents(agentParams.get("action").getAsString());
+            final String city = (agentParams.get("city") != null) ?
+                    UtilityManager.removeAccents(agentParams.get("city").getAsString()) : null;
+            final String foodType = (agentParams.get("type") != null) ?
+                    UtilityManager.removeAccents(agentParams.get("type").getAsString()) : null;
+            final Double budget = (agentParams.get("budget") != null) ?
+                    agentParams.get("budget").getAsDouble() : null;
+
+            if(location != null){
+                didFetchPlaces(city, location.getLatitude(), location.getLongitude(), action, foodType, budget);
+            }
+            else{
+                didShowLocationError();
+            }
         }
+
     }
 }

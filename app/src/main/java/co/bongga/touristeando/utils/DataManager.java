@@ -2,11 +2,11 @@ package co.bongga.touristeando.utils;
 
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
-import com.squareup.moshi.Json;
 
 import java.util.List;
 import co.bongga.touristeando.interfaces.APIEndpoints;
 import co.bongga.touristeando.interfaces.DataCallback;
+import co.bongga.touristeando.models.CollectionHelp;
 import co.bongga.touristeando.models.CollectionPlace;
 import co.bongga.touristeando.models.GalleryItem;
 import co.bongga.touristeando.models.Help;
@@ -64,18 +64,40 @@ public class DataManager {
         return null;
     }
 
-    public static List<Help> willShowHelp(final DataCallback callback){
-        Call<List<Help>> call = apiService.willShowHelp();
-        call.enqueue(new Callback<List<Help>>() {
+    public static CollectionPlace willFetchPlaces(String city, double lat, double lng, String action, int distance, String foodType, Double budget, final DataCallback callback){
+        Call<CollectionPlace> call = apiService.fetchPlaces(city, lat, lng, action, distance, foodType, budget);
+        call.enqueue(new Callback<CollectionPlace>() {
             @Override
-            public void onResponse(Call<List<Help>>call, Response<List<Help>> response) {
-                List<Help> helpList = response.body();
-                List<Object> data = UtilityManager.objectFilter(helpList, Object.class);
-                callback.didReceiveData(data);
+            public void onResponse(Call<CollectionPlace>call, Response<CollectionPlace> response) {
+                CollectionPlace places = response.body();
+                if(places.getListPlace() != null){
+                    List<Object> data = UtilityManager.objectFilter(places.getListPlace(), Object.class);
+                    callback.didReceiveData(data);
+                }
             }
 
             @Override
-            public void onFailure(Call<List<Help>>call, Throwable t) {
+            public void onFailure(Call<CollectionPlace>call, Throwable t) {
+                callback.didReceiveData(null);
+            }
+        });
+        return null;
+    }
+
+    public static CollectionHelp willShowHelp(final DataCallback callback){
+        Call<CollectionHelp> call = apiService.willShowHelp();
+        call.enqueue(new Callback<CollectionHelp>() {
+            @Override
+            public void onResponse(Call<CollectionHelp>call, Response<CollectionHelp> response) {
+                CollectionHelp helpList = response.body();
+                if(helpList.getListHelp() != null){
+                    List<Object> data = UtilityManager.objectFilter(helpList.getListHelp(), Object.class);
+                    callback.didReceiveData(data);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CollectionHelp>call, Throwable t) {
                 callback.didReceiveData(null);
             }
         });

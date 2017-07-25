@@ -19,7 +19,7 @@ public class Constants {
     public static final String UBER_SERVER_TOKEN = "o94BCI3ixfgPrK9rLX0ROtnln1RiPRyypdFtbbrg";
     public static final String UBER_REDIRECT_URL = "http://touristeando.bongga.co";
 
-    public static final String API_BASE_URL = "https://touristeando.herokuapp.com/api/";
+    public static final String API_BASE_URL = "https://touristeando-api.herokuapp.com/";
     public static final String API_SODA_URL = "https://www.datos.gov.co/resource/";
     public static final String DEFAULT_HEADER_IMAGE = "http://bongga.co/global_res/images/nav_menu_header_bg.jpg";
     public static final String DEFAULT_PROFILE_IMAGE = "http://bongga.co/global_res/images/logo.png";
@@ -29,6 +29,9 @@ public class Constants {
     public static final String ATTRACTIONS_ACTION = "attractions";
     public static final String PLACES_ACTION = "places";
     public static final String HELP_ACTION = "help";
+
+    public static  final String SEARCH_PLACES_ACTION = "toury.action.search.places";
+    public static final String RECOMMEND_ACTION = "toury.action.recommend";
 
     //Action types
     public static final String SEARCH_ACTION_TYPE = "search";

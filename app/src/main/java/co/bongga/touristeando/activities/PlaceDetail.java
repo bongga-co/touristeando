@@ -399,7 +399,7 @@ public class PlaceDetail extends AppCompatActivity implements View.OnClickListen
             servicesAdapter.notifyDataSetChanged();
         }
 
-        fetchGalleryImages();
+        //fetchGalleryImages();
     }
 
     private void takeMeToThePlace() {
