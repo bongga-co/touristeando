@@ -12,11 +12,11 @@ public class Constants {
     public static final int DESCRIPTION_LENGHT = 150;
 
     //Twitter API
-    public static final String TWITTER_KEY = "FS012mbtLsPYA0v0weqYvBYXe";
-    public static final String TWITTER_SECRET = "UnnrP1Ron60U8WHmPP5LsWhAZqlg9Ce9iPf14sf8jlvrhw1BGe";
+    public static final String TWITTER_KEY = "FS012mbtLssxxPYA0v0weqYvBYXex";
+    public static final String TWITTER_SECRET = "xxxUnnrP1Ron60xxU8WHmxPP5LsxWhxxxAZqlg9Cexxxx9ixxPf14sf8jlvrhw1BGe";
 
-    public static final String UBER_CLIENT_ID = "6XOg9WX55mzBwzfdmdo_Ro1MsREFeXD2";
-    public static final String UBER_SERVER_TOKEN = "o94BCI3ixfgPrK9rLX0ROtnln1RiPRyypdFtbbrg";
+    public static final String UBER_CLIENT_ID = "xxx6XOg9WX55mzBwzfdmdo_xRo1MsREFeXD2";
+    public static final String UBER_SERVER_TOKEN = "o94BCI3ixfgPrK9xrLxX0ROtnln1RiPRyypdFtbbrgxxx";
     public static final String UBER_REDIRECT_URL = "http://touristeando.bongga.co";
 
     public static final String API_BASE_URL = "https://touristeando-api.herokuapp.com/";
